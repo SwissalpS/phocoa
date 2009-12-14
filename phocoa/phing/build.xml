@@ -98,6 +98,10 @@
         <input propertyname="db.host" defaultValue="localhost">Enter the database host:</input>
         <property userProperty="true" name="propel.project" value="${phocoa.project.name}" />
         <property userProperty="true" name="propel.database.url" value="${propel.database}:user=${db.user};password=${db.pass};hostname=${db.host};dbname=${db.name}" />
+<<<<<<< HEAD
+=======
+
+>>>>>>> f76c916... added mysql friendly connection properties and removed creole in favor
         <property userProperty="true" name="propel.database.user" value="${db.user}" />
         <property userProperty="true" name="propel.database.password" value="${db.pass}" />
         <property userProperty="true" name="propel.database.reverse.url" value="${propel.database}://${db.user}:${db.pass}@${db.host}/${db.name}" />
