@@ -1,0 +1,100 @@
+[[WikiInclude(PropelSiteHeader)]]
+= Writing Unit Tests in Propel =
+
+In an ideal world, every fix or feature addition would be accompanied by a unit test.  Obviously that's an ideal, but the more realistic goal of this document is to at least provide the needed instructions so that all developers understand how to run and add unit tests.
+
+The good news is that this stuff is really EASY!
+
+== Background ==
+
+Propel uses [http://www.phpunit.de PHPUnit] to test the runtime framework directly, and the build framework indirectly.
+
+You can find the unit test classes and support files in the test/ subdirectory of the ''propel generator''.  The unit tests are run via Phing, but more on that in a moment ...
+
+== Getting Set Up ==
+
+You need to perform a few setup actions before you'll be able to run the unit tests.
+
+ * These instructions assume you're using an SVN version of Propel (or something structured like the SVN version).
+ * You need to install PHPUnit 3.x
+{{{
+$> pear channel-discover pear.phpunit.de
+$> pear install phpunit/phpunit
+}}}
+ * You need Phing installed (but this is probably already the case if you're using Propel generator).
+
+== Running the OM Tests ==
+
+Once you have your environment setup, running the tests is a simple 2-step process:
+
+ * 1. Build a vanilla (i.e. all conf files as they are in SVN) ''bookstore'' application and then run the insert-sql:
+
+{{{
+$> cd /path/to/propel/generator
+$> phing -Dproject=bookstore
+$> phing -Dproject=bookstore insert-sql
+}}}
+
+This will build the bookstore OM using the default database.  You may want to change the default RDBMS to something that you have in your environment (e.g. SQLite).  If you want to change the database, edit {{{projects/bookstore/build.properties}}} and {{{projects/bookstore/runtime-conf.xml}}} to match your environment. When using sqlite, the insert-sql task will create the database in your generator directory. However, the test (see below) will look for the database in the test/ directory. You can resolve this by copying the database file to the test directory after running the insert-sql task (which, by the way, will give you errors on the first run, but no errors on the second run).
+
+ * 2. Run the tests using the Phing buildfile
+
+{{{
+$> phing -f test/test.xml
+}}}
+
+ * 3. To run a single test, specify the classname (minus 'Test' ending) on the commandline, using ''test'' property. For example to run only ''GeneratedObjectTest'':
+
+{{{
+$> phing -f test/test.xml -Dtest=GeneratedObject
+}}}
+
+
+You should see a series of reports from Phing as test(s) are run.  Additionally the results will be placed in the {{{test/reports}}} directory. If there are errors or failures these will be marked with "E" or "F" respectively.  At the end of the test suite, there will be a more detailed description of what went right/wrong.
+
+== How the Tests Work ==
+
+The actual unit test classes that are executed can be found in the {{{test/classes/propel}}} subdirectory.
+
+The OM tests are the source:trunk/generator/test/classes/propel/GeneratedObjectTest.php and source:trunk/generator/test/classes/propel/GeneratedPeerTest.php files, specifically. 
+
+Every method in these classes that begins with 'test' is run as a test case by PHPUnit.  All tests are run in isolation; the '''setUp()''' method is called at the beginning of ''each'' test and the '''tearDown()''' method is called at the end.
+
+The ''BookstoreTestBase'' class (source:trunk/generator/test/classes/bookstore/BookstoreTestBase.php) specifies '''setUp()''' and '''tearDown()''' methods which populate and depopulate, respectively, the database.  This means that every unit test is run with a cleanly populated database.  To see the sample data that is populated, take a look at the '''BookstoreDataPopulator''' class (source:trunk/generator/test/classes/bookstore/BookstoreDataPopulator.php).  You can also add data to this class, if needed by your tests; however, proceed cautiously when changing existing data in there as there may be unit tests that depend on it.  More typically, you can simply create the data you need from within your test method.  It will be deleted by the '''tearDown()''' method, so no need to clean up after yourself.
+
+== Writing an OM Test ==
+
+If you've made a change to a template or to Propel behavior, the right thing to do is write a unit test that ensures that it works properly -- and continues to work in the future.
+
+Writing a unit test essentially means adding a method to one of the classes. For example, I recently made a change to the Propel templates to support saving of objects when only default values have been specified.  To test this feature, I added a ''testSaveWithDefaultValues()'' method to the ''GeneratedObjectTest'' class.
+
+{{{
+#!php
+<?php
+/** 
+ * Test saving object when only default values are set.
+ */
+public function testSaveWithDefaultValues() {
+  
+  // Relies on a default value of 'Penguin' specified in schema
+  // for publisher.name col.
+  
+  $pub = new Publisher();
+  $pub->setName('Penguin');
+    // in the past this wouldn't have marked object as modified
+    // since 'Penguin' is the value that's already set for that attrib
+  $pub->save();
+  
+  // if getId() returns the new ID, then we know save() worked.
+  $this->assertTrue($pub->getId() !== null, "Expect Publisher->save() to work  with only default values.");
+}
+?>
+}}}
+
+== You're done! ==
+
+Now just run the OM tests and if there aren't any errors then you know the test passed.
+
+== Other Unit Tests ==
+
+You can also add additional unit test classes to any of the directories in {{{test/classes/}}} (or add new directories if needed).  The Phing task will find these files automatically and run them.
