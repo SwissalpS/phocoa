@@ -19,8 +19,13 @@ class MyWebApplicationDelegate
 
         // load propel
         //Propel::init(PROPEL_CONF);
+
+        // for yahoo based hosting:
+        //WFYAHOO_yuiloader::sharedYuiLoader()->setBaseToYUIHosted();
+        // for local hosting:
+        WFYAHOO_yuiloader::sharedYuiLoader()->setBaseToLocal();
     }
-    
+
     function defaultInvocationPath()
     {
         return 'examples/widgets/toc';
