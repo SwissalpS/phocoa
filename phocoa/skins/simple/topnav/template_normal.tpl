@@ -3,10 +3,7 @@
 <html>
 <head>
     {$skinHead}
-    <link rel="stylesheet" type="text/css" href="/www/0.3.3/yui/reset-fonts-grids/reset-fonts-grids.css">
-    <link rel="stylesheet" type="text/css" href="/www/0.3.3/yui/base/base-min.css">
-    <!-- to host on yahoo replace above 2 lines with these two: <link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/2.4.0/build/reset-fonts-grids/reset-fonts-grids.css">
-    <link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/2.4.0/build/base/base-min.css"> -->
+    {WFSkinCSSYAHOOBase hosted="local"}
     {WFSkinCSS file="default.css"}
 </head>
 <body class="yui-skin-sam">
