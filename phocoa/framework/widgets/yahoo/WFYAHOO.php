@@ -5,9 +5,9 @@
  * @subpackage Widgets
  * @copyright Copyright (c) 2005 Alan Pinstein. All Rights Reserved.
  * @version $Id: kvcoding.php,v 1.3 2004/12/12 02:44:09 alanpinstein Exp $
- * @author Alan Pinstein <apinstein@mac.com>                        
+ * @author Alan Pinstein <apinstein@mac.com>
  */
- 
+
 
 /**
  * Wrapper for YUILoader
@@ -32,7 +32,7 @@ class WFYAHOO_yuiloader
 
     protected $hasRendered = false;
 
-    private function __construct() 
+    private function __construct()
     {
         $this->setBaseToLocal();
     }
@@ -81,7 +81,7 @@ class WFYAHOO_yuiloader
         }
         $optionsJSON = WFJSON::encode($options);
 
-        return "<script>new PHOCOA.YUI({$optionsJSON});</script>"; 
+        return "<script>new PHOCOA.YUI({$optionsJSON});</script>";
     }
 
     public function yuiRequire($requires)
@@ -183,9 +183,14 @@ class WFYAHOO_yuiloader
      */
     public function setBaseToYUIHosted()
     {
-        $this->base = 'http://yui.yahooapis.com/' . WFYAHOO_yuiloader::YUI_VERSION . '/build/';
+        $this->base = $this->hostedYUI();
         return $this;
     }
+
+	public function hostedYUI()
+	{
+		return 'http://yui.yahooapis.com/' . WFYAHOO_yuiloader::YUI_VERSION . '/build/';
+	}
 
     /**
      * Get the "base" URL for loading YUI assets. Paths end in '/'.
@@ -216,7 +221,7 @@ class WFYAHOO_yuiloader
     }
 
     /**
-     * 
+     *
      * @param string The callback is an anonymous javascript function (including the function definition syntax)
      */
     public function jsLoaderCode($callback = NULL)
@@ -227,7 +232,7 @@ class WFYAHOO_yuiloader
         $this->hasRendered = true;
 
         $customModules = NULL;
-        $indent = 
+        $indent =
 "                             ";
         foreach ($this->customModules as $mod) {
             $customModules .= "\n{$indent}PHOCOA.YUILoader.yuiLoader.addModule({";
@@ -258,7 +263,7 @@ class WFYAHOO_yuiloader
 
 /**
  * A YAHOO base class for our framework.
- * 
+ *
  * This class provides some base features for all Yahoo! YUI classes such as core js/css includes, etc.
  *
  * It's also useful as a stub if you're doing custom YUI coding; you can use a single {WFYAHOO} widget to make sure needed libs are loaded.
