@@ -873,6 +873,8 @@ class WFDieselSearchHelper extends WFObject
     const ATTRIBUTE_QUERY_ANY = "any";
     const ATTRIBUTE_QUERY_ALL = "all";
 
+    const QUERY_STATE_REGEX                             = '/^([A-Z]{2})_([^=]+)=(.+)$/';
+
     /**
      * @var object WFDieselSearch The search instance to operate on
      */
@@ -1012,7 +1014,7 @@ class WFDieselSearchHelper extends WFObject
             // convert this into a multi-d array of <attrID> with <ops> with <opQueries>
             foreach ($this->attributeQueries as $qInfo) {
                 $matches = array();
-                if (preg_match('/^([A-Z]{2})_([^=]*)=(.*)$/', $qInfo, $matches) and count($matches) == 4)
+                if (preg_match(WFDieselSearchHelper::QUERY_STATE_REGEX, $qInfo, $matches) and count($matches) == 4)
                 {
                     $op = $matches[1];
                     $attr = $matches[2];
@@ -1155,7 +1157,7 @@ class WFDieselSearchHelper extends WFObject
         $newAttributeQueries = array();
         foreach ($this->attributeQueries as $q) {
             $matches = array();
-            if (preg_match('/^([A-Z]{2})_([^=]*)=(.*)$/', $q, $matches) and count($matches) == 4)
+            if (preg_match(WFDieselSearchHelper::QUERY_STATE_REGEX, $q, $matches) and count($matches) == 4)
             {
                 $attr = $matches[2];
                 if ($attr != $attribute)
@@ -1180,7 +1182,7 @@ class WFDieselSearchHelper extends WFObject
         $state = array();
         foreach ($this->attributeQueries as $q) {
             $matches = array();
-            if (preg_match('/^([A-Z]{2})_([^=]*)=(.*)$/', $q, $matches) and count($matches) == 4)
+            if (preg_match(WFDieselSearchHelper::QUERY_STATE_REGEX, $q, $matches) and count($matches) == 4)
             {
                 $attr = $matches[2];
                 if ($attr == $attribute)
@@ -1196,7 +1198,7 @@ class WFDieselSearchHelper extends WFObject
             }
             else
             {
-                //print "Warning: couldn't parse attribute query: $qInfo.";
+                //print "Warning: couldn't parse attribute query: $q.";
             }
         }
         if (count($state))
@@ -1242,9 +1244,9 @@ class WFDieselSearchHelper extends WFObject
     {
         foreach ($this->attributeQueries as $q) {
             $matches = array();
-            if (preg_match('/^[A-Z]{2}_([^=]*)=.*$/', $q, $matches) and count($matches) == 2)
+            if (preg_match(WFDieselSearchHelper::QUERY_STATE_REGEX, $q, $matches) and count($matches) == 4)
             {
-                $attr = $matches[1];
+                $attr = $matches[2];
                 if ($attr == $attribute)
                 {
                     return true;
@@ -1309,9 +1311,9 @@ class WFDieselSearchHelper extends WFObject
         }
         foreach ($this->attributeQueries as $q) {
             $matches = array();
-            if (preg_match('/^[A-Z]{2}_([^=]*)=.*$/', $q, $matches) and count($matches) == 2)
+            if (preg_match(WFDieselSearchHelper::QUERY_STATE_REGEX, $q, $matches) and count($matches) == 4)
             {
-                $attr = $matches[1];
+                $attr = $matches[2];
                 if ($attr != $excludeAttribute)
                 {
                     $state[] = $q;
