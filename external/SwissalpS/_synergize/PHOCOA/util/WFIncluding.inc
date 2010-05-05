@@ -58,7 +58,7 @@ class WFIncluding {
                 'Horde_Yaml_Loader'
                 => HORDE_FRAMEWORK_DIR . '/Yaml/Loader.php',
                 'Horde_Yaml_Node'
-                => HORDE_FRAMEWORK_DIR . '/Node.php',
+                => HORDE_FRAMEWORK_DIR . '/Yaml/Node.php',
                 'iphp'
                 => SwissalpS_FRAMEWORK_DIR . '/_external/iPHP/iphp.php',
                 'Log'
