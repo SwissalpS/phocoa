@@ -352,8 +352,8 @@ class SssSphocoaGenerator {
 			return false;
 		} // if rename error
 
-		// make sure there isn't any old symlink
-		$oRunner->doScript('rm "' . $sPathDestAppRoot . DIR_SEP . 'bin' . DIR_SEP . 'run"');
+		// make sure there isn't any old symlink or empty directory...
+		$oRunner->doScript('rm -dfv "' . $sPathDestAppRoot . DIR_SEP . 'bin' . DIR_SEP . 'run"');
 		// make a symlink for easy running
 		$bRes = $oRunner->symlinkToAt($sPathRunner, $sPathDestAppRoot . DIR_SEP
 													. 'bin' . DIR_SEP . 'run');
@@ -400,7 +400,7 @@ class SssSphocoaGenerator {
 		} // if rename error
 
 		// first remove old symlink
-		$oRunner->doScript('rm "' . $sPathWebAppConfSyml . '";');
+		$oRunner->doScript('rm -dfv "' . $sPathWebAppConfSyml . '";');
 		// make symlink to SssSphocoaApp.conf for compatability with webapp.conf
 		$oRunner->symlinkToAt($sPathWebAppConf, $sPathWebAppConfSyml);
 
@@ -414,7 +414,7 @@ class SssSphocoaGenerator {
 		} // if rename error
 
 		// first remove old symlink
-		$oRunner->doScript('rm "' . $sPathGen . 'newSssSphocoaProject";');
+		$oRunner->doScript('rm -dfv "' . $sPathGen . 'newSssSphocoaProject";');
 		// make symlink to newSssSphocoaProject in SssSphocoaGen
 		$oRunner->symlinkToAt($sPathASnew, $sPathGen . 'newSssSphocoaProject');
 
