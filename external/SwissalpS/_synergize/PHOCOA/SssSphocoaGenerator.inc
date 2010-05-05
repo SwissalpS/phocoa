@@ -141,7 +141,11 @@ class SssSphocoaGenerator {
 	} // makeNewSssSphocoaProject
 
 	// make from settings in a plist file interactively changing or complementing arguments
-	static public function makeNewSssSphocoaProjectWithPlist($mPlist, $bUseAllDefaults = false, $sPathDest = false) {
+	static public function makeNewSssSphocoaProjectWithPlist(
+			$mPlist = null, // SssS_Plist object a path or a plist xml string or an array
+			$bUseAllDefaults = false,
+			$sPathDest = false,
+			$sPathInvocationBase = null) { // alternative root calculated from invocation path
 
 		static $nl = null; if (!$nl) $nl = chr(10);
 
@@ -149,9 +153,11 @@ class SssSphocoaGenerator {
 		// mPlist is plist string or path
 		if (('string' == $sArgType) || ('array' == $sArgType))
 			$oP = new SssS_Plist($mPlist);
+			$op->getOrSet('sPathDefaultBaseTemplate', $sPathInvocationBase);
 
 		else if (empty($mPlist))
 			$oP = self::defaultPlist();
+			if ($sPathInvocationBase) $oP->set('sPathDefaultBaseTemplate', $sPathInvocationBase);
 
 		else $oP = $mPlist; // hopefully is an SssS_Plist or subclass
 
@@ -193,7 +199,9 @@ class SssSphocoaGenerator {
 
 	if ($bUseAllDefaults) {
 		echo 'not interacting for values...' . $nl;
-		$sPathOrig = $sPathDefaultBaseTemplate;
+		$sPathOrig = ($sPathDefaultBaseTemplate)
+			? $sPathDefaultBaseTemplate : ($sPathInvocationBase)
+				? $sPathInvocationBase : '';
 		$sPathDest = ($sPathDest)
 				?  SssS_CLI_Tools::removeTrailingSlash($sPathDest, DIR_SEP) . DIR_SEP . $sAppName
 				: $oP->getOrSet('sPathDest', $sPathCurentWorkingDirectory . DIR_SEP . $sAppName);
