@@ -2,8 +2,6 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>sPathDefaultBaseTemplate</key>
-	<string>/usr/share/php/SwissalpS/_synergize/PHOCOA/SssSphocoaGenTemplates/SssSphocoaApp</string>
 	<key>sPathPhocoaFrameWork</key>
 	<string>/usr/share/php/phocoa</string>
 	<key>sPathSssSFrameWork</key>
