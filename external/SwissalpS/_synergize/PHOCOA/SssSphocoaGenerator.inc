@@ -32,32 +32,68 @@ class SssSphocoaGenerator {
 	// cli 'inlet'
 	static public function runCLI() {
 		$a = $_SERVER['argv'];
-		array_shift($a); // get rid of invocation path
+		$sInvocation = array_shift($a); // get $0 path
+		$sPathInvocationBase = null;
+		static $sAppleScriptletBit = null; if (!$sAppleScriptletBit)
+		$sAppleScriptletBit = '/SssSphocoaGen/newSssSphocoaProjectFromPlist.app/Contents/Resources/newSssSphocoaProject';
+		if (false !== strstr($sInvocation, $sAppleScriptletBit)) {
+			$sPathInvocationBase = realpath(substr($sInvocation, 0, strlen($sInvocation) - strlen($sAppleScriptletBit)));
+		} // if got an optional source path because run from winthin
+		// AppleScript.app in a SssSphocoaGen directory.
+		// That directory could be used as sPathDefaultBaseTemplate
+		// if sPathDefaultBaseTemplate is missing in the plist
+
 		$bUseAllDefaults = $sPathDest = false;
 		$aPaths = array();
 		while (0 < count($a)) {
 			$s = array_shift($a);
+
 			if ('help' == $s) {
 				//self::showHelpCLI();
 				self::bail();
 			} // if help passed as argument
+
 			if (('-target' == $s) && (0 < count($a)))
 				$sPathDest = array_shift($a);
+				// setting new sPathDest destination dir
+
 			else if (('-noInteraction' == $s)
-			|| ('-nointeraction' == $s)) $bUseAllDefaults = true;
+				|| ('-nointeraction' == $s)) $bUseAllDefaults = true;
+				// just use defaults for all files from now on
+
 			else if (('-withInteraction' == $s)
-			|| ('-withinteraction' == $s)) $bUseAllDefaults = false;
+				|| ('-withinteraction' == $s)) $bUseAllDefaults = false;
+				// ask for each item for all files from now on
+
 			else $aPaths[] = array($s, $bUseAllDefaults, $sPathDest);
-		} // loop all args
+				// got a path to a plist (if correct syntax etc) theoretically could be a string xml:plist
+
+		} // loop all args building aPaths array
+
 		$aFails = array();$iYes = 0;
 		foreach ($aPaths as $aPath) {
 			list($sPath, $bUseAllDefaults, $sPathDest) = $aPath;
-			if (self::makeNewSssSphocoaProjectWithPlist($sPath, $bUseAllDefaults, $sPathDest))
-				$iYes++;
+			// paths in $a may come quoted or escaped
+			$sPath = ('"' == $sPath{0} || "'" == $sPath{0})
+					? trim($sPath, "\" \t'") 		// trim whitespace and ' "
+					: str_replace('\\', '', $sPath);// or remove \ escapes
+
+			if (self::makeNewSssSphocoaProjectWithPlist($sPath, $bUseAllDefaults, $sPathDest, $sPathInvocationBase))
+				$iYes++; // count success
+
 			else
-				$aFails[] = array('sPath' => $sPath, 'bUseAllDefaults' => $bUseAllDefaults, 'sPathDest' => $sPathDest);
-		} // loop all paths
-		echo 'successful in ' . $iYes . ' out of ' . count($aPaths) . ' files' . chr(10);
+				$aFails[] = array('sPath' => $sPath,
+						'bUseAllDefaults' => $bUseAllDefaults,
+							  'sPathDest' => $sPathDest);
+				// record fails for debugging at end
+
+		} // loop all paths generating a project at each given set of values in plist or flagged form
+
+		// good bye
+		echo sprintf('%1$ssuccessful in %2$s out of %3$s files%1$s',
+						chr(10), $iYes, count($aPaths));
+
+		// debug fails if any
 		if (!empty($aFails)) echo 'failed paths: ' . print_r($aFails, true);
 		self::bail();
 	} // runCLI
