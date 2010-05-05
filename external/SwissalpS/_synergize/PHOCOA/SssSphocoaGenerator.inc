@@ -58,6 +58,11 @@ class SssSphocoaGenerator {
 				$sPathDest = array_shift($a);
 				// setting new sPathDest destination dir
 
+			else if ((('-appName' == $s)
+				|| ('-appname' == $s)) && (0 < count($a)))
+				$sAppName = array_shift($a);
+				// setting an app name by command line (not yet implemented) might never as editing the plists is so simple and gui-able
+
 			else if (('-noInteraction' == $s)
 				|| ('-nointeraction' == $s)) $bUseAllDefaults = true;
 				// just use defaults for all files from now on
@@ -143,37 +148,38 @@ class SssSphocoaGenerator {
 
 		// some default paths
 
-		// what to copy...
+		// what to copy... (will ask for confirmation)
 		$sPathDefaultBaseTemplate = $oP->get('sPathDefaultBaseTemplate');
 
-		// where to point it to
+		// where to point frameworks to
 		$sPathPhocoaFrameWork	= $oP->get('sPathPhocoaFrameWork');
-		$sPathSssSFrameWork		= $oP->get('sPathSssSFrameWork');
 		$sPathSmartyFrameWork	= $oP->get('sPathSmartyFrameWork');
 		$sPathPropelFrameWork	= $oP->get('sPathPropelFrameWork');
+		$sPathHordeFrameWork	= $oP->get('sPathHordeFrameWork');
+		$sPathSssSFrameWork		= $oP->get('sPathSssSFrameWork');
         $sPathPearLog			= $oP->get('sPathPearLog');
 
 		// some other default values
-		// for propel -conf.xml
-		$sDBtype = $oP->get('sDBtype');
-		$sDBhost = $oP->get('sDBhost'); //phocoaDBhost';
+		// for propel -conf.xml (will ask for confirmation)
+		$sDBtype = $oP->get('sDBtype', 'mysql');
+		$sDBhost = $oP->get('sDBhost', 'localhost'); //phocoaDBhost';
 		$sDBuser = $oP->get('sDBuser'); //DBuser';
 		$sDBpass = $oP->get('sDBpass'); //DBpass';
 		$sDBname = $oP->get('sDBname'); //DBname';
 
-		// for apache httpd.conf
-		$sIP	= $oP->get('sIP');
-		$sHost	= $oP->get('sHost');
-		$iPort	= $oP->get('iPort');
+		// for apache httpd.conf (will ask for confirmation)
+		$sHTTPip	= $oP->get('sHTTPip', '127.0.0.1');
+		$sHTTPHost	= $oP->get('sHTTPHost', 'localhost');
+		$iHTTPPort	= $oP->get('iHTTPPort', 80);
 
-		// default appName
-		$sAppName = $oP->get('sAppName');
+		// default appName (will ask for confirmation)
+		$sAppName = $oP->get('sAppName', 'PhocoaApp');
 
 		// where are we?
 		$sPathCurentWorkingDirectory = getcwd();
 
 		// welcome....
-		echo $nl . '     SssSphocoaGenerator::makeNewSssSphocoaProject()' . $nl;
+		echo $nl .  $nl . '     SssSphocoaGenerator::makeNewSssSphocoaProject()' . $nl;
 
 		$oRunner = new SssS_ShellScriptRunnerForDummies();
 
@@ -244,10 +250,10 @@ class SssSphocoaGenerator {
 
 	// httpd.conf takes also servername, ip and port
 		if ('Command Line Tool' != $sAppType) {
-			$sIP = SssS_CLI_Tools::getInputCLI($nl . 'IP:', $sIP);
-			$iPort = intval(
-					SssS_CLI_Tools::getInputCLI($nl . 'port:', $iPort));
-			$sHost = SssS_CLI_Tools::getInputCLI($nl . 'hostname:', $sHost);
+			$sHTTPip = SssS_CLI_Tools::getInputCLI($nl . 'IP:', $sHTTPip);
+			$iHTTPPort = intval(
+					SssS_CLI_Tools::getInputCLI($nl . 'port:', $iHTTPPort));
+			$sHTTPHost = SssS_CLI_Tools::getInputCLI($nl . 'hostname:', $sHTTPHost);
 			echo $nl;
 		} // if not cli
 
@@ -410,7 +416,8 @@ class SssSphocoaGenerator {
 		$aSearches = array('##PHOCOA_BASE_DIR##', '##PHOCOA_PROJECT_NAME##',
 				'##PHOCOA_APP_CONTAINER_DIR##', '##PHOCOA_APP_DIR##',
 				'##SwissalpS_FRAMEWORK_DIR##', '##PEAR_LOG_FRAMEWORK_DIR##',
-				'##PROPEL_FRAMEWORK_DIR##', '##DATE_STAMP##',
+				'##PROPEL_FRAMEWORK_DIR##', '##HORDE_FRAMEWORK_DIR##',
+				'##DATE_STAMP##',
 				'##SERVER_IP##', '##SERVER_PORT##', '##SERVER_NAME##',
 				'##LOG_DIR##', '##DB_NAME##', '##PROPEL_DATABASE##',
 				'##DB_USER##', '##DB_HOST##', '##DB_PASS##',
@@ -420,8 +427,9 @@ class SssSphocoaGenerator {
 		$aReplacements = array($sPathPhocoaFrameWork, $sAppName,
 				$sPathDest, $sPathDestAppRoot,
 				$sPathSssSFrameWork, $sPathPearLog,
-				$sPathPropelFrameWork, gmdate('Ymd_his'),
-				$sIP, $iPort, $sHost,
+				$sPathPropelFrameWork, $sPathHordeFrameWork,
+				gmdate('Ymd_his'),
+				$sHTTPip, $iHTTPPort, $sHTTPHost,
 				$sPathLog, $sDBname, $sDBtype,
 				$sDBuser, $sDBhost, $sDBpass,
 				$sPathSmartyFrameWork, DIR_SEP,

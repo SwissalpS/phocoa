@@ -35,7 +35,7 @@ define('FRAMEWORK_DIR', '##PHOCOA_BASE_DIR##');
 
 /* added by SwissalpS 20100502_033958
  * Absolute path to the base directory of the SwissalpS framework on the server.
- * probably ends in /SssS
+ * probably ends in /SssS or /SwissalpS
  */
 define('SwissalpS_FRAMEWORK_DIR', '##SwissalpS_FRAMEWORK_DIR##');
 
@@ -56,6 +56,12 @@ define('PROPEL_FRAMEWORK_DIR', '##PROPEL_FRAMEWORK_DIR##');
  * probably ends in /pear
  */
 define('PEAR_LOG_FRAMEWORK_DIR', '##PEAR_LOG_FRAMEWORK_DIR##');
+
+/* added by SwissalpS 20100505_231904
+ * Absolute path to the base directory of the Horde framework on the server.
+ * probably ends in /Horde
+ */
+define('HORDE_FRAMEWORK_DIR', '##HORDE_FRAMEWORK_DIR##');
 
 /*
  * Absolute path to the log directory for use by the framework. Should be world-writable.
@@ -103,12 +109,19 @@ define('IS_PRODUCTION', false);
  * The applicaction needs the PHP include_path to include Smarty, the framework itself, and whichever other of your classes you want to be able to access easily.
  */
 require(SwissalpS_FRAMEWORK_DIR . '##DIR_SEP##SssS_IncludeThesePathsToPHPIncludePath.inc');
-if (null === SssS_IncludeThesePathsToPHPIncludePath(
+if (null === //SssS_IncludeThesePathsToPHPIncludePath(
+			SssS_PrependThesePathsToPHPIncludePathAndRemove(
+
+	// prepend these
 	array(SwissalpS_FRAMEWORK_DIR, FRAMEWORK_DIR,
 			PROPEL_FRAMEWORK_DIR, '##SMARTY_DIR##',
 			PEAR_LOG_FRAMEWORK_DIR, APP_ROOT,
-			APP_ROOT . '##DIR_SEP##classes')))
-		trigger_error('Error including paths to include path', E_USER_NOTICE);
+			APP_ROOT . '##DIR_SEP##classes')
+
+	// remove these
+	, array('/Volumes/UNIX/ImgSrach/public/SssS')
+
+	)) trigger_error('Error including paths to include path', E_USER_NOTICE);
 
 define('PROPEL_CONF', APP_ROOT . '##DIR_SEP##conf##DIR_SEP####PHOCOA_PROJECT_NAME##-conf.php');
 

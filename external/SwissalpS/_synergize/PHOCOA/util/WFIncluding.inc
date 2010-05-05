@@ -52,13 +52,13 @@ class WFIncluding {
              	'CustomException'
              	=> SwissalpS_FRAMEWORK_DIR . '/_external/CustomException.inc',
                 'Horde_Yaml'
-                => '_synergize/PHOCOA/Horde/Yaml.php',
+                => HORDE_FRAMEWORK_DIR . '/Yaml.php',
                 'Horde_Yaml_Dumper'
-                => '_synergize/PHOCOA/Horde/Yaml/Dumper.php',
+                => HORDE_FRAMEWORK_DIR . '/Yaml/Dumper.php',
                 'Horde_Yaml_Loader'
-                => '_synergize/PHOCOA/Horde/Yaml/Loader.php',
+                => HORDE_FRAMEWORK_DIR . '/Yaml/Loader.php',
                 'Horde_Yaml_Node'
-                => '_synergize/PHOCOA/Horde/Yaml/Node.php',
+                => HORDE_FRAMEWORK_DIR . '/Node.php',
                 'iphp'
                 => SwissalpS_FRAMEWORK_DIR . '/_external/iPHP/iphp.php',
                 'Log'

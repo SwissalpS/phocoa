@@ -10,6 +10,8 @@
 	<string>/usr/share/php/Smarty</string>
 	<key>sPathPropelFrameWork</key>
 	<string>/usr/share/php/propel</string>
+	<key>sPathHordeFrameWork</key>
+	<string>/usr/share/php/Horde</string>
 	<key>sPathPearLog</key>
 	<string>/usr/share/php</string>
 	<key>sDBtype</key>
