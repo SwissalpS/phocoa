@@ -1,0 +1,30 @@
+#!##PHP_BIN##
+<?php
+/* * * *
+ * * ##PHOCOA_PROJECT_NAME## (runner.phps)
+ * *
+ * * attempts to run a PHOCOAs command line interface/cycle
+ * *
+ * * @generated ##DATE_STAMP##
+ * * @version 20100502_030453 (CC) Luke JZ aka SwissalpS
+ * * * */
+//error_reporting(E_ALL); // 0); //
+if (php_sapi_name() !== 'cli')
+		exit('This is a shell php script. To be run from command line.');
+/*##RUN_BLOCKER##
+// change into ##PHOCOA_PROJECT_NAME## app-root directory
+chdir('##PHOCOA_APP_DIR##');
+
+// bootstrap...
+// faster
+//require('##PHOCOA_APP_DIR####DIR_SEP##conf##DIR_SEP##SssSphocoaApp.conf');
+// more elegant as we already changed dir
+require_once('conf##DIR_SEP##SssSphocoaApp.conf');
+
+// ... and run!
+WFApplicationMain();
+##RUN_BLOCKER##*/
+// goodbye
+exit(0);
+/* * * *\ ##PHOCOA_PROJECT_NAME## (runner.phps) (CC) Luke JZ aka SwissalpS /* * * */
+?>

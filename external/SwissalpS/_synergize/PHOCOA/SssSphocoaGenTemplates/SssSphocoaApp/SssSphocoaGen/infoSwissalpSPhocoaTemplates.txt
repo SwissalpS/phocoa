@@ -1,0 +1,19 @@
+infoSwissalpSPhocoaTemplates.txt
+@author SwissalpS
+PHOCOA written by Alan Pinstein
+This is part of a PHOCOA template structure or part of a PHOCOA app that
+was built using such a template. (structure compiled by SwissalpS)
+
+using a script based on SssSphocoaGenerator php class
+in terminal
+cd to the dir where you want your PHOCOA app
+run 'newSssSphocoaProject' or whatever you call a script containing:
+<? require('SssSphocoaGenerator.inc');
+SssSphocoaGenerator::makeNewSssSphocoaProject(true);
+?>
+the parameter 'true' indicates to use all defaults. leave out to be asked
+interaktively from which template to copy and to set values for all the options
+such as base paths for the config
+
+
+needs updating....the functionality has evolved way beyond this....

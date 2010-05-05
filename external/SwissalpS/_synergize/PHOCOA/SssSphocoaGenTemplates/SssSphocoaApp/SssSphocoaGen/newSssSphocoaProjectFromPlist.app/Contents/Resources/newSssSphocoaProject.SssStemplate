@@ -1,0 +1,25 @@
+#!##PHP_BIN##
+<?php
+/* * * *
+ * * newSssSphocoaProject.phps
+ * * startup SssSphocoaGenerator as cli app to make new phocoa project
+ * * or replicate the current one
+ * *
+ * * developed and tested on a mac w OS X 10.5.x
+ * *
+ * * @version 20100504_151015 (CC) Luke JZ aka SwissalpS
+ * * * */
+error_reporting(E_ALL); // 0); //
+// cheat while debugging
+//chdir('/Volumes/_Projects/PHP projects/SssSPhocoaTieIn');
+
+// add framework to include path
+ini_set('include_path', '##SwissalpS_FRAMEWORK_DIR##:' . ini_get('include_path'));
+
+require_once('_synergize/PHOCOA/SssSphocoaGenerator.inc');
+
+// run as CLI tool
+SssSphocoaGenerator::runCLI();
+
+/* * * *\ newSssSphocoaProject.phps (CC) Luke JZ aka SwissalpS /* * * */
+?>
