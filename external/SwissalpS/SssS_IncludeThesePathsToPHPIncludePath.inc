@@ -25,7 +25,7 @@ if (!function_exists('SssS_IncludeThesePathsToPHPIncludePath')) {
 	 * @copyright 2007 Luke JZ aka SwissalpS
 	 * @version 20100501_005024 (CC)2007 Luke JZ aka SwissalpS
 	 */
-	function SssS_IncludeThesePathsToPHPIncludePath($mPaths, $bPrependWithoutChecking = false) {
+	function SssS_IncludeThesePathsToPHPIncludePath($mPaths, $bPrependWithoutChecking = false, $bRemoveIfExisting = false) {
 		// nonsense -> go home
 		if (empty($mPaths)) return null;
 
@@ -42,7 +42,7 @@ if (!function_exists('SssS_IncludeThesePathsToPHPIncludePath')) {
 		if (':' !== substr($sIncludePath, -1)) $sIncludePath .= ':';
 
 		// prepare new path string
-		$sNewIncludePath = ($bPrependWithoutChecking) ? '' : $sIncludePath;
+		$sNewIncludePath = ($bPrependWithoutChecking) ? '' : ($bRemoveIfExisting) ? '' : $sIncludePath;
 
 		// add any missing paths
 		$iCount = 0;
@@ -61,10 +61,14 @@ if (!function_exists('SssS_IncludeThesePathsToPHPIncludePath')) {
 					$iCount++;
 
 				} // if missing found
+				else if ($bRemoveIfExisting)
+					$sIncludePath = str_replace($sPath, '', $sIncludePath);
+					// remove already existing if so
+
 			} // if $bPrependWithoutChecking
 		} // loop all paths
 
-		$sNewIncludePath .= ($bPrependWithoutChecking) ? $sIncludePath : '';
+		$sNewIncludePath .= ($bPrependWithoutChecking || $bRemoveIfExisting) ? $sIncludePath : '';
 
 		// set the new path
 		if (false === ini_set('include_path', $sNewIncludePath)) return null;
@@ -80,12 +84,41 @@ if (!function_exists('SssS_PrependThesePathsToPHPIncludePath')) {
 	} // SssS_PrependThesePathsToPHPIncludePath
 } // if not yet defined function SssS_PrependThesePathsToPHPIncludePath
 
+// prepend no matter what and also remove them then remove any in mPaths2go
+// returns array ( iCountAdded , iCountRemoved )
+if (!function_exists('SssS_PrependThesePathsToPHPIncludePathAndRemove')) {
+	function SssS_PrependThesePathsToPHPIncludePathAndRemove($mPaths, $mPaths2go = '') {
+		$iCountAdded = SssS_IncludeThesePathsToPHPIncludePath($mPaths, false, true);
+
+		// had enough -> go home
+		if (empty($mPaths2go)) return $iCountAdded;
+
+		// only one path as string supplied...
+		if ('string' == gettype($mPaths2go)) $mPaths2go = array($mPaths2go);
+
+		// final type check
+		if ('array' != gettype($mPaths2go)) return iCountAdded;
+
+		// remove any paths in mPaths2go
+		$aGo = array();
+		foreach($mPaths2go as $sPath) {
+			// remove any prepending ':' // append ':' if not yet
+			$aGo[] = trim($sPath, ':') . ':';
+		} // loop all paths
+
+		$sNewIncludePath .= ($bPrependWithoutChecking || $bRemoveIfExisting) ? $sIncludePath : '';
+
+		// set the new path removeing any in aGo
+		return (false === ini_set('include_path', str_replace($aGo, '', ini_get('include_path')))) ? null : $iCountAdded;
+
+	} // SssS_PrependThesePathsToPHPIncludePathAndRemove
+} // if not yet defined function SssS_PrependThesePathsToPHPIncludePathAndRemove
+
 
 /*/ example adds both paths to include path if not yet there
 $sSwissalpSFrameworkPath = "/Volumes/UNIX/public/SssS";
 $mRes = SssS_IncludeThesePathsToPHPIncludePath(array($sSwissalpSFrameworkPath,
 													'/Volumes/UNIX'));
-
 
 /* * * *\ SssS_IncludeThesePathsToPHPIncludePath.inc (CC) Luke JZ aka SwissalpS /* * * */
 ?>
