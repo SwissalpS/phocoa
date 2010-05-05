@@ -5,15 +5,46 @@ This is part of a PHOCOA template structure or part of a PHOCOA app that
 was built using such a template. (structure compiled by SwissalpS)
 
 using a script based on SssSphocoaGenerator php class
-in terminal
-cd to the dir where you want your PHOCOA app
+
+OSX gui: newSssSphocoaProjectFromPlist.app
+========
+(1alternative) doubleclick newSssSphocoaProjectFromPlist.app and choose the plist(s) in dialog
+(1) drag one of the plist files on to newSssSphocoaProjectFromPlist.app
+    it should darken and if you let go a dialog pops up. If not, read (-1)
+(2) Answer 'No' quickly or default 'Yes' is assumed. Missed it? use the next
+    default and cancel at the folder choosing dialog. resume at (1)
+    'No' means you want to revise locations and other values.
+
+(3a) On first Run we use 'Choose destination'
+(3b) choose the folder within to place the project folder.
+
+(4) follow the prompts in Terminal.app
+
+(*) press ctrl-c anytime to abort remaining duties
+
+(-1) may be finder or another application is using or 'looking' at contents
+    within the app structure. Close all those windows and apps.
+
+
+in terminal: newSssSphocoaProject [help] [[(-noInteraction|-withInteraction) [-target <pathDestFolder> ] <pathPlist|stringPlist> ...]
+============
+newSssSphocoaProjectFromPlist.app initiates a Terminal.app window and starts newSssSphocoaProject with the parameters made for you.
+
+to run without any arguments:
+-----------------------------
+cd to the dir where you want your new PHOCOA project
 run 'newSssSphocoaProject' or whatever you call a script containing:
-<? require('SssSphocoaGenerator.inc');
-SssSphocoaGenerator::makeNewSssSphocoaProject(true);
-?>
-the parameter 'true' indicates to use all defaults. leave out to be asked
-interaktively from which template to copy and to set values for all the options
-such as base paths for the config
+   require('SssSphocoaGenerator.inc');
+   SssSphocoaGenerator::runCLI();
+
+respond to prompts.
+
+needs updating....the functionality has evolved way beyond this....but I have no personal use for it's possibilities so I'm not enclined to complete this info quite yet.
 
 
-needs updating....the functionality has evolved way beyond this....
+editing plist files
+===================
+use an editor of choice, I recommend the one found in developer tools from A Corp
+* paths are all without trailing slash
+* you may want to leave away field 'sPathDefaultBaseTemplate' to have the droplet and SssSphocoaGenerator use the structure as template in which the used droplet resides. Keep that plist in your documents to be able to duplicate any project into other settings ready for testing and tarballing for deployment. (Yes, just duplicating the conf files would do...)
+* defaults can be set in SssSphocoaGeneratorDefaults.conf which should be in the same dir as SssSphocoaGenerator.inc and are used when SssSphocoaGenerator is passed no plist to default from

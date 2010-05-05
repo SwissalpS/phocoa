@@ -33,12 +33,13 @@ class SssSphocoaGenerator {
 	static public function runCLI() {
 		$a = $_SERVER['argv'];
 		$sInvocation = array_shift($a); // get $0 path
+		//echo chr(10) . $sInvocation . '<-sInvocation-';
 		$sPathInvocationBase = null;
 		static $sAppleScriptletBit = null; if (!$sAppleScriptletBit)
 		$sAppleScriptletBit = '/SssSphocoaGen/newSssSphocoaProjectFromPlist.app/Contents/Resources/newSssSphocoaProject';
 		if (false !== strstr($sInvocation, $sAppleScriptletBit)) {
-			$sPathInvocationBase = realpath(substr($sInvocation, 0, strlen($sInvocation) - strlen($sAppleScriptletBit)));
-		} // if got an optional source path because run from winthin
+			$sPathInvocationBase = substr($sInvocation, 0, strlen($sInvocation) - strlen($sAppleScriptletBit));
+		} // if got an optional source path because run from winthin realpath()
 		// AppleScript.app in a SssSphocoaGen directory.
 		// That directory could be used as sPathDefaultBaseTemplate
 		// if sPathDefaultBaseTemplate is missing in the plist
@@ -151,9 +152,10 @@ class SssSphocoaGenerator {
 
 		$sArgType = gettype($mPlist);
 		// mPlist is plist string or path
-		if (('string' == $sArgType) || ('array' == $sArgType))
+		if (('string' == $sArgType) || ('array' == $sArgType)) {
 			$oP = new SssS_Plist($mPlist);
-			$op->getOrSet('sPathDefaultBaseTemplate', $sPathInvocationBase);
+			$oP->getOrSet('sPathDefaultBaseTemplate', $sPathInvocationBase);
+		} // if string or array as mPlist
 
 		else if (empty($mPlist))
 			$oP = self::defaultPlist();
@@ -197,14 +199,15 @@ class SssSphocoaGenerator {
 
 		$oRunner = new SssS_ShellScriptRunnerForDummies();
 
-	if ($bUseAllDefaults) {
-		echo 'not interacting for values...' . $nl;
 		$sPathOrig = ($sPathDefaultBaseTemplate)
 			? $sPathDefaultBaseTemplate : ($sPathInvocationBase)
 				? $sPathInvocationBase : '';
 		$sPathDest = ($sPathDest)
 				?  SssS_CLI_Tools::removeTrailingSlash($sPathDest, DIR_SEP) . DIR_SEP . $sAppName
 				: $oP->getOrSet('sPathDest', $sPathCurentWorkingDirectory . DIR_SEP . $sAppName);
+
+	if ($bUseAllDefaults) {
+		echo 'not interacting for values...' . $nl;
 		$sPathLog = $sPathDest . DIR_SEP . 'log';
 		$sPathDestAppRoot = $sPathDest . DIR_SEP . $sAppName;
 	} else {
@@ -213,7 +216,7 @@ class SssSphocoaGenerator {
 		$sPathOrig = SssS_CLI_Tools::removeTrailingSlash(
 								SssS_CLI_Tools::getInputCLI(
 										'Path of template Base Structure:',
-										$sPathDefaultBaseTemplate), DIR_SEP);
+										$sPathOrig), DIR_SEP);
 		$oP->set('sPathDefaultBaseTemplate', $sPathOrig);
 
 		// PHP is not letting me use paths with spaces...best not to have unsoported
@@ -238,7 +241,7 @@ class SssSphocoaGenerator {
 		$sPathDest = SssS_CLI_Tools::removeTrailingSlash(
 								SssS_CLI_Tools::getInputCLI(
 										$nl . 'Path of new App:',
-										$sPathCurentWorkingDirectory . DIR_SEP
+										substr($sPathDest, 0, strlen($sPathDest) - strlen(strrchr($sPathDest, DIR_SEP))) . DIR_SEP
 										. $sAppName), DIR_SEP);
 		$oP->set('sPathDest', $sPathDest);
 
@@ -476,6 +479,8 @@ class SssSphocoaGenerator {
 
 		return true;
 	} // makeNewSssSphocoaProjectWithPlist
+
+	// TODO: static function () {} // refreshSetOfConfigToPlistValues or something of the kind to make an alternative .conf for different deployment or testing
 
 } // SssSphocoaGenerator
 /* * * *\ SssSphocoaGenerator.inc (CC) Luke JZ aka SwissalpS /* * * */
