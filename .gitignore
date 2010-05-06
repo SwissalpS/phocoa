@@ -3,3 +3,5 @@ phocoa-*.tgz
 *.swp
 *.swo
 .DS_Store
+external/SwissalpS/_external/iPHP
+*~
