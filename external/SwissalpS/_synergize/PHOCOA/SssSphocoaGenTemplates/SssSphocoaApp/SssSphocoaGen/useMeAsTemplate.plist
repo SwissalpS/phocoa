@@ -24,11 +24,11 @@
 	<string>phocoa</string>
 	<key>sDBname</key>
 	<string>phocoa</string>
-	<key>sIP</key>
+	<key>sHTTPip</key>
 	<string>127.0.0.1</string>
-	<key>sHost</key>
+	<key>sHTTPHost</key>
 	<string>localhost</string>
-	<key>iPort</key>
+	<key>iHTTPPort</key>
 	<integer>80</integer>
 	<key>sAppName</key>
 	<string>SssSphocoaAppCopy</string>

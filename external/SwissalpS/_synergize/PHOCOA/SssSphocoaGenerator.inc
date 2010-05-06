@@ -23,22 +23,23 @@ if (!defined('DIR_SEP')) define('DIR_SEP', DIRECTORY_SEPARATOR);
 
 class SssSphocoaGenerator {
 
+	const sAppleScriptletBitNew = '/SssSphocoaGen/newSssSphocoaProjectFromPlist.app/Contents/Resources/newSssSphocoaProject';
+	const sAppleScriptletBitInPlace = '/SssSphocoaGen/newSssSphocoaProjectFromPlist.app/Contents/Resources/remakeTemplatedFilesWithInfoFromPlist';
+
 	// __construct()
 	public function SssSphocoaGenerator() {} // SssSphocoaGenerator
 
 	// dealloc
 	static public function bail() {	echo chr(10) . 'SssSphocoaGenerator exiting...' . chr(10); exit(0); } // bail
 
-	// cli 'inlet'
+	// main cli 'inlet'
 	static public function runCLI() {
 		$a = $_SERVER['argv'];
 		$sInvocation = array_shift($a); // get $0 path
 		//echo chr(10) . $sInvocation . '<-sInvocation-';
 		$sPathInvocationBase = null;
-		static $sAppleScriptletBit = null; if (!$sAppleScriptletBit)
-		$sAppleScriptletBit = '/SssSphocoaGen/newSssSphocoaProjectFromPlist.app/Contents/Resources/newSssSphocoaProject';
-		if (false !== strstr($sInvocation, $sAppleScriptletBit)) {
-			$sPathInvocationBase = substr($sInvocation, 0, strlen($sInvocation) - strlen($sAppleScriptletBit));
+		if (false !== strstr($sInvocation, self::sAppleScriptletBitNew)) {
+			$sPathInvocationBase = substr($sInvocation, 0, strlen($sInvocation) - strlen(self::sAppleScriptletBitNew));
 		} // if got an optional source path because run from winthin realpath()
 		// AppleScript.app in a SssSphocoaGen directory.
 		// That directory could be used as sPathDefaultBaseTemplate
@@ -76,7 +77,7 @@ class SssSphocoaGenerator {
 
 		} // loop all args building aPaths array
 
-		$aFails = array();$iYes = 0;
+		$aFails = array(); $iYes = 0;
 		foreach ($aPaths as $aPath) {
 			list($sPath, $bUseAllDefaults, $sPathDest) = $aPath;
 			// paths in $a may come quoted or escaped
@@ -103,6 +104,43 @@ class SssSphocoaGenerator {
 		if (!empty($aFails)) echo 'failed paths: ' . print_r($aFails, true);
 		self::bail();
 	} // runCLI
+
+	// cli 'inlet'
+	static public function runCLIinPlaceReplacement() {
+		$a = $_SERVER['argv'];
+		$sInvocation = array_shift($a); // get $0 path
+		$sPathInvocationBase = null;
+		if (false !== strstr($sInvocation, self::sAppleScriptletBitInPlace)) {
+			$sPathInvocationBase = substr($sInvocation, 0, strlen($sInvocation) - strlen(self::sAppleScriptletBitInPlace));
+		} // if got an optional source path because run from winthin realpath()
+		// AppleScript.app in a SssSphocoaGen directory.
+		// That directory could be used as sPathDefaultBaseTemplate
+		// if sPathDefaultBaseTemplate is missing in the plist
+
+		$aFails = array(); $iYes = 0; $iCount = count($a);
+		while (0 < count($a)) {
+			$s = array_shift($a);
+			$mPlist = ('"' == $s{0} || "'" == $s{0})
+					? trim($s, "\" \t'") 		// trim whitespace and ' "
+					: str_replace('\\', '', $s);// or remove \ escapes --> this endangers sending clear xml plist todo: check xml header
+			if (self::inPlaceRefreshTemplatesInPlist($mPlist, null, $sPathInvocationBase))
+				$iYes++; // count success
+
+			else
+				$aFails[] = array('mPlist' => $mPlist,
+					 'sPathInvocationBase' => $sPathInvocationBase);
+
+		} // while have arguments
+
+		// good bye
+		echo sprintf('%1$ssuccessful in %2$s out of %3$s files%1$s',
+						chr(10), $iYes, $iCount);
+
+		// debug fails if any
+		if (!empty($aFails)) echo 'failed paths: ' . print_r($aFails, true);
+		self::bail();
+
+	} // runCLIinPlaceReplacement
 
 	// edit this function to accomodate default values
 	static public function defaultPlist() {
@@ -131,27 +169,45 @@ class SssSphocoaGenerator {
 			$sPathDest = false,
 			$sPathInvocationBase = null) { // alternative root calculated from invocation path
 
-		static $nl = null; if (!$nl) $nl = chr(10);
+		static $rts = null; static $ats = null; static $gi = null;
+		static $nl = null; if (!$nl) {
+			$nl = chr(10);
+			$rts = 'removeTrailingSlash';
+			$ats = 'addTrailingSlash';
+			$gi = 'getInputCLI';
+		} // first run
+
+		if ($sPathInvocationBase)
+			$sPathInvocationBase = SssS_CLI_Tools::$rts($sPathInvocationBase, DIR_SEP);
 
 		$sArgType = gettype($mPlist);
-		// mPlist is plist string or path
-		if (('string' == $sArgType) || ('array' == $sArgType)) {
-			$oP = new SssS_Plist($mPlist);
-			$oP->getOrSet('sPathDefaultBaseTemplate', $sPathInvocationBase);
-		} // if string or array as mPlist
+		if (('object' == $sArgType) && is_subclass_of($mPlist, 'SssS_Plist')) {
+			$oP = $mPlist;
+			if ($sPathInvocationBase)
+				$oP->getOrSet('sPathDefaultBaseTemplate', $sPathInvocationBase);
 
-		else if (empty($mPlist))
-			$oP = self::defaultPlist();
-			if ($sPathInvocationBase) $oP->set('sPathDefaultBaseTemplate', $sPathInvocationBase);
+		} else { // is not an SssS_Plist or subclass
+			// mPlist is plist string or path
+			if (('string' == $sArgType) || ('array' == $sArgType)) {
+				$oP = new SssS_Plist($mPlist);
+				if ($sPathInvocationBase)
+					$oP->getOrSet('sPathDefaultBaseTemplate', $sPathInvocationBase);
 
-		else $oP = $mPlist; // hopefully is an SssS_Plist or subclass
+			} // if string (path or xml) or array as mPlist
+			else {
+				$oP = self::defaultPlist();
+				if ($sPathInvocationBase)
+					$oP->set('sPathDefaultBaseTemplate', $sPathInvocationBase);
+
+			} // if mPlist type handling
+		} // if no useable mPlist
 
 		// some default paths
 
 		// what to copy... (will ask for confirmation)
 		$sPathDefaultBaseTemplate = $oP->get('sPathDefaultBaseTemplate');
 
-		// where to point frameworks to
+		// where to point frameworks to (~required fields)
 		$sPathPhocoaFrameWork	= $oP->get('sPathPhocoaFrameWork');
 		$sPathSmartyFrameWork	= $oP->get('sPathSmartyFrameWork');
 		$sPathPropelFrameWork	= $oP->get('sPathPropelFrameWork');
@@ -184,10 +240,11 @@ class SssSphocoaGenerator {
 		$oRunner = new SssS_ShellScriptRunnerForDummies();
 
 		$sPathOrig = ($sPathDefaultBaseTemplate)
-			? $sPathDefaultBaseTemplate : ($sPathInvocationBase)
+			? SssS_CLI_Tools::$rts($sPathDefaultBaseTemplate, DIR_SEP) : ($sPathInvocationBase)
 				? $sPathInvocationBase : '';
+
 		$sPathDest = ($sPathDest)
-				?  SssS_CLI_Tools::removeTrailingSlash($sPathDest, DIR_SEP) . DIR_SEP . $sAppName
+				?  SssS_CLI_Tools::$ats($sPathDest, DIR_SEP) . $sAppName
 				: $oP->getOrSet('sPathDest', $sPathCurentWorkingDirectory . DIR_SEP . $sAppName);
 
 	if ($bUseAllDefaults) {
@@ -197,9 +254,8 @@ class SssSphocoaGenerator {
 	} else {
 	// get template path
 		// normally gets parts from sPathPhocoaFrameWork. we have our templates
-		$sPathOrig = SssS_CLI_Tools::removeTrailingSlash(
-								SssS_CLI_Tools::getInputCLI(
-										'Path of template Base Structure:',
+		$sPathOrig = SssS_CLI_Tools::$rts(SssS_CLI_Tools::$gi(
+				'Path of template Base Structure (sPathDefaultBaseTemplate):',
 										$sPathOrig), DIR_SEP);
 		$oP->set('sPathDefaultBaseTemplate', $sPathOrig);
 
@@ -216,15 +272,14 @@ class SssSphocoaGenerator {
 
 	// get app name
 		// ##PHOCOA_PROJECT_NAME##
-		$sAppName = SssS_CLI_Tools::getInputCLI(
-									$nl . 'Name of new App:', $sAppName);
+		$sAppName = SssS_CLI_Tools::$gi(
+								$nl . 'Name of new App (sAppName):', $sAppName);
 		$oP->set('sAppName', $sAppName);
 
 	// get target path
 		// ##PHOCOA_APP_CONTAINER_DIR##
-		$sPathDest = SssS_CLI_Tools::removeTrailingSlash(
-								SssS_CLI_Tools::getInputCLI(
-										$nl . 'Path of new App:',
+		$sPathDest = SssS_CLI_Tools::$rts(SssS_CLI_Tools::$gi(
+										$nl . 'Path of new App (sPathDest):',
 										substr($sPathDest, 0, strlen($sPathDest) - strlen(strrchr($sPathDest, DIR_SEP))) . DIR_SEP
 										. $sAppName), DIR_SEP);
 		$oP->set('sPathDest', $sPathDest);
@@ -250,10 +305,14 @@ class SssSphocoaGenerator {
 
 	// httpd.conf takes also servername, ip and port
 		if ('Command Line Tool' != $sAppType) {
-			$sHTTPip = SssS_CLI_Tools::getInputCLI($nl . 'IP:', $sHTTPip);
+			$sHTTPip = SssS_CLI_Tools::$gi($nl . 'IP (sHTTPip):', $sHTTPip);
+			$oP->set('sHTTPip', $sHTTPip);
 			$iHTTPPort = intval(
-					SssS_CLI_Tools::getInputCLI($nl . 'port:', $iHTTPPort));
-			$sHTTPHost = SssS_CLI_Tools::getInputCLI($nl . 'hostname:', $sHTTPHost);
+					SssS_CLI_Tools::$gi($nl . 'port (iHTTPPort): ', $iHTTPPort));
+			$oP->set('iHTTPPort, $iHTTPPort');
+			$sHTTPHost = SssS_CLI_Tools::$gi(
+									$nl . 'hostname (sHTTPHost):', $sHTTPHost);
+			$oP->set('sHTTPHost', $sHTTPHost);
 			echo $nl;
 		} // if not cli
 
@@ -263,7 +322,7 @@ class SssSphocoaGenerator {
 				array('no' => 'NO', 'yes' => 'YES'), 'yes');
 		if ('yes' == strtolower($sUsePropel)) {
 			// get db props
-			$sPathLog = SssS_CLI_Tools::getInputCLI(
+			$sPathLog = SssS_CLI_Tools::$gi(
 											$nl . 'log path:', $sPathLog);
 			$oP->set('sPathLog', $sPathLog);
 			echo $nl;
@@ -272,17 +331,13 @@ class SssSphocoaGenerator {
 						  'mssql' => 'mssql', 'sqllite' => 'sqllite',
 						   'ldap' => 'ldap'), $sDBtype);
 			$oP->set('sDBtype', $sDBtype);
-			$sDBname = SssS_CLI_Tools::getInputCLI(
-												$nl . 'DB name:', $sDBname);
+			$sDBname = SssS_CLI_Tools::$gi($nl . 'DB name:', $sDBname);
 			$oP->set('sDBname', $sDBname);
-			$sDBuser = SssS_CLI_Tools::getInputCLI(
-											$nl . 'DB username:', $sDBuser);
+			$sDBuser = SssS_CLI_Tools::$gi($nl . 'DB username:', $sDBuser);
 			$oP->set('sDBuser', $sDBuser);
-			$sDBpass = SssS_CLI_Tools::getInputCLI(
-											$nl . 'DB password:', $sDBpass);
+			$sDBpass = SssS_CLI_Tools::$gi($nl . 'DB password:', $sDBpass);
 			$oP->set('sDBpass', $sDBpass);
-			$sDBhost = SssS_CLI_Tools::getInputCLI(
-											$nl . 'DB hostname:', $sDBhost);
+			$sDBhost = SssS_CLI_Tools::$gi($nl . 'DB hostname:', $sDBhost);
 			$oP->set('sDBhost', $sDBhost);
 		} // if propel
 
@@ -295,13 +350,13 @@ class SssSphocoaGenerator {
 		$bRes = $oRunner->makePath($sPathDest);
 		$bPHPcompatiblePathDest = true;
 		if ((!is_dir($sPathDest)) && $bRes) {
-			echo 'destination path is not PHP compatible, problems to be'
-					. ' expected' . $nl;
+			echo $nl . $nl . 'destination path is not PHP compatible, problems'
+					. ' to be expected' . $nl;
 			$bPHPcompatiblePathDest = false;
 		} // if php compatible path destination
 
 		// make log dir
-		$oRunner->makePath($sPathDest . DIR_SEP . 'log');
+		$oRunner->makePath($sPathLog);
 		// make runtime dir
 		//$oRunner->makePath($sPathDest . DIR_SEP . 'runtime');
 		// copy runtime dir
@@ -413,6 +468,20 @@ class SssSphocoaGenerator {
 		// make symlink to newSssSphocoaProject in SssSphocoaGen
 		$oRunner->symlinkToAt($sPathASnew, $sPathGen . 'newSssSphocoaProject');
 
+		// copy inPlace AppleScripts php shell runner (on apple dir_sep is /)
+		$sPathASres = $sPathGen . 'remakeTemplatedFilesWithInfoFromPlist.app/Contents/Resources/';
+		$sPathASipNew = $sPathASres . 'remakeTemplatedFilesWithInfoFromPlist';
+		$sPathASipNewOrig = $sPathASres . 'remakeTemplatedFilesWithInfoFromPlist.SssStemplate';
+		if (!$oRunner->copyPreserving($sPathASipNewOrig, $sPathASipNew)) {
+			echo 'error with copy' . $nl; var_dump($oRunner->aResults);
+			//return false;
+		} // if rename error
+
+		// first remove old symlink
+		$oRunner->doScript('rm -dfv "' . $sPathGen . 'remakeTemplatedFilesWithInfoFromPlist";');
+		// make symlink to newSssSphocoaProject in SssSphocoaGen
+		$oRunner->symlinkToAt($sPathASipNew, $sPathGen . 'remakeTemplatedFilesWithInfoFromPlist');
+
 		$aSearches = array('##PHOCOA_BASE_DIR##', '##PHOCOA_PROJECT_NAME##',
 				'##PHOCOA_APP_CONTAINER_DIR##', '##PHOCOA_APP_DIR##',
 				'##SwissalpS_FRAMEWORK_DIR##', '##PEAR_LOG_FRAMEWORK_DIR##',
@@ -444,7 +513,7 @@ class SssSphocoaGenerator {
 		foreach (array($sPathWebAppConf, //webapp.conf',
 						$sPathRunner, $sPathPropelConf,
 						$sPathHTAconf, $sPathHTTPdConf,
-						$sPathASnew) as $sPath) {
+						$sPathASnew, $sPathASipNew) as $sPath) {
 			file_put_contents_safely($sPath,
 					str_replace($aSearches, $aReplacements,
 					file_get_contents_safely($sPath)), 'wb');
@@ -466,7 +535,120 @@ class SssSphocoaGenerator {
 		return true;
 	} // makeNewSssSphocoaProjectWithPlist
 
-	// TODO: static function () {} // refreshSetOfConfigToPlistValues or something of the kind to make an alternative .conf for different deployment or testing
+	// TODO:
+	static function inPlaceRefreshTemplatesInPlist(
+			$mPlist = null,
+			$aFiles = null,
+			$sPathInvocationBase = null) {
+		if (!$mPlist) return null;
+
+		static $rts = null; static $ats = null; static $gi = null;
+		static $aSearches = null;
+		static $nl = null; if (!$nl) {
+			$nl = chr(10);
+			$rts = 'removeTrailingSlash';
+			$ats = 'addTrailingSlash';
+			$gi = 'getInputCLI';
+			$aSearches = array('##PHOCOA_BASE_DIR##', '##PHOCOA_PROJECT_NAME##',
+				'##PHOCOA_APP_CONTAINER_DIR##', '##PHOCOA_APP_DIR##',
+				'##SwissalpS_FRAMEWORK_DIR##', '##PEAR_LOG_FRAMEWORK_DIR##',
+				'##PROPEL_FRAMEWORK_DIR##', '##HORDE_FRAMEWORK_DIR##',
+				'##DATE_STAMP##',
+				'##SERVER_IP##', '##SERVER_PORT##', '##SERVER_NAME##',
+				'##LOG_DIR##', '##DB_NAME##', '##PROPEL_DATABASE##',
+				'##DB_USER##', '##DB_HOST##', '##DB_PASS##',
+				'##SMARTY_DIR##', '##DIR_SEP##', '##PHP_BIN##',
+				'/*##RUN_BLOCKER##', '##RUN_BLOCKER##*/'); // last 2 need no replacement
+		} // first run
+
+		$sArgType = gettype($mPlist);
+		if ('object' == $sArgType && is_subclass_of($mPlist, 'SssS_Plist'))
+			$oP = $mPlist;
+
+		else { // is not an SssS_Plist or subclass
+			// mPlist is plist string or path
+			if (('string' == $sArgType) || ('array' == $sArgType))
+				$oP = new SssS_Plist($mPlist);
+			// if string (path or xml) or array as mPlist
+
+			else {
+				$oP = self::defaultPlist();
+				if ($sPathInvocationBase)
+					$oP->set('sPathDefaultBaseTemplate', null);
+			} // if use defaults
+
+		} // if mPlist is is a SssS_Plist subclass or not
+
+		$oP->getOrSet('sPathDefaultBaseTemplate', $sPathInvocationBase);
+
+		$oPd = self::defaultPlist();
+		$a = array_merge($oPd->a_plist, $oP->a_plist);
+		$oP->set('', $a);
+
+		// collect the information
+		$sPathOrig = SssS_CLI_Tools::$rts($a['sPathDefaultBaseTemplate'], DIR_SEP);
+		$sAppName = basename($sPathOrig);
+		$sPathDestAppRoot = $sPathOrig . DIR_SEP . $sAppName;
+		$sPathGen = $sPathOrig . DIR_SEP . 'SssSphocoaGen';
+
+		if (empty($aFiles))
+				$aFiles = self::findTemplatesInProject($sPathOrig);
+
+		if (empty($aFiles))	return 0;
+
+		$aReplacements = array(
+			SssS_CLI_Tools::$rts($a['sPathPhocoaFrameWork']),
+			$sAppName, $sPathOrig, $sPathDestAppRoot,
+			SssS_CLI_Tools::$rts($a['sPathSssSFrameWork']),
+			SssS_CLI_Tools::$rts($a['sPathPearLog']),
+			SssS_CLI_Tools::$rts($a['sPathPropelFrameWork']),
+			SssS_CLI_Tools::$rts($a['sPathHordeFrameWork']),
+			gmdate('Ymd_his'),
+			$oP->get('sHTTPip', '127.00.0.1'), $oP->get('iHTTPPort', 80),
+			$oP->get('sHTTPHost', 'localhost'),
+			$oP->get('sPathLog', $sPathOrig . DIR_SEP . 'log'),
+			$oP->get('sDBname', 'phocoa'), $oP->get('sDBtype', 'mysql'),
+			$oP->get('sDBuser', 'phocoa'), $oP->get('sDBhost', 'phocoa'),
+			$oP->get('sDBpass', 'phocoa'),
+			SssS_CLI_Tools::$rts($a['sPathSmartyFrameWork']),
+			(isset($a['DIR_SEP']) ? $a['DIR_SEP'] : DIR_SEP), // todo: read this earlier
+			SssS_ShellScriptRunner::getPHPinterpreterPath()); // delete last 2
+
+		foreach ($aFiles as $sPath) {
+			$sPath = trim($sPath);
+			if (empty($sPath)) continue;
+			$sNameTemplate = basename($sPath);
+			$sName = basename($sPath, '.SssStemplate');
+			if ('runner.phps' == $sName) $sName = $sAppName;
+			if ('propel-conf.xml' == $sName) $sName = $sAppName . '-conf.xml';
+			$sPath = dirname($sPath) . DIR_SEP;
+			file_put_contents_safely($sPath . $sName,
+					str_replace($aSearches, $aReplacements,
+					file_get_contents_safely($sPath . $sNameTemplate)), 'wb');
+		} // foreach path
+
+		return true;
+	} // refreshSetOfConfigToPlistValues or something of the kind to make an alternative .conf for different deployment or testing
+	// scan current approot for any files ending with .SssStemplate
+	// for each make a copy removing the suffix and overwrite existing
+
+	static function findTemplatesInProject($sPathOrig = null) {
+		static $oRunner = null; if (!$oRunner)
+			$oRunner = self::sharedSssS_ShellScriptRunnerForDummies();
+
+		if (!$oRunner->isFolder($sPathOrig)) return array();
+
+		$oRunner->doScript('find "' . $sPathOrig . '" -name "*.SssStemplate"');
+
+		return explode("\n", $oRunner->sOut());
+
+	} // findTemplatesInProject
+
+	static function sharedSssS_ShellScriptRunnerForDummies() {
+		static $oRunner = null; if (!$oRunner)
+			$oRunner = new SssS_ShellScriptRunnerForDummies();
+		return $oRunner;
+	} // sharedSssS_ShellScriptRunnerForDummies
 
 } // SssSphocoaGenerator
 /* * * *\ SssSphocoaGenerator.inc (CC) Luke JZ aka SwissalpS /* * * */
