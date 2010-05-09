@@ -204,58 +204,88 @@ class WFRequestController extends WFObject
         if (defined("E_RECOVERABLE_ERROR")) { $errset |= E_RECOVERABLE_ERROR; }
         set_error_handler(array($this, 'handleError'), $errset);
 
+		static $oIphpShell = null; static $sPathTags = null;
+		static $sPathSssSphocoaAppConf = null; static $aChoices = null;
+
         try {
-			// prepare iphp
-			$oIphpShell = null;
-			$sPathTags = APP_ROOT . DIR_SEP . 'tags';
-			$sPathSssSphocoaAppConf =
-				APP_ROOT . DIR_SEP . 'conf' . DIR_SEP . 'SssSphocoaApp.conf';
+
+        	if (!$aChoices) {
+				// prepare iphp
+				$oIphpShell = null;
+				$sPathTags = APP_ROOT . DIR_SEP . 'tags';
+				$sPathSssSphocoaAppConf =
+					APP_ROOT . DIR_SEP . 'conf' . DIR_SEP . 'SssSphocoaApp.conf';
+				$oAppDelegate = WFWebApplication::sharedWebApplication()->delegate();
+
+				$aChoices = (method_exists($oAppDelegate, 'handleCLIRequest'))
+						? array('call AppDelegate->handleCLIRequest()')
+						: array();
+
+				$aChoices = array_merge($aChoices, array('enter iphp console',
+						'dump html for an invocation', '(Lists...)',
+						'(Generate...)', 'quit'));
+
+			} // first run
 
         	while (true) {
-				// let app delegate give it a go -> should return true if done,
-				// false if wants WFRequestController to continue
-				$oAppDelegate = WFWebApplication::sharedWebApplication()->delegate();
-				if (method_exists($oAppDelegate, 'handleCLIRequest'))
-					if ($oAppDelegate->handleCLIRequest()) return;
+        		echo chr(10);
+        		$sChoice = SssS_CLI_Tools::getChoiceCLI(
+        				'please choose an action:', $aChoices, 0);
+        		switch ($sChoice) {
+        			case 'quit': return;
+        			case 'call AppDelegate->handleCLIRequest()':
+						// let app delegate give it a go -> should return true if done,
+						// false if wants WFRequestController to continue
+						if (method_exists($oAppDelegate, 'handleCLIRequest'))
+							if ($oAppDelegate->handleCLIRequest()) return;
 
-				// if the app delegate didn't kill us, we can continue with some
-				// testing if page builds
+						// if the app delegate didn't kill us, we can continue with some
+						break;
 
-				// parse 'invocationpath'
-				$modInvocationPath = (isset($_SERVER['argv'])
-									&& isset($_SERVER['argv'][1]))
-									? $_SERVER['argv'][1] : '';
+					case 'dump html for an invocation':
+						// testing if page builds
 
-				if ('' == $modInvocationPath) {
-					$modInvocationPath = WFWebApplication::sharedWebApplication()->defaultInvocationPath();
-				}
-				// create the root invocation; only skin if we're not in an XHR
-				$this->rootModuleInvocation = new WFModuleInvocation($modInvocationPath, NULL, NULL);
-				// get HTML result of the module, and output it
-				$html = $this->rootModuleInvocation->execute();
+						// parse 'invocationpath' // TODO: populate (global vars) with args to mimic an http request
+						$modInvocationPath = (isset($_SERVER['argv'])
+											&& isset($_SERVER['argv'][1]))
+											? $_SERVER['argv'][1] : '';
 
-				// respond to WFRPC::PARAM_ENABLE_AJAX_IFRAME_RESPONSE_MODE for iframe-targeted XHR. Some XHR requests (ie uploads) must be done by creating an iframe and targeting the form
-				// post to the iframe rather than using XHR (since XHR doesn't support uploads methinks). This WFRPC flag makes these such "ajax" requests need to be wrapped slightly differently
-				// to prevent the HTML returned in the IFRAME from executing in the IFRAME which would cause errors.
-				if (isset($_REQUEST[WFRPC::PARAM_ENABLE_AJAX_IFRAME_RESPONSE_MODE])
-						&& (1 == $_REQUEST[WFRPC::PARAM_ENABLE_AJAX_IFRAME_RESPONSE_MODE])) {
-					header('Content-Type: text/xml');
-					$html = "<?xml version=\"1.0\"?><raw><![CDATA[\n{$html}\n]]></raw>";
-				} // if ajax special situation with iframe
-				print $html;
+						if ('' == $modInvocationPath) {
+							$modInvocationPath = WFWebApplication::sharedWebApplication()->defaultInvocationPath();
+						}
+						// create the root invocation; only skin if we're not in an XHR
+						$this->rootModuleInvocation = new WFModuleInvocation($modInvocationPath, NULL, NULL);
+						// get HTML result of the module, and output it
+						$html = $this->rootModuleInvocation->execute();
+
+						// respond to WFRPC::PARAM_ENABLE_AJAX_IFRAME_RESPONSE_MODE for iframe-targeted XHR. Some XHR requests (ie uploads) must be done by creating an iframe and targeting the form
+						// post to the iframe rather than using XHR (since XHR doesn't support uploads methinks). This WFRPC flag makes these such "ajax" requests need to be wrapped slightly differently
+						// to prevent the HTML returned in the IFRAME from executing in the IFRAME which would cause errors.
+						if (isset($_REQUEST[WFRPC::PARAM_ENABLE_AJAX_IFRAME_RESPONSE_MODE])
+								&& (1 == $_REQUEST[WFRPC::PARAM_ENABLE_AJAX_IFRAME_RESPONSE_MODE])) {
+							header('Content-Type: text/xml');
+							$html = "<?xml version=\"1.0\"?><raw><![CDATA[\n{$html}\n]]></raw>";
+						} // if ajax special situation with iframe
+						print $html;
+						break;
 
 				// if all went well to this point, we can start the iphp shell
+					case 'enter iphp console':
+						print chr(10) . 'starting iphp shell' . chr(10);
 
-				print chr(10) . 'starting iphp shell' . chr(10);
+						if (null == $oIphpShell)
+							$oIphpShell = new iphp(array(
+								'tags' => $sPathTags,
+								'require' => $sPathSssSphocoaAppConf,
+								'commands' => array('iphp_command_stop'))); // \stop to exit iphp and reenter loop with appDelegate having a go and outputting current request path
 
-				if (null == $oIphpShell)
-					$oIphpShell = new iphp(array(
-						'tags' => $sPathTags,
-						'require' => $sPathSssSphocoaAppConf,
-						'commands' => array('iphp_command_stop'))); // \stop to exit iphp and reenter loop with appDelegate having a go and outputting current request path
+						$oIphpShell->runREPL();
+        				break;
 
-        		$oIphpShell->runREPL();
+        			default:
+        				echo 'that is an idea that needs to be worked on.' . chr(10);
 
+        		} // switch choice
 
         		usleep(5000); // maybe this helps maybe it hurts -> find out TEST:
         	} // loop until someone kills us or one or the other shell does :-)

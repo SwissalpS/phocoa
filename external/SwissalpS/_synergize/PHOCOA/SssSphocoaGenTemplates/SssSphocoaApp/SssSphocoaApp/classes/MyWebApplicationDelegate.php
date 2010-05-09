@@ -54,30 +54,89 @@ class MyWebApplicationDelegate
 		static $sWelcome = null;
 		static $sPrompt = null;
 		static $oPiSR = null;
+		static $sAppName = null;
+		static $nl = null;
+		static $aChoices = null;
 
 		if (!$oPiSR) {
+			$nl = chr(10);
+			$sAppName = basename(APP_ROOT);
 			$oPiSR = new SssS_PHPinlineScriptRunner($this);
 			$sPrompt = 'PiSR> ';
-			$sWelcome = 'SssS_PHPinlineScriptRunner: have not been told what to say
-		except what you told me:' . chr(0x0a);
+			$sWelcome = $nl . 'You are running "' . $sAppName
+					. '" on PHOCOA_VERSION: ' . PHOCOA_VERSION . $nl . $nl
+					. 'SssS_PHPinlineScriptRunner: type "help" for some info'
+					. $nl . 'iphp or stop to see the html-dump and then move'
+					. ' on to iphp console.' . $nl . ' there it takes a \stop'
+					. ' command to get you back here.' . $nl . 'exit, end or'
+					. ' quit will terminate this instance of ' . $sAppName . $nl
+					. ' so will any fatal errors in the consoles (not so much'
+					. ' in iphp)' . $nl . $nl . 'Actually the exact procedure'
+					. ' may vary as this is all rather experimental yet' . $nl
+					. ' here are the arguments I got:' . chr(0x0a);
+			$aChoices = array('brainX' => 'start chatserver',
+					'PiSR' => 'use SssS_PHPinlineScriptRunner console',
+					'WFRequestController' => 'back to WFRequestController (menu up)',
+					'quit' => 'quit ' . $sAppName);
+
 			$errset = E_ERROR | E_CORE_ERROR | E_COMPILE_ERROR;
        		if (defined("E_RECOVERABLE_ERROR")) $errset |= E_RECOVERABLE_ERROR;
 		} // first call
 
 		$lastHandler = set_error_handler(array($this, 'handleError'), $errset);
 
-        $bReturn = false;
+        $bReturn = false; $bRunPiSR = true;
 
 		echo $sWelcome;
 
 		$a = $_SERVER['argv'];
 		//array_shift($a); // get (rid of) invocation path
 
-		foreach ($a as $s) { echo $s . chr(10); }
+		foreach ($a as $s) { echo $s . $nl; }
 
-		echo chr(10);
+		echo $nl;
 
-		while (true) {
+		$sChoice = SssS_CLI_Tools::getChoiceCLI(
+										'what do we do?', $aChoices, 'PiSR');
+		switch ($sChoice) {
+			case 'quit' : return true;
+			case 'WFRequestController' : return false;
+
+			case 'brainX' :
+				$bRunPiSR = false;
+				$sPathPlist = APP_ROOT . DIR_SEP . 'conf' . DIR_SEP . 'brainXconfig.plist';
+
+				$sHow = SssS_CLI_Tools::getChoiceCLI('how do we run it?', array(
+						'a' => 'foreground, let us watch',
+						'b' => 'background, and return to WFRequestController',
+						'c' => 'background and quit this instance',
+						'd' => 'back to WFRequestController'), 'a');
+
+				if ('a' == $sHow) {
+					$oServer = new SssS_SocketController($sPathPlist);
+
+				} else if ('b' == $sHow || 'c' == $sHow) {
+					if ('c' == $sHow) $bReturn = true;
+					$sPath = RUNTIME_DIR . DIR_SEP . 'runBrainX';
+					$oRunner = new SssS_ShellScriptRunner();
+					$sScript = sprintf('<?php%1$srequire(%2$s);%1$s$sPathPlist'
+						. ' = "%3$s";%1$s$oServer = new SssS_SocketController('
+						. '$sPathPlist);%1$s?>', $nl, SwissalpS_FRAMEWORK_DIR
+						. DIR_SEP . 'SssS_SocketController.inc', $sPathPlist);
+
+					$oRunner->doScriptAsPHPFile($sScript, $sPath, 700, false, true);
+
+				} // choices
+
+				break;
+
+			default :
+			case 'PiSR' :
+				break;
+
+		} // switch choice
+
+		while ($bRunPiSR) {
 			echo $sPrompt;
 			$sInput =  fgets(STDIN);
 
