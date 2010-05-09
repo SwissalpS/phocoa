@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>paths</key>
+	<dict>
+		<key>commandsPath</key>
+		<string>##PHOCOA_APP_CONTAINER_DIR####DIR_SEP##runtime##DIR_SEP##uroXbrainX##DIR_SEP##commands.plist</string>
+		<key>pidPath</key>
+		<string>##PHOCOA_APP_CONTAINER_DIR####DIR_SEP##runtime##DIR_SEP##uroXbrainX##DIR_SEP##</string>
+		<key>uidPool</key>
+		<string>##PHOCOA_APP_CONTAINER_DIR####DIR_SEP##runtime##DIR_SEP##uroXbrainX##DIR_SEP##UIDs##DIR_SEP##</string>
+		<key>userPrefs</key>
+		<string>##PHOCOA_APP_CONTAINER_DIR####DIR_SEP##runtime##DIR_SEP##uroXbrainX##DIR_SEP##rooms##DIR_SEP##lobby_userList.plist</string>
+		<key>userSandbox</key>
+		<string>##PHOCOA_APP_CONTAINER_DIR####DIR_SEP##runtime##DIR_SEP##uroXbrainX##DIR_SEP##users</string>
+	</dict>
+</dict>
+</plist>
