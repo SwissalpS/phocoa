@@ -102,6 +102,7 @@ class SssSphocoaGenerator {
 
 		// debug fails if any
 		if (!empty($aFails)) echo 'failed paths: ' . print_r($aFails, true);
+
 		self::bail();
 	} // runCLI
 
@@ -138,6 +139,7 @@ class SssSphocoaGenerator {
 
 		// debug fails if any
 		if (!empty($aFails)) echo 'failed paths: ' . print_r($aFails, true);
+
 		self::bail();
 
 	} // runCLIinPlaceReplacement

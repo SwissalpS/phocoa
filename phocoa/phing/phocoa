@@ -68,7 +68,7 @@ while [ "`pwd`" != '/' ]; do # SwissalpS changed, to allow spaces in paths, from
             fi
         fi
         PHOCOA_PROJECT_CONF="`pwd`/conf/webapp.conf"
-        echo "Simulating:\nexport PHOCOA_PROJECT_CONF=${PHOCOA_PROJECT_CONF}"
+        # echo "Simulating:\nexport PHOCOA_PROJECT_CONF=${PHOCOA_PROJECT_CONF}"
         break
     fi
     cd ..

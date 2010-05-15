@@ -204,13 +204,14 @@ class WFRequestController extends WFObject
         if (defined("E_RECOVERABLE_ERROR")) { $errset |= E_RECOVERABLE_ERROR; }
         set_error_handler(array($this, 'handleError'), $errset);
 
-		static $oIphpShell = null; static $sPathTags = null;
+		static $oIphpShell = null; static $sPathTags = null; static $nl = null;
 		static $sPathSssSphocoaAppConf = null; static $aChoices = null;
 
         try {
 
         	if (!$aChoices) {
 				// prepare iphp
+				$nl = chr(10);
 				$oIphpShell = null;
 				$sPathTags = APP_ROOT . DIR_SEP . 'tags';
 				$sPathSssSphocoaAppConf =
@@ -228,7 +229,7 @@ class WFRequestController extends WFObject
 			} // first run
 
         	while (true) {
-        		echo chr(10);
+        		echo $nl . '                 WFRequestController "menu"' . $nl;
         		$sChoice = SssS_CLI_Tools::getChoiceCLI(
         				'please choose an action:', $aChoices, 0);
         		switch ($sChoice) {
@@ -248,11 +249,12 @@ class WFRequestController extends WFObject
 						// parse 'invocationpath' // TODO: populate (global vars) with args to mimic an http request
 						$modInvocationPath = (isset($_SERVER['argv'])
 											&& isset($_SERVER['argv'][1]))
-											? $_SERVER['argv'][1] : '';
+											? $_SERVER['argv'][1]
+											: WFWebApplication::sharedWebApplication()->defaultInvocationPath();
 
-						if ('' == $modInvocationPath) {
-							$modInvocationPath = WFWebApplication::sharedWebApplication()->defaultInvocationPath();
-						}
+						$modInvocationPath = SssS_CLI_Tools::getInputCLI(
+								$nl . 'invocation (the default shown is either the first argument passed or the default path):', $modInvocationPath);
+
 						// create the root invocation; only skin if we're not in an XHR
 						$this->rootModuleInvocation = new WFModuleInvocation($modInvocationPath, NULL, NULL);
 						// get HTML result of the module, and output it
@@ -271,7 +273,7 @@ class WFRequestController extends WFObject
 
 				// if all went well to this point, we can start the iphp shell
 					case 'enter iphp console':
-						print chr(10) . 'starting iphp shell' . chr(10);
+						print $nl . 'starting iphp shell' . $nl;
 
 						if (null == $oIphpShell)
 							$oIphpShell = new iphp(array(

@@ -115,17 +115,17 @@ define('IS_PRODUCTION', false);
  * The applicaction needs the PHP include_path to include Smarty, the framework itself, and whichever other of your classes you want to be able to access easily.
  */
 require(SwissalpS_FRAMEWORK_DIR . '##DIR_SEP##SssS_IncludeThesePathsToPHPIncludePath.inc');
-if (null === //SssS_IncludeThesePathsToPHPIncludePath(
-			SssS_PrependThesePathsToPHPIncludePathAndRemove(
+if (null === //SssS_IncludeThesePathsToPHPIncludePath( // normal - checks duplicates
+			// SssS_PrependThesePathsToPHPIncludePath( // fast - prepends without checking duplicates (calls SssS_IncludeThesePathsToPHPIncludePath(array, true)
+			SssS_PrependThesePathsToPHPIncludePathAndRemove( // dev - prepends and removes duplicates (calls SssS_IncludeThesePathsToPHPIncludePath(array, false, true) then if second array is given, removes those from include path
 
 	// prepend these
 	array(SwissalpS_FRAMEWORK_DIR, FRAMEWORK_DIR,
 			PROPEL_FRAMEWORK_DIR, '##SMARTY_DIR##',
 			PEAR_LOG_FRAMEWORK_DIR, APP_ROOT,
-			APP_ROOT . '##DIR_SEP##classes')
 			APP_ROOT . '##DIR_SEP##classes', PHING_PATH)
 
-	// remove these
+	// remove these (optional)
 	, array('/Volumes/UNIX/ImgSrach/public/SssS')
 
 	)) trigger_error('Error including paths to include path', E_USER_NOTICE);
