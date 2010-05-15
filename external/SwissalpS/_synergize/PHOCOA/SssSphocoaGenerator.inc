@@ -329,6 +329,10 @@ class SssSphocoaGenerator {
 											$nl . 'log path:', $sPathLog);
 			$oP->set('sPathLog', $sPathLog);
 			echo $nl;
+		// get propel path
+			$sPathPropelFrameWork = SssS_CLI_Tools::$rts(SssS_CLI_Tools::$gi(
+				$nl . 'path to propel', $sPathPropelFrameWork));
+			echo $nl;
 			$sDBtype = SssS_CLI_Tools::getChoiceCLI('Choose database type:',
 					array('pgsql' => 'Postgres', 'mysql' => 'MySQl',
 						  'mssql' => 'mssql', 'sqllite' => 'sqllite',
@@ -420,12 +424,12 @@ class SssSphocoaGenerator {
 		$sPathConf = $sPathDestAppRoot . DIR_SEP . 'conf' . DIR_SEP;
 
 		// copy propel-conf.xml.SssStemplate -> sAppName-conf.xml
-		$sPathPropelConf = $sPathConf . $sAppName . '-conf.xml';
-		$sPathPropelConfOrig = $sPathConf . 'propel-conf.xml.SssStemplate';
-		if (!$oRunner->copyPreserving($sPathPropelConfOrig, $sPathPropelConf)) {
-			echo 'error with copy' . $nl; var_dump($oRunner->aResults);
-			return false;
-		} // if rename error
+		//$sPathPropelConf = $sPathConf . $sAppName . '-conf.xml';
+		//$sPathPropelConfOrig = $sPathConf . 'propel-conf.xml.SssStemplate';
+		//if (!$oRunner->copyPreserving($sPathPropelConfOrig, $sPathPropelConf)) {
+		//	echo 'error with copy' . $nl; var_dump($oRunner->aResults);
+		//	return false;
+		//} // if rename error
 
 		// .htaccess.SssStemplate
 		$sPathHTAconf = $sPathConf . '.htaccess';
