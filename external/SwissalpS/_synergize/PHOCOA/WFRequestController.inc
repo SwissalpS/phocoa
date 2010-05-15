@@ -223,7 +223,7 @@ class WFRequestController extends WFObject
 
 				$aChoices = array_merge($aChoices, array('enter iphp console',
 						'dump html for an invocation', '(Lists...)',
-						'(Generate...)', 'quit'));
+						'(Generate...)', 'enter phocoa phing task manager', 'quit'));
 
 			} // first run
 
@@ -282,8 +282,29 @@ class WFRequestController extends WFObject
 						$oIphpShell->runREPL();
         				break;
 
+        			case 'enter phocoa phing task manager' :
+						print $nl . 'starting phocoa phing task manager' . $nl;
+						$sCommand = '';
+						//define('PHING_PATH', SwissalpS_FRAMEWORK_DIR . '/_synergize/PHOCOA');
+						if (!getenv('PHOCOA_HOME')) putenv('PHOCOA_HOME=' . FRAMEWORK_DIR);
+						if (!getenv('PHP_CLASSPATH')) putenv('PHP_CLASSPATH=' . PHING_PATH);
+						if (!getenv('PHING_COMMAND')) putenv('PHING_COMMAND=' . SssS_ShellScriptRunner::getPHPinterpreterPath() . ' -d html_errors=off -qC ' . PHING_PATH . DIR_SEP . 'phing.php -logger phing.listener.AnsiColorLogger');// . SssS_ShellScriptRunner::getPHPinterpreterPath() . ' -d html_errors=off -qC ' . PHING_PATH . DIR_SEP . 'phing.php -logger phing.listener.AnsiColorLogger -debug');-debug -l
+
+						while (true) {
+							// run without args to show menu
+							passthru(FRAMEWORK_DIR . DIR_SEP . 'phing' . DIR_SEP . 'phocoa ' . $sCommand);
+
+							// ask for command
+							$sCommand = SssS_CLI_Tools::getInputCLI($nl . '                 WFRequestController "phing task manager"' . $nl .'what to do? ("back" to go back)', 'back');
+							// if not stop
+							if (in_array(trim(strtolower($sCommand)), array('back', 'stop', 'exit', 'quit', 'halt', 'die'))) break;
+							// pass on command
+						} //
+						break;
+
+
         			default:
-        				echo 'that is an idea that needs to be worked on.' . chr(10);
+        				echo 'that is an idea that needs to be worked on.' . $nl;
 
         		} // switch choice
 

@@ -14,6 +14,8 @@
 	<string>/usr/share/php/Horde</string>
 	<key>sPathPearLog</key>
 	<string>/usr/share/php</string>
+	<key>sPathPhing</key>
+	<string>/usr/share/php</string>
 	<key>sDBtype</key>
 	<string>mysql</string>
 	<key>sDBhost</key>

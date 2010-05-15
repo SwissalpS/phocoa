@@ -63,6 +63,12 @@ define('PEAR_LOG_FRAMEWORK_DIR', '##PEAR_LOG_FRAMEWORK_DIR##');
  */
 define('HORDE_FRAMEWORK_DIR', '##HORDE_FRAMEWORK_DIR##');
 
+/* added by SwissalpS 20100509_150328
+ * Absolute path to the super directory of base directory of the phing framework on the server.
+ * PHING_PATH/phing.php and PHING_PATH/phing/
+ */
+define('PHING_PATH', '##PHING_PATH##');
+
 /*
  * Absolute path to the log directory for use by the framework. Should be world-writable.
  */
@@ -117,6 +123,7 @@ if (null === //SssS_IncludeThesePathsToPHPIncludePath(
 			PROPEL_FRAMEWORK_DIR, '##SMARTY_DIR##',
 			PEAR_LOG_FRAMEWORK_DIR, APP_ROOT,
 			APP_ROOT . '##DIR_SEP##classes')
+			APP_ROOT . '##DIR_SEP##classes', PHING_PATH)
 
 	// remove these
 	, array('/Volumes/UNIX/ImgSrach/public/SssS')

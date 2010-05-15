@@ -214,6 +214,7 @@ class SssSphocoaGenerator {
 		$sPathHordeFrameWork	= $oP->get('sPathHordeFrameWork');
 		$sPathSssSFrameWork		= $oP->get('sPathSssSFrameWork');
         $sPathPearLog			= $oP->get('sPathPearLog');
+		$sPathPhing				= $oP->get('sPathPhing');
 
 		// some other default values
 		// for propel -conf.xml (will ask for confirmation)
@@ -486,7 +487,7 @@ class SssSphocoaGenerator {
 				'##PHOCOA_APP_CONTAINER_DIR##', '##PHOCOA_APP_DIR##',
 				'##SwissalpS_FRAMEWORK_DIR##', '##PEAR_LOG_FRAMEWORK_DIR##',
 				'##PROPEL_FRAMEWORK_DIR##', '##HORDE_FRAMEWORK_DIR##',
-				'##DATE_STAMP##',
+				'##PHING_PATH##', '##DATE_STAMP##',
 				'##SERVER_IP##', '##SERVER_PORT##', '##SERVER_NAME##',
 				'##LOG_DIR##', '##DB_NAME##', '##PROPEL_DATABASE##',
 				'##DB_USER##', '##DB_HOST##', '##DB_PASS##',
@@ -497,7 +498,7 @@ class SssSphocoaGenerator {
 				$sPathDest, $sPathDestAppRoot,
 				$sPathSssSFrameWork, $sPathPearLog,
 				$sPathPropelFrameWork, $sPathHordeFrameWork,
-				gmdate('Ymd_his'),
+				$sPathPhing, gmdate('Ymd_his'),
 				$sHTTPip, $iHTTPPort, $sHTTPHost,
 				$sPathLog, $sDBname, $sDBtype,
 				$sDBuser, $sDBhost, $sDBpass,
@@ -553,7 +554,7 @@ class SssSphocoaGenerator {
 				'##PHOCOA_APP_CONTAINER_DIR##', '##PHOCOA_APP_DIR##',
 				'##SwissalpS_FRAMEWORK_DIR##', '##PEAR_LOG_FRAMEWORK_DIR##',
 				'##PROPEL_FRAMEWORK_DIR##', '##HORDE_FRAMEWORK_DIR##',
-				'##DATE_STAMP##',
+				'##PHING_PATH##', '##DATE_STAMP##',
 				'##SERVER_IP##', '##SERVER_PORT##', '##SERVER_NAME##',
 				'##LOG_DIR##', '##DB_NAME##', '##PROPEL_DATABASE##',
 				'##DB_USER##', '##DB_HOST##', '##DB_PASS##',
@@ -603,6 +604,7 @@ class SssSphocoaGenerator {
 			SssS_CLI_Tools::$rts($a['sPathPearLog']),
 			SssS_CLI_Tools::$rts($a['sPathPropelFrameWork']),
 			SssS_CLI_Tools::$rts($a['sPathHordeFrameWork']),
+			SssS_CLI_Tools::$rts($a['sPathPhing']),
 			gmdate('Ymd_his'),
 			$oP->get('sHTTPip', '127.00.0.1'), $oP->get('iHTTPPort', 80),
 			$oP->get('sHTTPHost', 'localhost'),
@@ -620,7 +622,7 @@ class SssSphocoaGenerator {
 			$sNameTemplate = basename($sPath);
 			$sName = basename($sPath, '.SssStemplate');
 			if ('runner.phps' == $sName) $sName = $sAppName;
-			if ('propel-conf.xml' == $sName) $sName = $sAppName . '-conf.xml';
+			//if ('propel-conf.xml' == $sName) $sName = $sAppName . '-conf.xml';
 			$sPath = dirname($sPath) . DIR_SEP;
 			file_put_contents_safely($sPath . $sName,
 					str_replace($aSearches, $aReplacements,
