@@ -517,14 +517,28 @@ class SssSphocoaGenerator {
 		// httpd.conf setup if needed or not
 		// propel-conf.xml ##LOG_DIR## ##DB_NAME## ##PROPEL_DATABASE## ##DB_USER## ##DB_HOST## ##DB_PASS##
 		// AppleScript droplet
-		foreach (array($sPathWebAppConf, //webapp.conf',
-						$sPathRunner, $sPathPropelConf,
-						$sPathHTAconf, $sPathHTTPdConf,
-						$sPathASnew, $sPathASipNew) as $sPath) {
-			file_put_contents_safely($sPath,
+		foreach (self::findTemplatesInProject($sPathDest)  as $sPath) {//array($sPathWebAppConf, //webapp.conf',
+						//$sPathRunner, $sPathPropelConf,
+						//$sPathHTAconf, $sPathHTTPdConf,
+						//$sPathASnew, $sPathASipNew)
+			//file_put_contents_safely($sPath,
+			//		str_replace($aSearches, $aReplacements,
+			//		file_get_contents_safely($sPath)), 'wb');
+			$sPath = trim($sPath);
+			if (empty($sPath)) continue;
+			$sNameTemplate = basename($sPath);
+			$sName = basename($sPath, '.SssStemplate');
+
+			// exceptions
+			if ('runner.phps' == $sName) $sName = $sAppName;
+			//if ('propel-conf.xml' == $sName) $sName = $sAppName . '-conf.xml';
+
+			$sPath = dirname($sPath) . DIR_SEP;
+			file_put_contents_safely($sPath . $sName,
 					str_replace($aSearches, $aReplacements,
-					file_get_contents_safely($sPath)), 'wb');
-		} // replace all tokens in these files
+					file_get_contents_safely($sPath . $sNameTemplate)), 'wb');
+
+		} // foreach path replace all tokens in these files
 
 		echo '--done, thanks & have fun--';
 
