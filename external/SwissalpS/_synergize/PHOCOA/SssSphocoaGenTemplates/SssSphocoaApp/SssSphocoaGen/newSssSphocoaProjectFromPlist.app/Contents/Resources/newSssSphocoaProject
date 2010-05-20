@@ -14,7 +14,8 @@ error_reporting(E_ALL); // 0); //
 //chdir('/Volumes/_Projects/PHP projects/SssSPhocoaTieIn');
 
 // add framework to include path
-ini_set('include_path', '/usr/share/php/SwissalpS:' . ini_get('include_path'));
+ini_set('include_path', '/Volumes/UNIXb/gitSwissalpS/phocoa/external/SwissalpS:' . ini_get('include_path'));
+
 require_once('_synergize/PHOCOA/SssSphocoaGenerator.inc');
 
 // run as CLI tool
