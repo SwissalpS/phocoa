@@ -45,13 +45,13 @@ class SssSphocoaGenerator {
 		// That directory could be used as sPathDefaultBaseTemplate
 		// if sPathDefaultBaseTemplate is missing in the plist
 
-		$bUseAllDefaults = $sPathDest = false;
+		$bUseAllDefaults = $sPathDest = $sAppName = false;
 		$aPaths = array();
 		while (0 < count($a)) {
 			$s = array_shift($a);
 
-			if ('help' == $s) {
-				//self::showHelpCLI();
+			if ('help' == strtolower($s)) {
+				self::showHelpCLI();
 				self::bail();
 			} // if help passed as argument
 
@@ -72,20 +72,20 @@ class SssSphocoaGenerator {
 				|| ('-withinteraction' == $s)) $bUseAllDefaults = false;
 				// ask for each item for all files from now on
 
-			else $aPaths[] = array($s, $bUseAllDefaults, $sPathDest);
+			else $aPaths[] = array($s, $bUseAllDefaults, $sPathDest, $sAppName);
 				// got a path to a plist (if correct syntax etc) theoretically could be a string xml:plist
 
 		} // loop all args building aPaths array
 
 		$aFails = array(); $iYes = 0;
 		foreach ($aPaths as $aPath) {
-			list($sPath, $bUseAllDefaults, $sPathDest) = $aPath;
+			list($sPath, $bUseAllDefaults, $sPathDest, $sAppName) = $aPath;
 			// paths in $a may come quoted or escaped
 			$sPath = ('"' == $sPath{0} || "'" == $sPath{0})
 					? trim($sPath, "\" \t'") 		// trim whitespace and ' "
 					: str_replace('\\', '', $sPath);// or remove \ escapes
 
-			if (self::makeNewSssSphocoaProjectWithPlist($sPath, $bUseAllDefaults, $sPathDest, $sPathInvocationBase))
+			if (self::makeNewSssSphocoaProjectWithPlist($sPath, $bUseAllDefaults, $sPathDest, $sPathInvocationBase, $sAppName))
 				$iYes++; // count success
 
 			else
@@ -169,7 +169,8 @@ class SssSphocoaGenerator {
 			$mPlist = null, // SssS_Plist object a path or a plist xml string or an array
 			$bUseAllDefaults = false,
 			$sPathDest = false,
-			$sPathInvocationBase = null) { // alternative root calculated from invocation path
+			$sPathInvocationBase = null, // alternative root calculated from invocation path
+			$sAppName = false) {
 
 		static $rts = null; static $ats = null; static $gi = null;
 		static $nl = null; if (!$nl) {
@@ -232,7 +233,7 @@ class SssSphocoaGenerator {
 		$iHTTPPort	= $oP->get('iHTTPPort', 80);
 
 		// default appName (will ask for confirmation)
-		$sAppName = $oP->get('sAppName', 'PhocoaApp');
+		if (!$sAppName) $sAppName = $oP->get('sAppName', 'PhocoaApp');
 
 		// where are we?
 		$sPathCurentWorkingDirectory = getcwd();
@@ -312,7 +313,7 @@ class SssSphocoaGenerator {
 			$oP->set('sHTTPip', $sHTTPip);
 			$iHTTPPort = intval(
 					SssS_CLI_Tools::$gi($nl . 'port (iHTTPPort): ', $iHTTPPort));
-			$oP->set('iHTTPPort, $iHTTPPort');
+			$oP->set('iHTTPPort', $iHTTPPort);
 			$sHTTPHost = SssS_CLI_Tools::$gi(
 									$nl . 'hostname (sHTTPHost):', $sHTTPHost);
 			$oP->set('sHTTPHost', $sHTTPHost);
@@ -671,6 +672,31 @@ class SssSphocoaGenerator {
 			$oRunner = new SssS_ShellScriptRunnerForDummies();
 		return $oRunner;
 	} // sharedSssS_ShellScriptRunnerForDummies
+
+	static function showHelpCLI() {
+
+		static $sHelpText = null; if (!$sHelpText) $sHelpText =
+		'syntax for SssSphocoaGenerator::runCLI()
+		newSssSphocoaProject [args] <plist> [[args] <plist>] ...]
+	the following arguments are valid:
+		help	shows this text. no other arguments are parsed when this
+				argument is present.
+
+		-target <destination_dir>	ignore the target in plist and use this
+
+		-appName <appName>	override plist appName
+
+		-noInteraction	use all defaults, don\'t ask for confirmation
+
+		-withInteraction (default) prompt for each value
+
+		arguments are not case sensitive, values are.
+	your_script needs to make sure SssSphocoaGenerator.inc is loaded
+';
+
+		echo $sHelpText;
+
+	} // showHelpCLI
 
 } // SssSphocoaGenerator
 /* * * *\ SssSphocoaGenerator.inc (CC) Luke JZ aka SwissalpS /* * * */
