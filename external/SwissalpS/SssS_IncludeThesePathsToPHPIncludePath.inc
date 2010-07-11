@@ -39,7 +39,8 @@ if (!function_exists('SssS_IncludeThesePathsToPHPIncludePath')) {
 		$sIncludePath = ini_get('include_path');
 
 		// add ':' if not yet
-		if (':' !== substr($sIncludePath, -1)) $sIncludePath .= ':';
+		$sPS = PATH_SEPARATOR;
+		if ($sPS !== substr($sIncludePath, -1)) $sIncludePath .= $sPS;
 
 		// prepare new path string
 		$sNewIncludePath = ($bPrependWithoutChecking) ? '' : ($bRemoveIfExisting) ? '' : $sIncludePath;
@@ -48,7 +49,7 @@ if (!function_exists('SssS_IncludeThesePathsToPHPIncludePath')) {
 		$iCount = 0;
 		foreach($mPaths as $sPath) {
 			// append ':' if not yet
-			if (':' !== substr($sPath, -1)) $sPath .= ':';
+			if ($sPS !== substr($sPath, -1)) $sPath .= $sPS;
 
 			if ($bPrependWithoutChecking) {
 				$sNewIncludePath .= $sPath;
@@ -101,9 +102,10 @@ if (!function_exists('SssS_PrependThesePathsToPHPIncludePathAndRemove')) {
 
 		// remove any paths in mPaths2go
 		$aGo = array();
+		$sPS = PATH_SEPARATOR;
 		foreach($mPaths2go as $sPath) {
 			// remove any prepending ':' // append ':' if not yet
-			$aGo[] = trim($sPath, ':') . ':';
+			$aGo[] = trim($sPath, $sPS) . $sPS;
 		} // loop all paths
 
 		$sNewIncludePath .= ($bPrependWithoutChecking || $bRemoveIfExisting) ? $sIncludePath : '';
