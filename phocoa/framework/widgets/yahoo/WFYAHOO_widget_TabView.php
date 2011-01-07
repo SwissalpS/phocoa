@@ -191,6 +191,8 @@ class WFYAHOO_widget_TabView extends WFYAHOO
     // YUI Tab Config Properties
     protected $orientation = NULL;
 
+    protected $hideWhileLoading = false;
+
     /**
       * Constructor.
       */
@@ -243,6 +245,15 @@ class WFYAHOO_widget_TabView extends WFYAHOO
         }
     }
 
+    function getSelectedTabId()
+    {
+        if (!isset($this->tabRenderOrder[$this->selectedTabId]))
+        {
+            $this->selectedTabId = array_shift(array_keys($this->tabRenderOrder));
+        }
+        return $this->selectedTabId;
+    }
+
     function render($blockContent = NULL)
     {
         if ($blockContent === NULL) return NULL;
@@ -252,11 +263,12 @@ class WFYAHOO_widget_TabView extends WFYAHOO
         }
         else
         {
+            $initialStyle = $this->hideWhileLoading ? 'style="display:none;"' : NULL;
             $html = parent::render($blockContent);
-            $html .= "\n<div id=\"{$this->id}\" class=\"yui-navset\">";
+            $html .= "\n<div id=\"{$this->id}\" class=\"yui-navset\" {$initialStyle}>";
             $html .= "\n<ul class=\"yui-nav\">";
             foreach ($this->tabRenderOrder as $tabId => $tab) {
-                $html .= "<li class=\"" . ($this->selectedTabId === $tabId ? ' selected' : NULL) . "\"><a href=\"#" . $tabId . "\"><em>" . $tab->label() . "</em></a></li>";
+                $html .= "<li class=\"" . ($this->getSelectedTabId() === $tabId ? ' selected' : NULL) . "\"><a href=\"#" . $tabId . "\"><em>" . $tab->label() . "</em></a></li>";
             }
             $html .= "\n</ul>";
             $html .= "\n<div class=\"yui-content\">{$blockContent}</div>";
@@ -277,7 +289,15 @@ class WFYAHOO_widget_TabView extends WFYAHOO
         {
             $html .= "orientation: '{$this->orientation}'";
         }
-        $html .= "});
+        $html .= "});";
+        if ($this->hideWhileLoading)
+        {
+            $html .= "
+            YAHOO.util.Dom.setStyle('{$this->id}', 'display', 'block');
+            ";
+        }
+
+        $html .= "
             var tab;
             ";
         // set up individual tabs
@@ -291,7 +311,7 @@ class WFYAHOO_widget_TabView extends WFYAHOO
                     if ($needTabVarInJS)
                     {
                         $html .= "
-            tab = tabView.getTab(" . $i++ . ");\n";
+            tab = tabView.getTab(" . $i . ");\n";
                     $needTabVarInJS = false;
                     }
                     switch ($config) {
@@ -334,8 +354,8 @@ class WFYAHOO_widget_TabView extends WFYAHOO
                                         var handleCancel = function() {
                                             this.hide();
                                         };
-                                        var confirmDialog = new YAHOO.widget.SimpleDialog('dlg', { 
-                                                                                            //effect:{effect:YAHOO.widget.ContainerEffect.FADE, duration:0.25}, 
+                                        var confirmDialog = new YAHOO.widget.SimpleDialog('dlg', {
+                                                                                            //effect:{effect:YAHOO.widget.ContainerEffect.FADE, duration:0.25},
                                                                                             fixedcenter:true,
                                                                                             width: '20em',
                                                                                             modal:true,
@@ -362,6 +382,12 @@ class WFYAHOO_widget_TabView extends WFYAHOO
                     }
                 }
             }
+            if ($tabId === $this->selectedTabId)
+            {
+                $html .= "            tabView.set('activeIndex', null);";
+                $html .= "            tabView.set('activeIndex', {$i});";
+            }
+            $i++;
         }
         $html .= "
             PHOCOA.runtime.addObject(tabView, '{$this->id}');
