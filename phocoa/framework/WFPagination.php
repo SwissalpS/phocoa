@@ -638,6 +638,18 @@ class WFPaginator extends WFObject
     }
 
     /**
+     * Are all items visible on the current page?
+     *
+     * This is useful for "Show All" calculations.
+     *
+     * @return boolean
+     */
+    function canSeeAllItems()
+    {
+        return $this->pageCount() <= 1; // still true if 0 items
+    }
+
+    /**
      *  Is the current page the first page?
      *
      *  @return boolean
@@ -916,6 +928,57 @@ class WFPagedPropelQuery implements WFPagedData
             }
         }
         return call_user_func(array($this->peerName, $this->peerSelectMethod), $criteria);
+    }
+}
+
+/**
+ * A WFPagedData implementation for Propel 1.5's ModelQuery (ModelCriteria) architecture.
+ *
+ * Sorting support: The sortKeys should be the "XXXPeer::COLUMN" with +/- prepended.
+ */
+class WFPagedPropelModelCriteria implements WFPagedData
+{
+    protected $criteria;
+    protected $countCriteria;
+    protected $con;
+
+    /**
+     *  Constructor.
+     *
+     *  @param object ModelCriteria The Propel ModelCriteria for the query.
+     *  @param object ModelCriteria The Propel ModelCriteria for the COUNT query. OPTIONAL. Useful for complex primary criteria which could have more efficient count queries.
+     *  @param object PropelPDO An optional connection object to us.
+     */
+    function __construct($criteria, $countCriteria = NULL, $con = NULL)
+    {
+        if (!($criteria instanceof ModelCriteria)) throw new WFException("WFPagedPropelModelCriteria requires a ModelCriteria.");
+        $this->criteria = $criteria;
+        $this->countCriteria = ($countCriteria === NULL ? $criteria : $countCriteria);
+        $this->con = $con;
+    }
+    function itemCount()
+    {
+        return $this->countCriteria->count();
+    }
+    function itemsAtIndex($startIndex, $numItems, $sortKeys)
+    {
+        $criteria = clone $this->criteria;
+        $criteria->setOffset($startIndex - 1);
+        if ($numItems !== WFPaginator::PAGINATOR_PAGESIZE_ALL)
+        {
+            $criteria->setLimit($numItems);
+        }
+        foreach ($sortKeys as $sortKey) {
+            if (substr($sortKey, 0, 1) == '-')
+            {
+                $criteria->addDescendingOrderByColumn(substr($sortKey, 1));
+            }
+            else
+            {
+                $criteria->addAscendingOrderByColumn(substr($sortKey, 1));
+            }
+        }
+        return $criteria->find($this->con);
     }
 }
 

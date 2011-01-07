@@ -55,6 +55,7 @@ class WFIncluding
                 'WFKeyValueCoding' => 'framework/WFKeyValueCoding.php',
                 'WFKeyValueValidators' => 'framework/util/WFKeyValueValidators.php',
                 'WFRequestController' => 'framework/WFRequestController.php',
+                'WFRedirectRequestException' => 'framework/WFRequestController.php',
                 'WFRequestController_RedirectException' => 'framework/WFRequestController.php',
                 'WFRequestController_InternalRedirectException' => 'framework/WFRequestController.php',
                 'WFRequestController_NotFoundException' => 'framework/WFRequestController.php',
@@ -87,6 +88,7 @@ class WFIncluding
                 'WFAuthorizationInfo' => 'framework/WFAuthorization.php',
                 'WFAuthorizationException' => 'framework/WFAuthorization.php',
                 'WFAuthorizationManager' => 'framework/WFAuthorization.php',
+                'WFFormatter' => 'framework/widgets/WFFormatter.php',
                 'WFBooleanFormatter' => 'framework/widgets/WFFormatter.php',
                 'WFDateTimeFormatter' => 'framework/widgets/WFFormatter.php',
                 'WFUNIXDateFormatter' => 'framework/widgets/WFFormatter.php',
@@ -95,7 +97,6 @@ class WFIncluding
                 'WFSensitiveDataFormatter' => 'framework/widgets/WFFormatter.php',
                 'WFPaginator' => 'framework/WFPagination.php',
                 'WFPagedArray' => 'framework/WFPagination.php',
-                'WFPagedPropelQuery' => 'framework/WFPagination.php',
                 'WFPagedCreoleQuery' => 'framework/WFPagination.php',
                 'WFPagedData' => 'framework/WFPagination.php',
                 'WFDieselSearch' => 'framework/WFDieselpoint.php',
@@ -124,6 +125,7 @@ class WFIncluding
                 'WFJumpSelect' => 'framework/widgets/WFJumpSelect.php',
                 'WFTimeSelect' => 'framework/widgets/WFTimeSelect.php',
                 'WFHidden' => 'framework/widgets/WFHidden.php',
+                'WFSpamHoneypot' => 'framework/widgets/WFSpamHoneypot.php',
                 'WFCheckbox' => 'framework/widgets/WFCheckbox.php',
                 'WFCheckboxGroup' => 'framework/widgets/WFCheckboxGroup.php',
                 'WFRadio' => 'framework/widgets/WFRadio.php',
@@ -176,11 +178,23 @@ class WFIncluding
                 'WFError' => 'framework/WFError.php',
                 'WFErrorArray' => 'framework/WFError.php',
                 'WFErrorsException' => 'framework/WFError.php',
+                'WFErrorCollection' => 'framework/WFError.php',
                 'WFExceptionReporting' => 'framework/WFExceptionReporting.php',
                 'WFUnixDateFormatter' => 'framework/widgets/WFFormatter.php',
                 'WFSQLDateFormatter' => 'framework/widgets/WFFormatter.php',
                 'WFNumberFormatter' => 'framework/widgets/WFFormatter.php',
                 'FCKEditor' => FRAMEWORK_DIR . '/wwwroot/www/framework/FCKEditor/fckeditor.php',
+
+                // propel
+                'WFPagedPropelQuery'         => 'framework/WFPagination.php',
+                'WFPagedPropelModelCriteria' => 'framework/WFPagination.php',
+                'WFModelBuilderPropel'       => 'framework/generator/WFGeneratorPropel12_13.php',
+                'WFModelBuilderPropel15'     => 'framework/generator/WFGeneratorPropel15.php',
+                'WFPropelException'          => 'framework/util/WFPropelIntegration.php',
+                'WFObject_Propel'            => 'framework/util/WFPropelIntegration.php',
+
+                // PHPUnit
+                'PhocoaControllerTestCase_PHPUnit' => 'phpunit/PhocoaControllerTestCase_PHPUnit.php',
             );
         }
 

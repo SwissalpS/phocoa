@@ -120,6 +120,7 @@ class WFObject implements WFKeyValueCoding
 
     function valuesForKeys($keys)
     {
+        if (!is_array($keys)) throw new WFException("valuesForKeys() requires an array as first argument.");
         $hash = array();
         foreach ($keys as $k) {
             $v = $this->valueForKey($k);
@@ -133,6 +134,7 @@ class WFObject implements WFKeyValueCoding
         foreach ($valuesForKeys as $k => $v) {
             $this->setValueForKey($v, $k);
         }
+        return $this;
     }
 
     function valuesForKeyPaths($keysAndKeyPaths)
@@ -163,7 +165,7 @@ class WFObject implements WFKeyValueCoding
      */
     function valueForUndefinedKey($key)
     {
-        throw( new WFUndefinedKeyException("Unknown key '$key' requested for object '" . get_class($this) . "'.") );
+        throw( new WFUndefinedKeyException("Unknown key '$key' (" . gettype($key) . ") requested for object '" . get_class($this) . "'.") );
     }
 
     /**
@@ -181,6 +183,9 @@ class WFObject implements WFKeyValueCoding
 
     /**
      * Helper function for implementing KVC.
+     * 
+     * Supports "coalescing" KVC by using ; separated keyPaths. The first non-null value returned will be used.
+     * The *last* keypath is actually the "default default" which is used if all keyPaths return NULL.
      *
      * This is public so that other objects that don't subclass WFObject can leverage this codebase to implement KVC.
      *
@@ -189,7 +194,32 @@ class WFObject implements WFKeyValueCoding
      * @return mixed
      * @throws Exception, WFUndefinedKeyException
      */
-    public static function valueForTargetAndKeyPath($keyPath, $rootObject = NULL)
+    public static function valueForTargetAndKeyPath($inKeyPath, $rootObject = NULL)
+    {
+        // detect coalescing keypath
+        if (strpos($inKeyPath, ';') !== false)
+        {
+            $coalescingKeyPaths = preg_split('/(?<!\\\\);/', $inKeyPath);
+            if (count($coalescingKeyPaths) < 2) throw new WFException("Error parsing coalescing keypath: {$inKeyPath}");
+            $coalesceDefault = str_replace('\\;', ';', array_pop($coalescingKeyPaths));
+
+            $val = NULL;
+            while ($val === NULL && ($keyPath = array_shift($coalescingKeyPaths))) {
+                $val = self::valueForTargetAndKeyPathSingle($keyPath, $rootObject);
+            }
+            if ($val === NULL)
+            {
+                $val = $coalesceDefault;
+            }
+            return $val;
+        }
+        else
+        {
+            return self::valueForTargetAndKeyPathSingle($inKeyPath, $rootObject);
+        }
+    }
+
+    private static function valueForTargetAndKeyPathSingle($keyPath, $rootObject = NULL)
     {
         if ($keyPath == NULL) throw( new Exception("NULL keyPath Exception") );
         $staticMode = ($rootObject === NULL);
@@ -199,12 +229,6 @@ class WFObject implements WFKeyValueCoding
 
         $keyParts = explode('.', $keyPath);
         $keyPartCount = count($keyParts);
-        $modelKeyPath = NULL;
-        if ($keyPartCount > 0)
-        {
-            $modelKeyPath = join('.', array_slice($keyParts, 1));
-        }
-
 
         // walk keypath
         $keys = explode('.', $keyPath);
@@ -213,6 +237,15 @@ class WFObject implements WFKeyValueCoding
         for ($keyI = 0; $keyI < $keyCount; $keyI++) {
             $key = $keys[$keyI];
             $keyPartsLeft--;
+
+            // parse out decorate magic, if any
+            $decoratorClass = NULL;
+            $decoratorPos = strpos($key, '[');
+            if ($decoratorPos !== false and substr($key, -1) === ']')
+            {
+                $decoratorClass = substr($key, $decoratorPos + 1, -1);
+                $key = substr($key, 0, $decoratorPos);
+            }
 
             // determine target; use this if on first key, use result otherwise
             if ($keyI == 0)
@@ -257,6 +290,13 @@ class WFObject implements WFKeyValueCoding
             {
                 $arrayMode = true;
             }
+            else
+            {
+                if ($decoratorClass)
+                {
+                    $result = new $decoratorClass($result);
+                }
+            }
 
             // IF the result of the a key is an array, we do some magic.
             // We CREATE a new array with the results of calling EACH object in the array with the rest of the path.
@@ -284,6 +324,10 @@ class WFObject implements WFKeyValueCoding
                     foreach ($result as $object) {
                         if (!is_object($object)) throw( new Exception("All array items must be OBJECTS THAT IMPLEMENT Key-Value Coding for KVC Magic Arrays to work.") );
                         if (!method_exists($object, 'valueForKey')) throw( new Exception("target is not Key-Value Coding compliant for valueForKey.") );
+                        if ($decoratorClass)
+                        {
+                            $object = new $decoratorClass($object);
+                        }
                         $magicArray[] = $object->valueForKeyPath($rightKeyPath);
                     }
                 }
@@ -377,6 +421,19 @@ class WFObject implements WFKeyValueCoding
         return self::valueForStaticKeyPath($key);
     }
 
+    /**
+     * Returns the current object.
+     *
+     * Useful for KVC "hacking" in cases where you need to use KVC magic on the "current" object.
+     * Examples: this[MyDecorator].name, this.@first (for an array), etc.
+     *
+     * @return object WFObject
+     */
+    public function this()
+    {
+        return $this;
+    }
+
 
     function setValueForKey($value, $key)
     {
@@ -403,7 +460,7 @@ class WFObject implements WFKeyValueCoding
 
         if (!$performed)
         {
-            throw( new WFUndefinedKeyException("Unknown key '$key' requested for object '" . get_class($this) . "'.") );
+            throw( new WFUndefinedKeyException("Unknown key '$key' (" . gettype($key) . ") requested for object '" . get_class($this) . "'.") );
         }
     }
 

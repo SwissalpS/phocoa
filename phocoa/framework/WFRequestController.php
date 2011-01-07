@@ -144,6 +144,17 @@ class WFRequestController extends WFObject
             {
                 $modInvocationPath = WFWebApplication::sharedWebApplication()->defaultInvocationPath();
             }
+            // allow routing delegate to munge modInvocationPath
+            $webAppDelegate = WFWebApplication::sharedWebApplication()->delegate();
+            if (is_object($webAppDelegate) && method_exists($webAppDelegate, 'rerouteInvocationPath'))
+            {
+                $newInvocationPath = $webAppDelegate->rerouteInvocationPath($modInvocationPath);
+                if ($newInvocationPath)
+                {
+                    $modInvocationPath = $newInvocationPath;
+                }
+            }
+
             // create the root invocation; only skin if we're not in an XHR
             $this->rootModuleInvocation = new WFModuleInvocation($modInvocationPath, NULL, ($this->isAjax() ? NULL : WFWebApplication::sharedWebApplication()->defaultSkinDelegate()) );
             // get HTML result of the module, and output it
@@ -155,7 +166,7 @@ class WFRequestController extends WFObject
             if (isset($_REQUEST[WFRPC::PARAM_ENABLE_AJAX_IFRAME_RESPONSE_MODE]) && $_REQUEST[WFRPC::PARAM_ENABLE_AJAX_IFRAME_RESPONSE_MODE] == 1)
             {  
                 header('Content-Type: text/xml');
-                $html = "<?xml version=\"1.0\"?><raw><![CDATA[\n{$html}\n]]></raw>";
+                $html = "<"."?xml version=\"1.0\"?"."><raw><![CDATA[\n{$html}\n]]></raw>";
             }   
 
             print $html;
@@ -201,6 +212,68 @@ class WFRequestController extends WFObject
         return false;
     }
 
+    /**
+     * Determine whether the current request is from a mobile browers
+     *
+     *
+     * @return boolean
+     */
+    private $isMobileBrowser = NULL;
+    function isMobileBrowser()
+    {
+        if ($this->isMobileBrowser !== NULL) return $this->isMobileBrowser;
+
+        $op = (isset($_SERVER['HTTP_X_OPERAMINI_PHONE']) ? strtolower($_SERVER['HTTP_X_OPERAMINI_PHONE']) : '');
+        $ua = (isset($_SERVER['HTTP_USER_AGENT']) ? strtolower($_SERVER['HTTP_USER_AGENT']) : '');
+        $ac = (isset($_SERVER['HTTP_ACCEPT']) ? strtolower($_SERVER['HTTP_ACCEPT']) : '');
+
+        $this->isMobileBrowser = strpos($ac, 'application/vnd.wap.xhtml+xml') !== false
+                    || $op != ''
+                    || strpos($ua, 'sony') !== false 
+                    || strpos($ua, 'symbian') !== false 
+                    || strpos($ua, 'nokia') !== false 
+                    || strpos($ua, 'samsung') !== false 
+                    || strpos($ua, 'mobile') !== false
+                    || strpos($ua, 'windows ce') !== false
+                    || strpos($ua, 'epoc') !== false
+                    || strpos($ua, 'opera mini') !== false
+                    || strpos($ua, 'nitro') !== false
+                    || strpos($ua, 'j2me') !== false
+                    || strpos($ua, 'midp-') !== false
+                    || strpos($ua, 'cldc-') !== false
+                    || strpos($ua, 'netfront') !== false
+                    || strpos($ua, 'mot') !== false
+                    || strpos($ua, 'up.browser') !== false
+                    || strpos($ua, 'up.link') !== false
+                    || strpos($ua, 'audiovox') !== false
+                    || strpos($ua, 'blackberry') !== false
+                    || strpos($ua, 'ericsson,') !== false
+                    || strpos($ua, 'panasonic') !== false
+                    || strpos($ua, 'philips') !== false
+                    || strpos($ua, 'sanyo') !== false
+                    || strpos($ua, 'sharp') !== false
+                    || strpos($ua, 'sie-') !== false
+                    || strpos($ua, 'portalmmm') !== false
+                    || strpos($ua, 'blazer') !== false
+                    || strpos($ua, 'avantgo') !== false
+                    || strpos($ua, 'danger') !== false
+                    || strpos($ua, 'palm') !== false
+                    || strpos($ua, 'series60') !== false
+                    || strpos($ua, 'palmsource') !== false
+                    || strpos($ua, 'pocketpc') !== false
+                    || strpos($ua, 'smartphone') !== false
+                    || strpos($ua, 'rover') !== false
+                    || strpos($ua, 'ipaq') !== false
+                    || strpos($ua, 'au-mic,') !== false
+                    || strpos($ua, 'alcatel') !== false
+                    || strpos($ua, 'ericy') !== false
+                    || strpos($ua, 'up.link') !== false
+                    || strpos($ua, 'vodafone/') !== false
+                    || strpos($ua, 'wap1.') !== false
+                    || strpos($ua, 'wap2.') !== false;
+
+        return $this->isMobileBrowser;
+    }
 
     /**
      *  Get the root {@link WFModuleInvocation} used by the request controller.

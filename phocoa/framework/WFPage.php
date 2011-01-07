@@ -42,6 +42,19 @@ interface WFPageDelegate
     /**
      *  Get the list of named parameters for the page.
      *
+     *  NOTE: You can also pass an associative array, there are two forms of this extended option:
+     *  array(
+     *          'param1'    =>  'defaultValueForParam1'
+     *          'param2',       // default will be NULL
+     *          'param3'        // default will be NULL 
+     *  )
+     *  array(
+     *          'param1'    =>  array(
+     *                                  'default'   => 'defaultValueForParam1',
+     *                                  'greedy'    => true                     // makes this param include the remaining path_info from this parameter on
+     *                                                                          // ie /module/page/foo/bar/baz => param1 = foo/bar/baz with greedy=true
+     *                               )
+     *  )
      *  @return array An array of names of parameters, in positional order.
      */
     function parameterList();
@@ -589,7 +602,7 @@ class WFPage extends WFObject
         // we want to see if the class is a WFView subclass before instantiating (so that we can be sure our 'new' call below calls an existing prototype).
         // bug in PHP's is_subclass_of() causes segfault sometimes if the class needs to be autoloaded, so in 5.1.0 PHP stops calling autoload.
         // Thus, the fix is to load the class ourselves if needed before checking the inheritance.
-        if (!class_exists($class))
+        if (!class_exists($class) && function_exists('__autoload'))
         {
             __autoload($class);
         }
@@ -994,6 +1007,8 @@ class WFPage extends WFObject
                     WFLog::log("restoring state for widget id '$widgetID'", WFLog::TRACE_LOG);
                     $widget->restoreState();
                 }
+            } catch (WFRequestController_HTTPException $e) {
+                throw $e;
             } catch (Exception $e) {
                 WFLog::log("Error restoring state for widget '$widgetID'.", WFLog::TRACE_LOG);
             }
@@ -1023,6 +1038,51 @@ class WFPage extends WFObject
     {
         foreach ($arr as $err) {
             $this->addError($err);
+        }
+    }
+
+    /**
+     * Helper function to propagate errors from WFErrorsException to widgets.
+     *
+     * @param object WFErrorsException
+     * @param array Either 1) An array of strings, each string being both the key and corresponding widgetId, or 2) A hash of key => widgetId. You can mix the two as well.
+     * @param boolean TRUE to prune the errors from the WFErrorCollection once propagated. Default: TRUE
+     * @throws
+     */
+    function propagateErrorsForKeysToWidgets(WFErrorCollection $errors, $keysAndWidgets, $prune = true)
+    {
+        if (!is_array($keysAndWidgets)) throw new WFException("Array or Hash required.");
+        foreach ($keysAndWidgets as $key => $widget) {
+            if (is_int($key))
+            {
+                $key = $widget;
+            }
+            if (is_string($widget))
+            {
+                $widget = $this->outlet($widget);
+            }
+            $this->propagateErrorsForKeyToWidget($errors, $key, $widget, $prune);
+        }
+    }
+
+    /**
+     * Helper function to propagate errors from WFErrorsException to widgets.
+     *
+     * @param object WFErrorsException
+     * @param string The key to propagate errors for
+     * @param object WFWidget A widget object to propagate the errors to.
+     * @param boolean TRUE to prune the errors from the WFErrorCollection once propagated. Default: TRUE
+     * @throws
+     */
+    function propagateErrorsForKeyToWidget(WFErrorCollection $errors, $key, $widget, $prune = true)
+    {
+        foreach ($errors->errorsForKey($key) as $keyErr) {
+            $widget->addError($keyErr);
+        }
+        if ($prune && $errors->hasErrorsForKey($key))
+        {
+            $errors = $errors->errors();
+            unset($errors[$key]);
         }
     }
 
@@ -1153,15 +1213,50 @@ class WFPage extends WFObject
                 // first map all items through from PATH_INFO
                 // @todo Right now this doesn't allow DEFAULT parameter values (uses NULL). Would be nice if this supported assoc_array so we could have defaults.
                 $invocationParameters = $this->module->invocation()->parameters();
-                for ($i = 0; $i < count($parameterList); $i++) {
-                    if (isset($invocationParameters[$i]))
+                $defaultOpts = array(
+                                        'defaultValue'  => NULL,
+                                        'greedy'        => false
+                                    );
+                $i = 0;
+                $lastI = count($parameterList) - 1;
+                foreach ($parameterList as $k => $v) {
+                    if (gettype($k) === 'integer')  // has options
                     {
-                        $parameters[$parameterList[$i]] = $invocationParameters[$i];
+                        $opts = $defaultOpts;
+                        $parameterKey = $v;
                     }
                     else
                     {
-                        $parameters[$parameterList[$i]] = NULL;
+                        $parameterKey = $k;
+                        if (is_array($v))
+                        {
+                            $opts = array_merge($defaultOpts, $v);
+                        }
+                        else
+                        {
+                            $opts = $defaultOpts;
+                            $opts['defaultValue'] = $v;
+                        }
                     }
+
+                    if (isset($invocationParameters[$i]))
+                    {
+                        // handle greedy
+                        if ($i === $lastI and $opts['greedy'] === true and count($invocationParameters) > count($parameterList))
+                        {
+                            $parameters[$parameterKey] = join('/', array_slice($invocationParameters, $i));
+                        }
+                        else
+                        {
+                            $parameters[$parameterKey] = $invocationParameters[$i];
+                        }
+                    }
+                    else
+                    {
+                        $parameters[$parameterKey] = isset($_REQUEST[$parameterKey]) ? $_REQUEST[$parameterKey] : $opts['defaultValue'];
+                    }
+
+                    $i++;
                 }
 
                 // then over-ride with from form, if one has been submitted
@@ -1310,7 +1405,7 @@ class WFPage extends WFObject
                 {
                     try {
                         $rpc->execute($this);
-                    } catch (WFErrorsException $e) {
+                    } catch (WFErrorCollection $e) {
                         $this->addErrors($e->allErrors());
                     }
                     if ($rpc->isAjax() and count($this->errors()))  // errors can also occur in the action method
@@ -1331,11 +1426,11 @@ class WFPage extends WFObject
 
     private function sendPageErrorsOverAjax()
     {
-        // Collect all errors and send them back in a WFActionResponsePhocoaUIUpdater
+        // Collect all errors and send them back in a WFActionResponseWFErrorsException
         $errorSmarty = new WFSmarty;
         $errorSmarty->setTemplate(WFWebApplication::appDirPath(WFWebApplication::DIR_SMARTY) . '/form_error.tpl');
 
-        $uiUpdates = new WFActionResponsePhocoaUIUpdater();
+        $uiUpdates = new WFActionResponseWFErrorsException();
         foreach ($this->widgets() as $id => $obj) {
             $errors = $obj->errors();
             if (count($errors))
@@ -1536,6 +1631,8 @@ class WFPage extends WFObject
 
     function willPushBindings()
     {
+        if (!$this->hasSubmittedForm()) return; // pushBindings() doesn't run if no form submitted as nothing could have changed, thus we should skip the delegate call as well
+
         if ($this->delegate)
         {
             if (method_exists($this->delegate, 'willPushBindings'))

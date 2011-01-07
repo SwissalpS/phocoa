@@ -365,7 +365,10 @@ class WFRPC extends WFObject
         // invocationPath comes from PATH_INFO which has not been urldecode'd or rawurldecode'd
         // the PARAM_INVOCATION_PATH is in request, which php automatically urldecode'd and rawurldecode'd, but since our infrastructure *also* rawurlencode'd it,
         // for this test we need to urldecode and then rawurldecode the invocationPath, and rawurldecode the PARAM_INVOCATION_PATH
-        if (rawurldecode(urldecode($invocationPathWithWWW)) !== rawurldecode($_REQUEST[self::PARAM_INVOCATION_PATH])) return NULL;
+        if (
+            $invocationPathWithWWW !== $_REQUEST[self::PARAM_INVOCATION_PATH]
+            and rawurldecode(urldecode($invocationPathWithWWW)) !== rawurldecode($_REQUEST[self::PARAM_INVOCATION_PATH])
+            ) return NULL;
 
         $rpc = WFRPC::RPC();
         $rpc->setInvocationPath($_REQUEST[self::PARAM_INVOCATION_PATH]);
@@ -449,6 +452,8 @@ class WFEvent extends WFObject
                 return new WFFocusEvent($action);
             case 'blur':
                 return new WFBlurEvent($action);
+            case 'keyup':
+                return new WFKeyupEvent($action);
             default:
                 throw( new WFException("Unknown event: " . $event) );
         }
@@ -552,6 +557,17 @@ class WFBlurEvent extends WFEvent
     {
         parent::__construct($action);
         $this->name = 'blur';
+    }
+}
+/**
+ * Maps to the DOM "keyup" event.
+ */
+class WFKeyupEvent extends WFEvent
+{
+    public function __construct($action = NULL)
+    {
+        parent::__construct($action);
+        $this->name = 'keyup';
     }
 }
 
@@ -723,14 +739,6 @@ class WFAction extends WFObject
                 action.rpc = new PHOCOA.WFRPC('" . $invocationPath . "',
                                               '" . $this->rpc->target() . "',
                                               '" . $this->rpc->action() . "');
-                if (" . $this->jsAjaxSuccess() . ")
-                {
-                    action.rpc.callback.success = " . $this->jsAjaxSuccess() . ";
-                }
-                if (" . $this->jsAjaxError() . ")
-                {
-                    action.rpc.callback.failure = " . $this->jsAjaxError() . ";
-                }
                 ";
             
             if ($this->event()->widget() instanceof WFSubmit)
@@ -772,44 +780,6 @@ class WFAction extends WFObject
         {
             return "PHOCOA.widgets." . $this->event()->widget()->id() . ".events." . $this->event()->name() . ".handleEvent";
         }
-    }
-
-    /**
-     * The name of the JS event handler function that's called to collect the arguments to pass to the event handler.
-     *
-     * The JS function PHOCOA.widgets.<id>.events.<eventName>.collectArguments() is called to get an array of arguments to pass to handleEvent.
-     *
-     * Ultimately these arguments are passed back to the server.
-     *
-     * @return string
-     */
-    public function jsCollectArguments()
-    {
-        return "PHOCOA.widgets." . $this->event()->widget()->id() . ".events." . $this->event()->name() . ".collectArguments";
-    }
-
-    /**
-     * The name of the JS event handler function that's called when an AJAX RPC succeeds.
-     *
-     * The JS function PHOCOA.widgets.<id>.events.<eventName>.ajaxSuccess() is called for AjaxAction when the ajax call completes successfully.
-     *
-     * @return string
-     */
-    public function jsAjaxSuccess()
-    {
-        return "PHOCOA.widgets." . $this->event()->widget()->id() . ".events." . $this->event()->name() . ".ajaxSuccess";
-    }
-
-    /**
-     * The name of the JS event handler function that's called if an AJAX RPC fails.
-     *
-     * The JS function PHOCOA.widgets.<id>.events.<eventName>.ajaxError() is called if the AjaxAction fails.
-     *
-     * @return string
-     */
-    public function jsAjaxError()
-    {
-        return "PHOCOA.widgets." . $this->event()->widget()->id() . ".events." . $this->event()->name() . ".ajaxError";
     }
 
     /**
@@ -994,5 +964,11 @@ class WFActionResponsePhocoaUIUpdater extends WFActionResponse
         return WFJSON::json_encode($this->data);
     }
 }
+class WFActionResponseWFErrorsException extends WFActionResponsePhocoaUIUpdater
+{
+    public function contentType()
+    {
+        return 'application/x-json-phocoa-wferrorsexception';
+    }
 
-?>
+}
