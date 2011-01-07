@@ -107,5 +107,5 @@ fi
 
 CMD="$PHING_COMMAND -f '$PHOCOA_HOME/phing/build.xml' -Dusing.phocoa.make=true \"-Dphocoa.pwd=$PHOCOA_RUN_FROM_DIR\" '-Dphocoa.dir=$PHOCOA_HOME' '-Dphocoa.project.name=$PHOCOA_PROJECT_NAME' '-Dphocoa.project.dir=$PHOCOA_PROJECT_DIR' $PHOCOA_CMD"
 #echo $CMD
-#$CMD
+#`$CMD`
 $PHING_COMMAND -f "$PHOCOA_HOME/phing/build.xml" -Dusing.phocoa.make=true "-Dphocoa.pwd=$PHOCOA_RUN_FROM_DIR" "-Dphocoa.dir=$PHOCOA_HOME" "-Dphocoa.project.name=$PHOCOA_PROJECT_NAME" "-Dphocoa.project.dir=$PHOCOA_PROJECT_DIR" $PHOCOA_CMD

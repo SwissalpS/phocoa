@@ -30,7 +30,7 @@ class css extends WFModule
     {
         // determine skin type/skin/theme
         $cssTemplate = $skinName = $skinThemeName = NULL;
-        @list(,,,$cssTemplate, $skinTypeName, $skinName, $skinThemeName) = split('/', $_SERVER['PATH_INFO']);
+        @list(,,,$cssTemplate, $skinTypeName, $skinName, $skinThemeName) = split('/', $_SERVER['REQUEST_URI']);
         $cssFilePath = WFWebApplication::appDirPath(WFWebApplication::DIR_SKINS) . '/' . $skinTypeName . '/'. $skinName . '/' . $cssTemplate;
         if (!file_exists($cssFilePath)) {
             header("HTTP/1.0 404 Not Found");

@@ -32,6 +32,6 @@ interface WFViewPhocoaBuilderIntegration
       *
       * @return array An array of {@link WFBindingSetup} objects.
       */
-    public static function setupExposedBindings()
+    public static function setupExposedBindings();
 }
 ?>

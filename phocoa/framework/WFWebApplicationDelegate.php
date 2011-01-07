@@ -26,7 +26,7 @@ class WFWebApplicationDelegate
      *  @param string The class name needing loading.
      *  @return boolean TRUE if the class loading request was handled, FALSE otherwise.
      */
-    function autoload($className)
+    function autoload($className) {}
 
     /**
      * Retrieve the default invocation path for the application.
