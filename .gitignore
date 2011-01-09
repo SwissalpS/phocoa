@@ -5,3 +5,6 @@ phocoa-*.tgz
 .DS_Store
 external/SwissalpS/_external/iPHP
 *~
+phocoa/docs/userguide/PHOCOA User Guide.xml
+phocoa/pear/build-pear-package.xml
+phocoa/phing/build.orig.xml
