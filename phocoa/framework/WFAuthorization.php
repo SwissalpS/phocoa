@@ -371,7 +371,8 @@ class WFAuthorizationManager extends WFObject
 
         if ($this->authorizationDelegate && method_exists($this->authorizationDelegate, 'rememberMeOptions'))
         {
-            $options = array_merge($options, $this->authorizationDelegate->rememberMeOptions());
+            $delegateOptions = $this->authorizationDelegate->rememberMeOptions();
+            if (is_array($delegateOptions)) $options = array_merge($options, $delegateOptions);
         }
 
         return $options;
