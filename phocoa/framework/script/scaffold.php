@@ -2,8 +2,7 @@
 
 require_once(getenv('PHOCOA_PROJECT_CONF'));
 
-if ($argc != 2) die("Usage: scaffold.php 'entity1 entity2 ...'\n");
-
+if ($argc < 2) die("Usage: scaffold.php 'entity1 entity2 ...'\n");
 $adapter = 'Propel';
 $builder = 'WFModelCodeGen' . $adapter;
 $configFile = APP_ROOT . '/propel-build/phocoa-generator-config.yaml';
@@ -12,16 +11,24 @@ if (!file_exists($configFile))
     $configFile = NULL;
 }
 
-$delim = ' ';
-if (strchr($argv[1], ','))
-{
-    $delim = ',';
-}
-$entities = array_map("trim", explode($delim, $argv[1]));
+$aEntities = array();
+$aArgs = $argv;
+array_shift($aArgs); // drop invocation
+
+foreach ($aArgs as $sArgs) {
+	$delim = ' ';
+	if (false != strchr($sArgs, ',')) {
+		$delim = ',';
+	} // if got comma in arg
+
+	$aEntities = array_merge($aEntities,
+			array_map('trim', explode($delim, $sArgs)));
+
+} // loop all args and collect into array
 
 $model = WFModel::sharedModel();
-$model->buildModel($adapter, $configFile, $entities);
-print $model->toString();
+$model->buildModel($adapter, $configFile, $aEntities);
+print $model->__toString();
 foreach ($model->entities() as $entity) {
     $codeGen = new $builder;
     try {
