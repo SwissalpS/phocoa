@@ -1,6 +1,6 @@
 <?php
-
-require_once(getenv('PHOCOA_PROJECT_CONF'));
+$sPathPhocoaConfig = getenv('PHOCOA_PROJECT_CONF');
+require_once($sPathPhocoaConfig);
 
 if ($argc != 2) die("You must enter the name of the class to test as an argument.\n\nphp createTestStub.php ClassUnderTest\n");
 $className = $argv[1];
@@ -12,7 +12,7 @@ if (file_exists($testFile)) throw new WFException("Test file {$testFile} already
 $testTemplate = <<<TPLEND
 <?php
 
-require_once getenv('PHOCOA_PROJECT_CONF');
+require_once({$sPathPhocoaConfig});
 
 // http://www.phpunit.de/pocket_guide/3.0/en/writing-tests-for-phpunit.html
 class {$className}Test extends PHPUnit_Framework_TestCase
