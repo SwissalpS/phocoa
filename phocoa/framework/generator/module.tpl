@@ -79,6 +79,8 @@ class module_{{$moduleName}}_list {
 
 		$oSkin->setTitle('{{$entityName}} List');
 
+		//$oSkin->setTemplateType(WFSkin::SKIN_WRAPPER_TYPE_RAW);
+
 	} // setupSkin
 
 } // module_{{$moduleName}}_list

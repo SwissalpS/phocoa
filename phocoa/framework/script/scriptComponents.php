@@ -30,6 +30,7 @@ function createModule($modName, $pageName) {
 } // createModule
 
 
+// this may not be the brightest name!
 function _moduleBit($modName, $pageName) {
 
 	 $moduleTemplate = '
@@ -69,6 +70,7 @@ class module_' . $modName . ' extends WFModule {
 } // _moduleBit
 
 
+// this may not be the brightest name!
 function _pageForModule($modName, $pageName) {
 
 	return '
@@ -101,6 +103,8 @@ class module_' . $modName . '_' . $pageName . ' {
 		//$oSkin->addHeadString(\'<link rel="stylesheet" type="text/css" href="\' . $oSkin->getSkinDirShared() . \'/form.css" />\');
 
 		$oSkin->setTitle(\'' . $modName . ' : ' . $pageName . '\');
+
+		//$oSkin->setTemplateType(WFSkin::SKIN_WRAPPER_TYPE_RAW);
 
 	} // setupSkin
 
