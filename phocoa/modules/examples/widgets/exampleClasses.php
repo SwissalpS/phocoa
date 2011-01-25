@@ -2,6 +2,7 @@
 
 require_once('framework/WFObject.php');
 
+if (!class_exists('Person')) {
 class Person extends WFObject
 {
     public $id;
@@ -104,8 +105,9 @@ class Person extends WFObject
     {
         return array();
     }
-}
+}}
 
+if (!class_exists('City')) {
 class City extends WFObject
 {
     public $id;
@@ -124,7 +126,7 @@ class City extends WFObject
         }
         return NULL;
     }
-    
+
     function allCities()
     {
         static $cities = NULL;
@@ -137,5 +139,5 @@ class City extends WFObject
         }
         return $cities;
     }
-}
+}}
 
