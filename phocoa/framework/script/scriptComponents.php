@@ -46,12 +46,23 @@ class module_' . $modName . ' extends WFModule {
 	// this function should throw an exception if the user is not permitted to edit (add/edit/delete) in the current context
 	function verifyEditingPermission($oPage) {
 
-		// example
+		// example 1
 		// $oAauthInfo = WFAuthorizationManager::sharedAuthorizationManager()->authorizationInfo();
 
 		// if ($oAauthInfo->userid() != $oPage->sharedOutlet(\'sharedEntityId\')->selection()->getUserId()) throw(new Exception(\'You don\'t have permission to edit\'));
 
+		// example 2
+		// if (!$oAuthInfo->isLoggedIn()) throw (new WFRequestController_HTTPException(
+			WFLocalizedString(\'403 Forbidden\'), 403));
+
 	} // verifyEditingPermission
+
+
+	function oAuthInfo() {
+
+		return WFAuthorizationManager::sharedAuthorizationManager()->authorizationInfo();
+
+	} // oAuthInfo
 ';
 
 	if (NULL === $pageName) $pageName = 'defaultPage';
@@ -102,7 +113,7 @@ class module_' . $modName . '_' . $pageName . ' {
 
 		//$oSkin->addHeadString(\'<link rel="stylesheet" type="text/css" href="\' . $oSkin->getSkinDirShared() . \'/form.css" />\');
 
-		$oSkin->setTitle(\'' . $modName . ' : ' . $pageName . '\');
+		$oSkin->setTitle(SssSBla::cleanForTitle(WFLocalizedString(\'' . $modName . ucfirst($pageName) . 'Title\')));
 
 		//$oSkin->setTemplateType(WFSkin::SKIN_WRAPPER_TYPE_RAW);
 
@@ -116,9 +127,15 @@ class module_' . $modName . '_' . $pageName . ' {
 
 function createPage($pageName) {
 
-		$configFile = "---";
+		$configFile = "
+result:
+  class: WFMessageBox";
 
 		$templateFile = "{* vim: set expandtab tabstop=4 shiftwidth=4 syntax=smarty: *}
+{assign var='oAuthInfo' value=$__module->valueForKeyPath('oAuthInfo')}
+{assign var='bLoggedIn' value=$oAuthInfo->isLoggedIn()}
+{assign var='bSuperUser' value=$oAuthInfo->isSuperUser()}
+{WFView id=\"result\"}
 Smarty HTML Goes Here.
 ";
 
