@@ -1,26 +1,27 @@
 {* vim: set expandtab tabstop=4 shiftwidth=4 syntax=smarty: *}
-<h2>{{$entityName}}</h2>
+<h2>{SssSBla value="{{$entityName}}Sing"}</h2>
 <div class="form-container">
 {WFView id="statusMessage"}
 {WFShowErrors id={{$editFormId}}}
 
 {WFViewBlock id="{{$editFormId}}"}
-    <fieldset>
-    <legend>{{$entityName}} Detail</legend>
+	<fieldset>
+		<legend>{SssSBla value="{{$entityName}}Detail"}</legend>
 
     {{foreach name=widgets from=$widgets key="widgetId" item="property"}}
         {{if $property->valueForKey('name') == $entity->valueForKey('primaryKeyProperty')}}
             {WFView id="{{$widgetId}}"}
         {{else}}
-            <div>
-                <label for="{{$widgetId}}">{{$property->valueForKey('name')}}:</label>
-                {WFView id="{{$widgetId}}"}{WFShowErrors id="{{$widgetId}}"}
-            </div>
+		<div>
+			<label for="{{$widgetId}}">{SssSBla value="{{$entityName}}{{$property->valueForKey('name')}}"}:</label>
+			{WFView id="{{$widgetId}}"}{WFShowErrors id="{{$widgetId}}"}
+		</div>
         {{/if}}
     {{/foreach}}
-    <div class="buttonrow">
-        {WFView id="saveNew"}{WFView id="save"}{WFView id="deleteObj"}
-    </div>
-    </fieldset>
+		<div class="buttonrow">
+			{WFView id="saveNew"}{WFView id="save"}{WFView id="deleteObj"}
+		</div>
+	</fieldset>
 {/WFViewBlock}
 </div>{* end form-container *}
+<a href="{{$modulePath}}/list">{SssSBla value="SharedBack2list"}</a>

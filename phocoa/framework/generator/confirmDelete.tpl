@@ -1,4 +1,4 @@
-<h2>{{$entityName}}</h2>
+<h2>{{SssSBla value="{{$entityName}}Sing"}}</h2>
 
 <div class="form-container">
 {WFViewBlock id="{{$confirmDeleteFormId}}"}
@@ -10,4 +10,5 @@
     </div>
 {/WFViewBlock}
 </div>{* end form-container *}
+<a href="{{$modulePath}}/list">{SssSBla value="SharedBack2list"}</a>
 

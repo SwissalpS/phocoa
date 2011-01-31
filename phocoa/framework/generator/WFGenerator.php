@@ -315,8 +315,8 @@ class WFModelCodeGenPropel extends WFObject
                 'properties' => array(
                     'modeForm' => 'search',
                     'pageSize' => 25,
-                    'itemPhraseSingular' => $entity->valueForKey('name'),
-                    'itemPhrasePlural' => $entity->valueForKey('name') . 's'
+                    'itemPhraseSingular' => 'SssSBla' . $entity->valueForKey('name') . 'Sing',
+                    'itemPhrasePlural' => 'SssSBla' . $entity->valueForKey('name') . 'Plur'
                     )
                 );
         file_put_contents($moduleDir . '/shared.yaml', WFYaml::dump($sharedYaml));
@@ -324,6 +324,7 @@ class WFModelCodeGenPropel extends WFObject
         $sharedEntityId = $entity->valueForKey('name');
 
         // build module code
+        $this->smarty->assign('modulePath', $this->modulePath);
         $this->smarty->assign('moduleName', $moduleName);
         $this->smarty->assign('entity', $entity);
         $this->smarty->assign('entityName', $entity->valueForKey('name'));
@@ -346,15 +347,15 @@ class WFModelCodeGenPropel extends WFObject
         $listYaml[$listFormId] = array(
                 'class' => 'WFForm', 'children' => array(
                     'search' => array(
-                        'class' => 'WFSubmit',
+                        'class' => 'SssSSubmit',
                         'properties' => array(
-                            'label' => 'Search'
+                            'label' => 'SssSBlaSharedSearch'
                             ),
                         ),
                     'clear' => array(
-                        'class' => 'WFSubmit',
+                        'class' => 'SssSSubmit',
                         'properties' => array(
-                            'label' => 'Clear'
+                            'label' => 'SssSBlaSharedClear'
                             ),
                         ),
                     'paginatorState' => array(
@@ -365,11 +366,11 @@ class WFModelCodeGenPropel extends WFObject
                     )
                 );
         $listYaml['paginatorNavigation'] = array(
-                'class' => 'WFPaginatorNavigation',
+                'class' => 'SssSPaginatorNavigation',
                 'properties' => array('paginator' => '#module#paginator'),
                 );
         $listYaml['paginatorPageInfo'] = array(
-                'class' => 'WFPaginatorPageInfo',
+                'class' => 'SssSPaginatorPageInfo',
                 'properties' => array('paginator' => '#module#paginator'),
                 );
 
@@ -415,7 +416,7 @@ class WFModelCodeGenPropel extends WFObject
                                 'options' => array('ValuePattern' => $this->modulePath . '/edit/%1%')
                                 )
                             )
-                        ) 
+                        )
                     )
                 );
         $listYaml['deleteLink'] = array(
@@ -435,7 +436,7 @@ class WFModelCodeGenPropel extends WFObject
                                 'options' => array('ValuePattern' => $this->modulePath . '/confirmDelete/%1%')
                                 )
                             )
-                        ) 
+                        )
                     )
                 );
         file_put_contents($moduleDir . '/list.yaml', WFYaml::dump($listYaml));
@@ -492,11 +493,11 @@ class WFModelCodeGenPropel extends WFObject
 
         }
         // status message
-        $editYaml['statusMessage'] = array('class' => 'WFMessageBox');
+        $editYaml['statusMessage'] = array('class' => 'SssSMessageBox');
         $editYaml[$editFormId]['children']['saveNew'] = array(
-                'class' => 'WFSubmit',
+                'class' => 'SssSSubmit',
                 'properties' => array(
-                    'label' => 'Create ' . $entity->valueForKey('name'),
+                    'label' => 'SssSBlaSharedCreate', // ' . $entity->valueForKey('name'),
                     'action' => 'save'
                     ),
                 'bindings' => array(
@@ -511,9 +512,9 @@ class WFModelCodeGenPropel extends WFObject
                     )
                 );
         $editYaml[$editFormId]['children']['save'] = array(
-                'class' => 'WFSubmit',
+                'class' => 'SssSSubmit',
                 'properties' => array(
-                    'label' => 'Save'
+                    'label' => 'SssSBlaSharedSave'
                     ),
                 'bindings' => array(
                     'hidden' => array(
@@ -524,9 +525,9 @@ class WFModelCodeGenPropel extends WFObject
                     )
                 );
         $editYaml[$editFormId]['children']['deleteObj'] = array(
-                'class' => 'WFSubmit',
+                'class' => 'SssSSubmit',
                 'properties' => array(
-                    'label' => 'Delete'
+                    'label' => 'SssSBlaSharedDelete'
                     ),
                 'bindings' => array(
                     'hidden' => array(
@@ -561,21 +562,22 @@ class WFModelCodeGenPropel extends WFObject
                             )
                         ),
                     'cancel' => array(
-                        'class' => 'WFSubmit',
+                        'class' => 'SssSSubmit',
                         'properties' => array(
-                            'label' => 'Cancel'
+                            'label' => 'SssSBlaSharedCancel'
                             )
                         ),
                     'deleteObj' => array(
-                        'class' => 'WFSubmit',
+                        'class' => 'SssSSubmit',
                         'properties' => array(
-                            'label' => 'Delete'
+                            'label' => 'SssSBlaSharedDelete'
                             )
                         )
                     ),
                     );
+        // TODO: SssSBlaHelper for formatted localization
         $confirmDeleteYaml['confirmMessage'] = array(
-                'class' => 'WFMessageBox',
+                'class' => 'SssSMessageBox',
                 'bindings' => array(
                     'value' => array(
                         'instanceID' => $sharedEntityId,
@@ -588,7 +590,7 @@ class WFModelCodeGenPropel extends WFObject
                     )
                 );
         file_put_contents($moduleDir . '/confirmDelete.yaml', WFYaml::dump($confirmDeleteYaml));
-        
+
         // confirmDelete.tpl file
         $this->smarty->assign('confirmDeleteFormId', $confirmDeleteFormId);
         file_put_contents($moduleDir . '/confirmDelete.tpl', $this->smarty->fetch(FRAMEWORK_DIR . '/framework/generator/confirmDelete.tpl'));
@@ -596,9 +598,9 @@ class WFModelCodeGenPropel extends WFObject
         // delete success
         $deleteSuccessYaml = array();
         $deleteSuccessYaml['statusMessage'] = array(
-                'class' => 'WFMessageBox',
+                'class' => 'SssSMessageBox',
                 'properties' => array(
-                    'value' => $entity->valueForKey('name') . ' successfully deleted.'
+                    'value' => 'SssSBla' . $entity->valueForKey('name') . 'DeleteSuccess'
                     )
                 );
         file_put_contents($moduleDir . '/deleteSuccess.yaml', WFYaml::dump($deleteSuccessYaml));
@@ -621,8 +623,22 @@ class WFModelCodeGenPropel extends WFObject
                         )
                     );
         }
+        $detailYaml['editMe'] = array(
+        	'class' => 'SssSLink',
+        	'bindings' => array(
+        		'value' => array(
+        			'instanceID' => $sharedEntityId,
+        			'controllerKey' => 'selection',
+        			'modelKeyPath' => $entity->valueForKey('primaryKeyProperty'),
+        			'options' => array(
+        				'ValuePattern' => $this->modulePath . '/edit/%1%')
+        			)
+        		),
+        	'properties' => array(
+        		'label' => 'SssSBlaSharedEdit')
+        	);
         file_put_contents($moduleDir . '/detail.yaml', WFYaml::dump($detailYaml));
-       
+
         // build detail.tpl
         $this->smarty->assign('widgets', $widgets);
         file_put_contents($moduleDir . '/detail.tpl', $this->smarty->fetch(FRAMEWORK_DIR . '/framework/generator/detail.tpl'));

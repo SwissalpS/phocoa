@@ -77,7 +77,7 @@ class module_{{$moduleName}}_list {
 
 		//$oSkin->addHeadString('<link rel="stylesheet" type="text/css" href="' . $oSkin->getSkinDirShared() . '/form.css" />');
 
-		$oSkin->setTitle('{{$entityName}} List');
+		$oSkin->setTitle(SssSBla::cleanForTitle(WFLocalizedString('{{$entityName}}List')));
 
 		//$oSkin->setTemplateType(WFSkin::SKIN_WRAPPER_TYPE_RAW);
 
@@ -149,11 +149,11 @@ class module_{{$moduleName}}_edit {
 
 		if ($oPage->sharedOutlet('{{$sharedEntityId}}')->selection()->isNew()) {
 
-			$title = 'New {{$entityName}}';
+			$title = SssSBla::cleanForTitle(WFLocalizedString('{{$entityName}}New'));
 		}
 		else {
 
-			$title = 'Edit {{$entityName}}:' . $oPage->sharedOutlet('{{$sharedEntityId}}')->selection()->valueForKeyPath('{{$descriptiveColumnName}}');
+			$title = SssSBla::cleanForTitle(WFLocalizedString('{{$entityName}}Edit')) . ':' . $oPage->sharedOutlet('{{$sharedEntityId}}')->selection()->valueForKeyPath('{{$descriptiveColumnName}}');
 
 		}
 

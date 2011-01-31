@@ -1,8 +1,8 @@
 {* vim: set expandtab tabstop=4 shiftwidth=4 syntax=smarty: *}
-<h2>{{$entityName}}</h2>
-<p><a href="{WFURL action="edit"}">Add a new {{$entityName}}.</a></p>
+<h2>{SssSBla value="{{$entityName}}Plur"}</h2>
+<p><a href="{WFURL action="edit"}">{SssSBla value="{{$entityName}}AddNew"}.</a></p>
 
-<h3>{{$entityName}} Search</h3>
+<h3>{SssSBla value="{{$entityName}}Search"}</h3>
 <div class="form-container">
 {WFViewBlock id="{{$listFormId}}"}
     {WFView id="paginatorState"}
@@ -21,7 +21,7 @@
 {section name=items loop=$__module->valueForKeyPath('{{$sharedEntityId}}.arrangedObjectCount')}
     {if $smarty.section.items.first}
     <tr>
-        <th>{{$entityName}}</th>
+        <th>{SssSBla value="{{$entityName}}Sing"}</th>
         <th></th>
     </tr>
     {/if}
@@ -30,7 +30,7 @@
         <td>{WFView id="editLink"} {WFView id="deleteLink"}</td>
     </tr>
 {sectionelse}
-    <tr><td>No {{$entityName}}(s) found.</td></tr>
+    <tr><td>{SssSBla value="{{$entityName}}NoneFound"}</td></tr>
 {/section}
 </table>
 
