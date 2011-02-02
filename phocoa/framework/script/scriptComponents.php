@@ -52,8 +52,7 @@ class module_' . $modName . ' extends WFModule {
 		// if ($oAauthInfo->userid() != $oPage->sharedOutlet(\'sharedEntityId\')->selection()->getUserId()) throw(new Exception(\'You don\'t have permission to edit\'));
 
 		// example 2
-		// if (!$oAuthInfo->isLoggedIn()) throw (new WFRequestController_HTTPException(
-			WFLocalizedString(\'403 Forbidden\'), 403));
+		// if (!$oAuthInfo->isLoggedIn()) throw (new WFRequestController_HTTPException(WFLocalizedString(\'403 Forbidden\'), 403));
 
 	} // verifyEditingPermission
 
@@ -129,12 +128,12 @@ function createPage($pageName) {
 
 		$configFile = "
 result:
-  class: WFMessageBox";
+  class: SssSMessageBox";
 
 		$templateFile = "{* vim: set expandtab tabstop=4 shiftwidth=4 syntax=smarty: *}
-{assign var='oAuthInfo' value=$__module->valueForKeyPath('oAuthInfo')}
-{assign var='bLoggedIn' value=$oAuthInfo->isLoggedIn()}
-{assign var='bSuperUser' value=$oAuthInfo->isSuperUser()}
+{assign var='oAuthInfo' value=\$__module->valueForKeyPath('oAuthInfo')}
+{assign var='bLoggedIn' value=\$oAuthInfo->isLoggedIn()}
+{assign var='bSuperUser' value=\$oAuthInfo->isSuperUser()}
 {WFView id=\"result\"}
 Smarty HTML Goes Here.
 ";
