@@ -1,0 +1,32 @@
+The classes and files in this folder have now been moved to a seperate git
+repository.
+
+To get them with git:
+	In terminal cd to this directories superdir (phocoa/external)
+	then clone from github
+	git clone git://github.com/SwissalpS/SwissalpSphp.git
+
+To get them with curl or wget:
+	the url is: https://SwissalpS@github.com/SwissalpS/SwissalpSphp.git
+
+To download from browser, visit https://github.com/SwissalpS/SwissalpSphp
+	and click the Download button...
+
+
+To create a new SwissalpS-PHOCOA application, you can use the commandline script:
+	SwissalpSphp/_synergize/PHOCOA/SssSphocoaGenTemplates/SssSphocoaApp/SssSphocoaGen/newSssSphocoaProject
+
+	this will walk you through the setup. In the newly created
+	project directory/SssSphocoaGen there will be
+		useMeAsTemplate.plist
+		useTemplateThatMadeMe.plist
+
+	you can use these to create clones, with a speedier setup.
+
+	on Mac: drag the plist onto newSssSphocoaProjectFromPlist.app
+
+	from cli: pass the plist path as argument for newSssSphocoaProject
+
+more info about the SssSphocoaGen templating system is found in:
+	infoSwissalpSPhocoaTemplates.txt
+
