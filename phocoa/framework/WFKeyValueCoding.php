@@ -84,6 +84,7 @@ interface WFKeyValueCoding
      *    Operators are preceeded by @:<br>
      *    count - Count of items specified by remainder of keypath.<br>
      *    first - Return the first item in the array, or NULL<BR>
+     *    firstNotNull - Return the first non-null item in the array, or NULL<BR>
      *    sum - Sum of items specified by remainder of keypath.<br>
      *    max - Maximum value of items specified by remainder of keypath.<br>
      *    min - Minimum value of items specified by remainder of keypath.<br>
@@ -111,6 +112,12 @@ interface WFKeyValueCoding
      *      "parent.firstName;parent.lastName;No Name"
      *    </code>
      *    If you want to use a literal ; in your default value, escape it with "\;".
+     * 6. Escape Hatch<br>
+     *    With valueForKeyPath you sometimes end up where a value in the middle of the keyPath can be NULL. By default this will throw a WFUndefinedKeyException.
+     *    However, if you prefer to just get back NULL in this case, you can use the escapeHatch.
+     *    <code>
+     *      "getRelatedObject^.name" - Will return NULL if getRelatedObject is NULL rather than throwing a WFUndefinedKeyException.
+     *    </code>
      *
      * @see valueForKey()
      * @param string The keyPath to retrive the value for.

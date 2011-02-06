@@ -88,6 +88,10 @@ abstract class WFWidget extends WFView
      * @see WFWidgets::setWidgetLabel()
      */
     protected $widgetLabel;
+    /**
+     * @var integer The tabindex of the control (defaults to NULL)
+     */
+    protected $tabIndex;
 
     /**
       * Constructor.
@@ -107,6 +111,7 @@ abstract class WFWidget extends WFView
         $this->hidden = false;
         $this->class = NULL;
         $this->widgetLabel = NULL;
+        $this->tabIndex = NULL;
     }
 
     public static function exposedProperties()
@@ -283,6 +288,8 @@ abstract class WFWidget extends WFView
         $enSetup->setBindingType(WFBindingSetup::WFBINDINGTYPE_MULTIPLE_BOOLEAN);
         $enSetup->setBooleanMode(WFBindingSetup::WFBINDINGTYPE_MULTIPLE_BOOLEAN_AND);
         $myBindings[] = $enSetup;
+        $tabIndexSetup = new WFBindingSetup('tabIndex', 'The current tabIndex.');
+        $myBindings[] = $tabIndexSetup;
         return $myBindings;
     }
 
@@ -376,15 +383,15 @@ abstract class WFWidget extends WFView
         // process value transformer
         if ($binding->valueTransformerName())
         {
-            WFLog::log("Transforming value " . print_r($boundValue, true) . " with " . $binding->valueTransformerName(), WFLog::TRACE_LOG);
+            WFLog::log("Transforming value " . var_export($boundValue, true) . " with " . $binding->valueTransformerName(), WFLog::TRACE_LOG);
             $vt = WFValueTransformer::valueTransformerForName($binding->valueTransformerName());
             $boundValue = $vt->transformedValue($boundValue);
-            WFLog::log("Transformed value: " . print_r($boundValue, true), WFLog::TRACE_LOG);
+            WFLog::log("Transformed value: " . var_export($boundValue, true), WFLog::TRACE_LOG);
         }
 
         if ($binding->formatter())
         {
-            WFLog::log("Formatting value " . print_r($boundValue, true) . " with " . $binding->formatter(), WFLog::TRACE_LOG);
+            WFLog::log("Formatting value " . var_export($boundValue, true) . " with " . $binding->formatter(), WFLog::TRACE_LOG);
             $formatter = $this->page()->module()->valueForKey($binding->formatter());
             // automatically handle formatting of arrays of objects
             if (is_array($boundValue))
@@ -398,10 +405,10 @@ abstract class WFWidget extends WFView
             {
                 $boundValue = $formatter->stringForValue($boundValue);
             }
-            WFLog::log("Formatted value: " . print_r($boundValue, true), WFLog::TRACE_LOG);
+            WFLog::log("Formatted value: " . var_export($boundValue, true), WFLog::TRACE_LOG);
         }
 
-        WFLog::log("Using value " . print_r($boundValue, true) . " for binding '$prop'", WFLog::TRACE_LOG);
+        WFLog::log("Using value " . var_export($boundValue, true) . " for binding '$prop'", WFLog::TRACE_LOG);
         return $boundValue;
     }
 
@@ -540,7 +547,7 @@ abstract class WFWidget extends WFView
                 {
                     $boundValue = $binding->coalescedOption(WFBindingSetup::WFBINDINGSETUP_NULL_PLACEHOLDER);
                 }
-                WFLog::log("FINAL value " . print_r($boundValue, true) . " for binding {$this->id} / $prop...", WFLog::TRACE_LOG);
+                WFLog::log("FINAL value " . var_export($boundValue, true) . " for binding {$this->id} / $prop...", WFLog::TRACE_LOG);
                 $this->setValueForKey($boundValue, $prop);  // must do this to allow accessors to be called!
             } catch (Exception $e) {
                 WFLog::log("Skipping pullBindings for {$this->id} / {$prop} due to exception: {$e->getMessage()}", WFLog::WARN_LOG);

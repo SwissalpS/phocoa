@@ -238,6 +238,15 @@ class WFObject implements WFKeyValueCoding
             $key = $keys[$keyI];
             $keyPartsLeft--;
 
+            // look for escape hatch
+            $escapeHatch = false;
+            $lastChrModifier = substr($key, -1);
+            if ($lastChrModifier === '^')
+            {
+                $escapeHatch = true;
+                $key = substr($key, 0, strlen($key)-1);
+            }
+
             // parse out decorate magic, if any
             $decoratorClass = NULL;
             $decoratorPos = strpos($key, '[');
@@ -292,6 +301,8 @@ class WFObject implements WFKeyValueCoding
             }
             else
             {
+                if ($escapeHatch and $result === NULL and $keyPartsLeft) return NULL;
+
                 if ($decoratorClass)
                 {
                     $result = new $decoratorClass($result);
@@ -305,7 +316,7 @@ class WFObject implements WFKeyValueCoding
             {
                 $nextPart = $keys[$keyI + 1];
                 // are we in operator mode as well?
-                if (in_array($nextPart, array('@count', '@first', '@sum', '@max', '@min', '@avg', '@unionOfArrays', '@unionOfObjects', '@distinctUnionOfArrays', '@distinctUnionOfObjects')))
+                if (in_array($nextPart, array('@count', '@first', '@firstNotNull', '@sum', '@max', '@min', '@avg', '@unionOfArrays', '@unionOfObjects', '@distinctUnionOfArrays', '@distinctUnionOfObjects')))
                 {
                     $operator = $nextPart;
                     $rightKeyPath = join('.', array_slice($keyParts, $keyI + 2));
@@ -350,6 +361,16 @@ class WFObject implements WFKeyValueCoding
                             else
                             {
                                 $result = null;
+                            }
+                            break;
+                        case '@firstNotNull':
+                            $result = null;
+                            foreach ($magicArray as $v) {
+                                if ($v !== NULL)
+                                {
+                                    $result = $v;
+                                    break;
+                                }
                             }
                             break;
                         case '@sum':

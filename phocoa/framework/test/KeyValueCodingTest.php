@@ -105,6 +105,16 @@ class KeyValueCodingTest extends PHPUnit_Framework_TestCase
         self::assertEquals($this->nodeTree->valueForKeyPath('children.@first.children.@first.name'), 'Grandkid1');
     }
 
+    function testFirstNotNullOperator()
+    {
+        $a = new Node;
+        $a->name = NULL;
+        $b = new Node;
+        $b->name = "Name";
+        $array = new WFArray(array($a, $b));
+        $this->assertEquals("Name", $array->valueForKeyPath('values.@firstNotNull.name'));
+    }
+
     // test @sum
     function testSumOperator()
     {
@@ -324,5 +334,13 @@ class KeyValueCodingTest extends PHPUnit_Framework_TestCase
         $p = new Person('Alan', 'Pinstein', 1);
         $this->assertEquals('Alan', $p->valueForKeyPath('firstName;No Name'), "Uses First Non-Null Value.");
         $this->assertEquals('Alan', $p->valueForKeyPath('alwaysNull;firstName;No Name'), "Uses First Non-Null Value.");
+    }
+    function testEscapeHatch()
+    {
+        $node = new Node;
+        $node->name = 'Some name.';
+        $node->value = NULL;
+
+        $this->assertNull($node->valueForKeyPath('value^.whatever'), "Escape hatch failed to detect null for scalar.");
     }
 }
