@@ -5,7 +5,7 @@
  * @subpackage Widgets
  * @copyright Copyright (c) 2005 Alan Pinstein. All Rights Reserved.
  * @version $Id: kvcoding.php,v 1.3 2004/12/12 02:44:09 alanpinstein Exp $
- * @author Alan Pinstein <apinstein@mac.com>                        
+ * @author Alan Pinstein <apinstein@mac.com>
  */
 
 /**
@@ -18,14 +18,14 @@
  * are based on dynamic data. Plus, no image will be rendered if value is blank, even if baseDir is non-blank.
  *
  * If only one of width or height is supplied, the image will be proportionally resized with CSS.
- * 
+ *
  * The "value" for WFImage is the image URL to include. The {@link WFImage::$baseDir baseDir} attribute will be pre-pended.
  *
  * <b>PHOCOA Builder Setup:</b>
  *
  * <b>Required:</b><br>
  * - {@link WFWidget::$value value}
- * 
+ *
  * <b>Optional:</b><br>
  * - {@link WFImage::$baseDir baseDir}
  * - {@link WFImage::$filesystemPath filesystemPath}
@@ -157,7 +157,7 @@ class WFImage extends WFWidget
         $newValBinding->setBindingType(WFBindingSetup::WFBINDINGTYPE_MULTIPLE_PATTERN);
 
         $myBindings[] = $newValBinding;
-        $newValBinding = new WFBindingSetup('baseDir', 'The base path to the image. Blank by default.', array(WFBindingSetup::WFBINDINGSETUP_PATTERN_OPTION_NAME => WFBindingSetup::WFBINDINGSETUP_PATTERN_OPTION_VALUE)); 
+        $newValBinding = new WFBindingSetup('baseDir', 'The base path to the image. Blank by default.', array(WFBindingSetup::WFBINDINGSETUP_PATTERN_OPTION_NAME => WFBindingSetup::WFBINDINGSETUP_PATTERN_OPTION_VALUE));
         $newValBinding->setReadOnly(true);
         $newValBinding->setBindingType(WFBindingSetup::WFBINDINGTYPE_MULTIPLE_PATTERN);
         $myBindings[] = $newValBinding;
@@ -180,16 +180,37 @@ class WFImage extends WFWidget
     function setBaseDir($path)
     {
         $this->baseDir = $path;
+        return $this;
     }
 
     function setSrcWidth($w)
     {
         $this->srcWidth = $w;
+        return $this;
     }
 
     function setSrcHeight($h)
     {
         $this->srcHeight = $h;
+        return $this;
+    }
+
+    function setFitToBox($b)
+    {
+        $this->fitToBox = $b;
+        return $this;
+    }
+
+    function setWidth($v)
+    {
+        $this->width = $v;
+        return $this;
+    }
+
+    function setHeight($v)
+    {
+        $this->height = $v;
+        return $this;
     }
 
     private function doFitToBox(&$pxWidth, &$pxHeight)
@@ -210,15 +231,15 @@ class WFImage extends WFWidget
         if ($this->width and $this->height)
         {
             // fit to box
-            
-            // scale DOWN to fix box 
+
+            // scale DOWN to fix box
             if ($this->srcWidth > $this->width or $this->srcHeight > $this->height)
-            {   
+            {
                 $newRatio = $this->width / $this->height;
                 //die("{$this->srcWidth} x {$this->srcHeight}; $iRatio / $this->width x $this->height; $newRatio");
                 // resize
                 if ($iRatio > $newRatio)
-                {   
+                {
                     $resizeRatio = $this->width / $this->srcWidth;
                     $newWidth = $this->srcWidth * $resizeRatio;
                     $newHeight = $newWidth / $iRatio;
@@ -232,7 +253,7 @@ class WFImage extends WFWidget
             }
             // DON'T scale up to fit box; only down - maybe make this optional later
             else
-            {   
+            {
                 //die("no need to resize: {$this->srcWidth}x{$this->srcHeight} to fix box: {$this->width}x{$this->height}");
                 $newWidth = $this->srcWidth;
                 $newHeight = $this->srcHeight;

@@ -1,9 +1,9 @@
 <?php
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
-/** 
+/**
 * @copyright Copyright (c) 2002 Alan Pinstein. All Rights Reserved.
 * @version $Id: smarty_showcase.php,v 1.3 2005/02/01 01:24:37 alanpinstein Exp $
-* @author Alan Pinstein <apinstein@mac.com>                        
+* @author Alan Pinstein <apinstein@mac.com>
 * @package UI
 * @subpackage Template
 */
@@ -46,7 +46,7 @@ class WFSmarty extends Smarty implements WFPageRendering
         return $this->template;
     }
 
-    function assign($name, $value)
+    function assign($name, $value = NULL)
     {
         parent::assign($name, $value);
     }

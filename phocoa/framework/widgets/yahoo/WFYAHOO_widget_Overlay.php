@@ -5,16 +5,16 @@
  * @subpackage Widgets
  * @copyright Copyright (c) 2005 Alan Pinstein. All Rights Reserved.
  * @version $Id: kvcoding.php,v 1.3 2004/12/12 02:44:09 alanpinstein Exp $
- * @author Alan Pinstein <apinstein@mac.com>                        
+ * @author Alan Pinstein <apinstein@mac.com>
  */
 
 /**
  * A YAHOO Overlay widget for our framework.
- * 
+ *
  * <b>PHOCOA Builder Setup:</b>
  *
  * <b>Required:</b><br>
- * 
+ *
  * <b>Optional:</b><br>
  */
 class WFYAHOO_widget_Overlay extends WFYAHOO_widget_Module
@@ -93,6 +93,11 @@ class WFYAHOO_widget_Overlay extends WFYAHOO_widget_Module
     function setFixedCenter($b)
     {
         $this->fixedcenter = $b;
+    }
+
+    function setConstrainToViewport($b)
+    {
+        $this->constraintoviewport = $b;
     }
 
     /**
@@ -185,9 +190,9 @@ PHOCOA.widgets.{$this->id}.Overlay.init = function() {
     var overlay = PHOCOA.runtime.getObject('{$this->id}');
     overlay.cfg.setProperty('fixedcenter', " . ($this->fixedcenter ? "'contained'" : 'false') . ");
     overlay.cfg.setProperty('iframe', " . ($this->iframe ? 'true' : 'false') . ");
-    overlay.cfg.setProperty('constraintoviewport', " . ($this->constraintoviewport ? 'true' : 'false') . ");" . 
-    ($this->context ? "\n    overlay.cfg.setProperty('context', [ '{$this->context['id']}', '{$this->context['elementCorner']}', '{$this->context['contextCorner']}' ] );" : NULL ) . 
-    ($this->width ? "\n    overlay.cfg.setProperty('width', '{$this->width}');" : NULL ) . 
+    overlay.cfg.setProperty('constraintoviewport', " . ($this->constraintoviewport ? 'true' : 'false') . ");" .
+    ($this->context ? "\n    overlay.cfg.setProperty('context', [ '{$this->context['id']}', '{$this->context['elementCorner']}', '{$this->context['contextCorner']}' ] );" : NULL ) .
+    ($this->width ? "\n    overlay.cfg.setProperty('width', '{$this->width}');" : NULL ) .
     ($this->height ? "\n    overlay.cfg.setProperty('height', '{$this->height}');" : NULL ) .
     ($this->x ? "\n    overlay.cfg.setProperty('x', '{$this->x}');" : NULL ) .
     ($this->y ? "\n    overlay.cfg.setProperty('y', '{$this->y}');" : NULL ) .

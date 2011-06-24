@@ -5,7 +5,7 @@
  * @subpackage Widgets
  * @copyright Copyright (c) 2005 Alan Pinstein. All Rights Reserved.
  * @version $Id: kvcoding.php,v 1.3 2004/12/12 02:44:09 alanpinstein Exp $
- * @author Alan Pinstein <apinstein@mac.com>                        
+ * @author Alan Pinstein <apinstein@mac.com>
  */
 
 /**
@@ -25,21 +25,21 @@
  * Bindings:
  * <b>Required:</b><br>
  * - {@link WFWidget::$value value} or {@link WFSelect::$values values}, depending on {@link WFSelect::$multiple multiple}.
- * 
+ *
  * <b>Optional:</b><br>
  * - {@link WFSelect::$contentValues contentValues} Set the values for each option specified in contentLabels.
  *  <pre>Binding Options:
  *  InsertsNullPlaceholder - boolean, true to insert an item for "NULL" value at the top of the list.
  *  NullPlaceholder - string, the value of the "Null" placeholder item.
  *  </pre>
- * 
+ *
  * - {@link WFSelect::$contentLabels contentLabels} Set the labels for each option specified in contentValues.
  *  <pre>Binding Options:
  *   InsertsNullPlaceholder - boolean, true to insert an item for "NULL" value at the top of the list.
  *   NullPlaceholder - string, the label of the "Null" placeholder item.
  *   ValuePattern - supports ValuePattern binding
  *  </pre>
- * 
+ *
  * - {@link WFSelect::setOptions() options} Set both contentValues and contentLabels at the same time, from an associative array of format 'value' => 'label'.
  *  <pre>Binding Options:
  *   InsertsNullPlaceholder - boolean, true to insert an item for "NULL" value at the top of the list.
@@ -305,17 +305,18 @@ class WFSelect extends WFWidget
         return $labels;
     }
 
-    
+
     function contentValues()
     {
         return $this->contentValues;
     }
-    
+
     /**
      * A convenience function to set both values and labels simultaneously from an associative array.
      * @param assoc_array A list of value => label.
      * @param string NullPlaceholder that will be inserted at the top of the options list
      * @param string NullPlaceholderValue The "value" used for the NULL placeholder (default NULL)
+     * @return object WFSelect For fluent interface.
      */
     function setOptions($opts, $nullPlaceholder = NULL, $nullPlaceholderValue = NULL)
     {
@@ -325,6 +326,8 @@ class WFSelect extends WFWidget
         }
         $this->setContentValues(array_keys($opts));
         $this->setContentLabels(array_values($opts));
+
+        return $this;
     }
 
     function setContentValues($values)
@@ -337,7 +340,7 @@ class WFSelect extends WFWidget
     {
         return $this->contentLabels;
     }
-    
+
     function setContentLabels($labels)
     {
         if (!is_array($labels) && !$labels instanceof ArrayObject) throw new WFException("Expected an array");
@@ -398,9 +401,9 @@ class WFSelect extends WFWidget
                     $size .
                     ($this->enabled() ? '' : ' disabled readonly ') .
                     ($this->class ? ' class="' . $this->class . '"' : '') .
-                    ($this->width ? ' style="width: ' . $this->width . ';" ' : '') . 
+                    ($this->width ? ' style="width: ' . $this->width . ';" ' : '') .
                     ($this->tabIndex ? ' tabIndex="' . $this->tabIndex . '" ' : NULL) .
-                    $this->getJSActions() . 
+                    $this->getJSActions() .
                     '>';
 
         $values = $this->contentValues();

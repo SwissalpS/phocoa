@@ -5,7 +5,7 @@
  * @subpackage Widgets
  * @copyright Copyright (c) 2005 Alan Pinstein. All Rights Reserved.
  * @version $Id: kvcoding.php,v 1.3 2004/12/12 02:44:09 alanpinstein Exp $
- * @author Alan Pinstein <apinstein@mac.com>                        
+ * @author Alan Pinstein <apinstein@mac.com>
  */
 
 /**
@@ -17,7 +17,7 @@
  *
  * <b>Required:</b><br>
  * - {@link WFWidget::$value value} or {@link WFSelect::$values values}, depending on {@link WFSelect::$multiple multiple}.
- * 
+ *
  * <b>Optional:</b><br>
  * - {@link WFJumpSelect::$baseURL baseURL}
  * - {@link WFSelect::$multiple multiple}
@@ -61,7 +61,7 @@ class WFJumpSelect extends WFSelect
         return $myBindings;
     }
 
-    // WFJumpSelect does not push the value back... 
+    // WFJumpSelect does not push the value back...
     function canPushValueBinding()
     {
         return false;
@@ -70,10 +70,12 @@ class WFJumpSelect extends WFSelect
       * Set the base URL for the WFJumpSelect.
       *
       * @param string The base URL for the WFJumpSelect. If NULL, use the "value". If not NULL, append the "value" to baseURL.
+      * @return object WFJumpSelect For fluent interface.
       */
     function setBaseURL($url)
     {
         $this->baseURL = $url;
+        return $this;
     }
 
     /**
@@ -120,7 +122,7 @@ class WFJumpSelect extends WFSelect
                     {
                         if(select.options[index].value != initialSelection)
                         {
-                            newURL = "' . $this->baseURL . '" + select.options[index].value; 
+                            newURL = "' . $this->baseURL . '" + select.options[index].value;
                             window.location.href = newURL;
                         }
                         break;

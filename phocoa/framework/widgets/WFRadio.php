@@ -5,7 +5,7 @@
  * @subpackage Widgets
  * @copyright Copyright (c) 2005 Alan Pinstein. All Rights Reserved.
  * @version $Id: kvcoding.php,v 1.3 2004/12/12 02:44:09 alanpinstein Exp $
- * @author Alan Pinstein <apinstein@mac.com>                        
+ * @author Alan Pinstein <apinstein@mac.com>
  */
 
 /**
@@ -23,9 +23,10 @@
  *
  * <b>Required:</b><br>
  * - {@link WFRadio::$selectedValue selectedValue} The value to use if this radio button is selected.
- * 
+ *
  * <b>Optional:</b><br>
  * - {@link WFRadio::$label label}
+ * - {@link WFRadio::$labelPosition labelPosition}
  *
  * NOTE: The "value" property is not really used for WFRadio... that instead is handled by the WFRadioGroup.
  */
@@ -43,6 +44,10 @@ class WFRadio extends WFWidget
      * @var string The label to show next to the radio. This will be shown to the RIGHT of the radio, and will use the HTML <label> tag to link the radio to the label.
      */
     protected $label;
+    /**
+     * @var string The position of the labels in HTML. 'left' will put the <label> first; 'right' will put it after the radio button.
+     */
+    protected $labelPosition;
 
     /**
       * Constructor.
@@ -53,6 +58,7 @@ class WFRadio extends WFWidget
         $this->setSelectedValue($id);
         $this->setSelected(false);
         $this->setLabel('');
+        $this->labelPosition = 'right';
     }
 
     public static function exposedProperties()
@@ -62,6 +68,7 @@ class WFRadio extends WFWidget
             'selected' => array('true', 'false'),
             'selectedValue',
             'label',
+            'labelPosition' => array('left', 'right'),
             ));
     }
 
@@ -141,15 +148,22 @@ class WFRadio extends WFWidget
         // get there reference to the named item
         // set the name / value
         // render
-        return '<input type="radio" ' .
+        $labelLeft = $labelRight = ($this->label() !== '' ? " <label for=\"{$this->id}\">{$this->label}</label>" : '');
+        if ($this->labelPosition === 'left')
+        {
+            $labelRight = NULL;
+        }
+        else
+        {
+            $labelLeft = NULL;
+        }
+        return $labelLeft . '<input type="radio" ' .
                     'name="' . $this->parent()->name() . '" ' .
                     'id="' . $this->id() . '" ' .
                     'value="' . $this->selectedValue() . '" ' .
                     ($this->selected() ? ' checked="checked" ' : '') .
-                    ' />' . 
-                    ($this->label() !== '' ? " <label for=\"{$this->id}\">{$this->label}</label>" : '')
-                    . $this->getListenerJSInScriptTag();
-     
+                    ' />' . $labelRight .
+                    $this->getListenerJSInScriptTag();
     }
 
     function canPushValueBinding() { return false; }

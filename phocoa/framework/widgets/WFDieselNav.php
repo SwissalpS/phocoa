@@ -5,12 +5,12 @@
  * @subpackage Widgets
  * @copyright Copyright (c) 2005 Alan Pinstein. All Rights Reserved.
  * @version $Id: kvcoding.php,v 1.3 2004/12/12 02:44:09 alanpinstein Exp $
- * @author Alan Pinstein <apinstein@mac.com>                        
+ * @author Alan Pinstein <apinstein@mac.com>
  */
 
 /**
  * The Dieselpoint Faceted Navigation UI placeholder.
- * 
+ *
  * This widget coordinates all WFDieselFacet widgets (which are its children). It provides the "cookie trail" of the search and the overall search form.
  *
  * IMPORTANT: Any module/page using a DieselNav needs to have as its last 2 parameters:
@@ -21,12 +21,12 @@
  * It's possible a future version could be smart enough to handle these params at arbitrary positions and zero them out as needed when constructing URLs.
  *
  * You can have additional parameters, at the beginning, used with setBaseParams().
- * 
+ *
  * <b>PHOCOA Builder Setup:</b>
  *
  * <b>Required:</b><br>
  * - {@link WFWidget::$value value} or {@link WFSelect::$values values}, depending on {@link WFSelect::$multiple multiple}.
- * 
+ *
  * <b>Optional:</b><br>
  * - {@link WFLabel::$ellipsisAfterChars ellipsisAfterChars}
  */
@@ -108,8 +108,7 @@ class WFDieselNav extends WFWidget
             if ($pName == $this->dpQueryStateParamName) break;
             $baseURLParams .= "/{$value}";
         }
-        $baseURLParams = rtrim(join('/', $baseURLParams), '/');
-        
+
         // calculate base URL for links
         if ($this->page->module()->invocation()->targetRootModule() and !$this->page->module()->invocation()->isRootInvocation())
         {
@@ -151,7 +150,7 @@ class WFDieselNav extends WFWidget
             // set up popup container
             $popup = new WFYAHOO_widget_Panel("phocoaWFDieselNav_Popup_{$this->id}", $this->page);
             $popup->setRenderTo("'{$this->getForm()->id()}'");
-            $popup->setFixedCenter(true);
+            $popup->setConstrainToViewport(true);
             $popup->setHeader('<div style="height: 10px"></div>');
             $popup->setBody("<div id=\"phocoaWFDieselNav_PopupContent_{$this->id}\" style=\"padding: 5px;\"></div><input " . ($this->showLoadingMessage ? 'onClick="cancelPopup(); showLoading();"' : NULL) . " type=\"submit\" name=\"action|" . $this->searchAction . "\" value=\"Go\"/>");
             $popup->setValueForKey('400px', 'width');
@@ -162,9 +161,12 @@ class WFDieselNav extends WFWidget
             // js
             $html .= "
     <script type=\"text/javascript\">
-    function doPopup(facetID, dpQueryState, facetSelections)
+    function doPopup(facetID, dpQueryState, facetSelections, contextEl)
     {
-        PHOCOA.runtime.getObject('phocoaWFDieselNav_Popup_{$this->id}').cfg.setProperty('context', ['{$this->id}', 'tl', 'tl']);
+        if (typeof contextEl !== 'undefined')
+        {
+            PHOCOA.runtime.getObject('phocoaWFDieselNav_Popup_{$this->id}').cfg.setProperty('context', [contextEl, 'tl', 'tl']);
+        }
         PHOCOA.runtime.getObject('phocoaWFDieselNav_Popup_{$this->id}').show();
         Element.update('phocoaWFDieselNav_PopupContent_{$this->id}', '<div style=\"padding: 10px; font-size: 20px; line-height: 25px;\">Loading... please wait...</div><div class=\"phocoaWFDieselNav_Loading\"></div>');
 
@@ -188,7 +190,7 @@ class WFDieselNav extends WFWidget
     function showLoading()
     {
     ";
-    
+
             if ($this->showLoadingMessage)
             {
                 $html .= "
@@ -215,7 +217,7 @@ class WFDieselNav extends WFWidget
             $renderedList = array();
             // keep track of each item as rendered so we don't do it 2x
             $selectionRenderedList = array();
-            
+
             // 1. render current selections / filters
             // first do items in desired order
             $filtersShownCount = 0;
@@ -264,7 +266,7 @@ class WFDieselNav extends WFWidget
             if ($filtersShownCount >= 2)
             {
                 $html .= "\n<div class=\"phocoaWFDieselNav_FilterInfo\" style=\"border: 0\"><a " .
-                        ($this->showLoadingMessage ? ' onClick="showLoading(); "' : '') . 
+                        ($this->showLoadingMessage ? ' onClick="showLoading(); "' : '') .
                         " href=\"" . $this->baseURL() . '/' . urlencode($this->dieselSearchHelper->getQueryStateWithRestrictDQLOnly()) . "\">Clear all filters</a></div>\n";
             }
             $html .= "<br clear=\"all\" />\n";
@@ -354,7 +356,7 @@ class WFDieselNav extends WFWidget
                 }
                 $html .= "\n</li>\n";
             }
-            
+
             $html .= "</ul></div>";
             return $html;
         }

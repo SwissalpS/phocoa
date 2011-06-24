@@ -1,6 +1,6 @@
 <?php
 
-ini_set("memory_limit", '20M');
+ini_set("memory_limit", '200M');
 
 /**
  * The iphp shell is an interactive PHP shell for working with your php applications.
@@ -24,7 +24,7 @@ class iphp
 
     const OPT_TAGS_FILE     = 'tags';
     const OPT_REQUIRE       = 'require';
-    
+
     /**
      * Constructor
      *
@@ -83,28 +83,28 @@ class iphp
     {
         return tempnam(sys_get_temp_dir(), "iphp.{$name}.");
     }
-    
+
     public function prompt()
     {
         return $this->prompt;
     }
-    
+
     public function historyFile()
     {
         return getenv('HOME') . '/.iphpHistory';
     }
-    
+
     public function readlineCallback($command)
     {
         if ($command === NULL) exit;
         $this->lastCommand = $command;
     }
-    
+
     public function readlineCompleter($str)
     {
         return $this->autocompleteList;
     }
-    
+
     public function doCommand($command)
     {
         print "\n";
@@ -162,7 +162,7 @@ file_put_contents('{$this->tmpFileShellCommandState}', serialize(\$__allData));
                 if ($require === $this->tmpFileShellCommand) continue;
                 require_once($require);
             }
-            
+
             $lastState = unserialize(file_get_contents($this->tmpFileShellCommandState));
             $this->lastResult = $lastState['_'];
             if ($lastState['__out'])
@@ -187,7 +187,7 @@ file_put_contents('{$this->tmpFileShellCommandState}', serialize(\$__allData));
             print "Uncaught exception with command:\n" . $e->getMessage() . "\n";
         }
     }
-    
+
     private function myReadline()
     {
         $this->lastCommand = NULL;

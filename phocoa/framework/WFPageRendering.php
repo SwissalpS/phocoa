@@ -5,7 +5,7 @@
  * @subpackage Template
  * @copyright Copyright (c) 2005 Alan Pinstein. All Rights Reserved.
  * @version $Id: kvcoding.php,v 1.3 2004/12/12 02:44:09 alanpinstein Exp $
- * @author Alan Pinstein <apinstein@mac.com>                        
+ * @author Alan Pinstein <apinstein@mac.com>
  */
 
 interface WFPageRendering
@@ -15,7 +15,7 @@ interface WFPageRendering
      * @param string Name of the variable.
      * @param mixed Value of the variable.
      */
-    function assign($name, $value);
+    function assign($name, $value = NULL);
 
     /**
      * Get the value of a previously assigned variable.
@@ -45,7 +45,7 @@ interface WFPageRendering
      * The only thing the framework assigns to the template is __page, which is a reference to itself so that the
      * template can access widgets, etc. By having this interface include this function, we can always get back
      * to the WFPage from any template engine.
-     * @return object WFPage Page that the template is part of. 
+     * @return object WFPage Page that the template is part of.
      */
     function getPage();
 

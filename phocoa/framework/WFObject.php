@@ -4,10 +4,10 @@
  * @package framework-base
  * @copyright Copyright (c) 2005 Alan Pinstein. All Rights Reserved.
  * @version $Id: kvcoding.php,v 1.3 2004/12/12 02:44:09 alanpinstein Exp $
- * @author Alan Pinstein <apinstein@mac.com>                        
+ * @author Alan Pinstein <apinstein@mac.com>
  */
 
-/** 
+/**
  * Base Class for all framework classes.
  *
  * Provides:
@@ -17,6 +17,54 @@ class WFObject implements WFKeyValueCoding
 {
     function __construct()
     {
+    }
+
+    /**
+     * Break circular references so this object will GC pre-5.2.
+     *
+     * NOTE: if the value of the var is an array, the array will be iterated on as well and the destroy() method called (if available) and the array references removed.
+     *
+     * @param array A list of all instances to destroy.
+     */
+    private $alreadyInDestroy = false;
+    public function destroy($vars = array())
+    {
+        if ($this->alreadyInDestroy) return;
+
+        $this->alreadyInDestroy = true;
+        foreach ($vars as $v) {
+            $toBeDestroyed = $this->$v;
+            if ($toBeDestroyed)
+            {
+                $_destroyedClass = get_class($toBeDestroyed);
+                $o = memory_get_usage();
+                if (is_object($toBeDestroyed) and method_exists($toBeDestroyed, 'destroy'))
+                {
+                    $toBeDestroyed->destroy();
+                }
+                else if (is_array($toBeDestroyed))
+                {
+                    while ($tbd = array_pop($toBeDestroyed)) {  // destroys more memory than foreach() here for some reason
+                        if (method_exists($tbd, 'destroy'))
+                        {
+                            $tbd->destroy();
+                        }
+                        else
+                        {
+                            // for debugging this will tell you what doesn't have destroy impemented
+                            //print "==&gt; No destroy for " . get_class($this) . "::\${$v}[x]<br>\n";
+                        }
+                    }
+                }
+                else
+                {
+                    // for debugging this will tell you what doesn't have destroy impemented
+                    //print "==&gt; No destroy for " . get_class($this) . "::\${$v}<br>\n";
+                }
+                $this->$v = NULL;
+                //print "Recovered " . ($o - memory_get_usage()) . " by destroying " . get_class($this) . "::\${$v} [{$_destroyedClass}]<br>\n";
+            }
+        }
     }
 
     /**
@@ -183,7 +231,7 @@ class WFObject implements WFKeyValueCoding
 
     /**
      * Helper function for implementing KVC.
-     * 
+     *
      * Supports "coalescing" KVC by using ; separated keyPaths. The first non-null value returned will be used.
      * The *last* keypath is actually the "default default" which is used if all keyPaths return NULL.
      *
@@ -488,13 +536,13 @@ class WFObject implements WFKeyValueCoding
     /**
      * Helper function to convert a keyPath into the targetKeyPath (the object to call xxxKey on) and the targetKey (the key to call on the target object).
      *
-     * Usage: 
+     * Usage:
      *
      * <code>
      * list($targetKeyPath, $targetKey) = keyPathToParts($keyPath);
      * </code>
      *
-     * @return array targetKeyPath, targetKey. 
+     * @return array targetKeyPath, targetKey.
      */
     protected function keyPathToTargetAndKey($keyPath)
     {
@@ -570,10 +618,10 @@ class WFObject implements WFKeyValueCoding
      * Default implementation for validateObject().
      *
      * The default implementation will call all defined Key-Value Validators (any method matching "^validate*") using {@link validatedSetValueForKey()}.
-     * 
+     *
      * Validations are done via {@link validatedSetValueForKey()}, meaning that changes made to values by the validators will be updated via setValueForKey.
      *
-     * Subclasses needing to do interproperty validation should override the validateObject() method. If subclasses wish to block the default behavior of re-validating 
+     * Subclasses needing to do interproperty validation should override the validateObject() method. If subclasses wish to block the default behavior of re-validating
      * all properties with validators, then the subclass should not call the super method. Subclasses wishing to preserve this behavior should call parent::validateObject($errors).
      *
      * @experimental

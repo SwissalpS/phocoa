@@ -5,7 +5,7 @@
  * @subpackage Widgets
  * @copyright Copyright (c) 2005 Alan Pinstein. All Rights Reserved.
  * @version $Id: kvcoding.php,v 1.3 2004/12/12 02:44:09 alanpinstein Exp $
- * @author Alan Pinstein <apinstein@mac.com>                        
+ * @author Alan Pinstein <apinstein@mac.com>
  */
 
 /**
@@ -21,7 +21,7 @@
  * <b>PHOCOA Builder Setup:</b>
  *
  * <b>Required:</b><br>
- * 
+ *
  * <b>Optional:</b><br>
  * {@link WFYAHOO_widget_Tab::$cacheData cacheData}
  * {@link WFYAHOO_widget_Tab::$dataSrc dataSrc}
@@ -178,7 +178,7 @@ class WFYAHOO_widget_Tab extends WFYAHOO
  * <b>PHOCOA Builder Setup:</b>
  *
  * <b>Required:</b><br>
- * 
+ *
  * <b>Optional:</b><br>
  * selectedTabId - The ID of the tab that should be selected by default.
  * orientation - One of top, left, right, or bottom.
@@ -276,7 +276,7 @@ class WFYAHOO_widget_TabView extends WFYAHOO
             return $html;
         }
     }
-    
+
     function initJS($blockContent)
     {
         if ($blockContent === NULL) return NULL;
@@ -390,6 +390,17 @@ class WFYAHOO_widget_TabView extends WFYAHOO
             $i++;
         }
         $html .= "
+            tabView.goToTab = function(tabId) {
+                tabId = '#' + tabId;
+                for (var i = 0; i < tabView.getAttributeConfig('tabs').value.length; i++) {
+                    if (tabView.getTab(i).getAttributeConfig('href').value === tabId)
+                    {
+                        tabView.selectTab(i);
+                        return;
+                    }
+                }
+                throw new Error('TabId ' + tabId + ' does not exist.');
+            };
             PHOCOA.runtime.addObject(tabView, '{$this->id}');
         };
         ";

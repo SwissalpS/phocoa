@@ -5,7 +5,7 @@
  * @subpackage Widgets
  * @copyright Copyright (c) 2005 Alan Pinstein. All Rights Reserved.
  * @version $Id: kvcoding.php,v 1.3 2004/12/12 02:44:09 alanpinstein Exp $
- * @author Alan Pinstein <apinstein@mac.com>                        
+ * @author Alan Pinstein <apinstein@mac.com>
  */
 
 interface WFUploadedFile
@@ -13,6 +13,58 @@ interface WFUploadedFile
     function tmpFileName();
     function originalFileName();
     function mimeType();
+}
+
+class WFUploadedFile_Basic extends WFObject implements WFUploadedFile
+{
+    /**
+     * @var string The temp file name of the uploaded file.
+     */
+    protected $tmpFileName;
+    /**
+     * @var string The mime type of the uploaded file. This is the mime-type reported by the browser, so remember that it can be faked!
+     */
+    protected $mimeType;
+    /**
+     * @var string The name of the actual file.
+     */
+    protected $originalFileName;
+
+    function __construct($tmpFileName, $mimeType, $originalFileName)
+    {
+        $this->tmpFileName = $tmpFileName;
+        $this->mimeType = $mimeType;
+        $this->originalFileName = $originalFileName;
+    }
+
+    function tmpFileName()
+    {
+        return $this->tmpFileName;
+    }
+
+    function getTmpFileName()
+    {
+        return $this->tmpFileName();
+    }
+
+    function mimeType()
+    {
+        return $this->mimeType;
+    }
+
+    function getMimeType()
+    {
+        return $this->mimeType();
+    }
+
+    function originalFileName()
+    {
+        return $this->originalFileName;
+    }
+    function getOriginalFileName()
+    {
+        return $this->originalFileName();
+    }
 }
 
 /**

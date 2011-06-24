@@ -1,6 +1,6 @@
 <?php
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
-/** 
+/**
  * The WFPage object.
  *
  * Each request creates a module/page to handle the request. This struct uses exactly 2 pages, a requestPage and a responsePage. The requestPage respesents the UI state of the submitted form, if any, and the responsePage represents the UI state of the page that will be displayed in response to the request. The client responds to the request/action by reading from the requestPage and taking appropriate actions (ie saving data, etc). The client then selects a responsePage and sets up the UI elements as desired. The rendered responsePage is what the user will see.
@@ -9,7 +9,7 @@
  *
  * @copyright Copyright (c) 2002 Alan Pinstein. All Rights Reserved.
  * @version $Id: smarty_showcase.php,v 1.3 2005/02/01 01:24:37 alanpinstein Exp $
- * @author Alan Pinstein <apinstein@mac.com>                        
+ * @author Alan Pinstein <apinstein@mac.com>
  * @package UI
  * @subpackage PageController
  * @todo Some more refactoring... it's odd that the class has to figure out if it's the requestPage or responsePage. I think instead they should be 2 classes.
@@ -19,7 +19,7 @@
 
 /**
  * Informal Protocol declaration for WFPage delegates.
- * 
+ *
  * Function in this informal protocol are used to respond to different points in the page life cycle.
  *
  * Common activities include setting up dynamic widgets, responding to actions, etc.
@@ -27,9 +27,9 @@
 interface WFPageDelegate
 {
     // delegate functions documented in calling order during page life cycle
-   
+
     /**
-     *  Called when the page instances have been loaded and configured. 
+     *  Called when the page instances have been loaded and configured.
      *
      *  You can be certain at this point that all instances in the .yaml files have been loaded and connected.
      *
@@ -46,7 +46,7 @@ interface WFPageDelegate
      *  array(
      *          'param1'    =>  'defaultValueForParam1'
      *          'param2',       // default will be NULL
-     *          'param3'        // default will be NULL 
+     *          'param3'        // default will be NULL
      *  )
      *  array(
      *          'param1'    =>  array(
@@ -124,7 +124,7 @@ interface WFPageDelegate
     function willNotRunAction($page, $params);
 
     /**
-     *  Called just befored rendering, but after the skin has been initalized. 
+     *  Called just befored rendering, but after the skin has been initalized.
      *
      *  This is a good callback to use to add head strings, meta tags, set the HTML title, set the skin to use, etc.
      *
@@ -167,13 +167,13 @@ interface WFPageDelegate
  * The WFPage encapsulates the UI and Controller Layer state of a page.
  *
  * The Page infrastructure initializes pages by instantiating all WFView instances (including widgets) in a page (from the .instances file),
- * loads all configs for those instances (from the .config file), and also can render the page to HTML using a WFPageRendering-compatible 
+ * loads all configs for those instances (from the .config file), and also can render the page to HTML using a WFPageRendering-compatible
  * template instance.
  *
  * The page manages the WFView instances with a Mediator pattern.
  *
  * The page is responsible for helping the widgets restore their state from a request.
- * 
+ *
  * SEE COMPOSITE PATTERN IN GoF for ideas about the widget hierarchy.
  *
  * WFPage automatically adds a few useful variables to your template:
@@ -188,7 +188,7 @@ class WFPage extends WFObject
     protected $template;    // and object conforming to interface WFPageRendering
     protected $instances;   // assoc array of all instances, 'id' => instance object
     protected $parameters;  // finalized calculated parameters in effect for the page
-    protected $errors;      // all validation errors for the current page; errors are managed in real-time. Any errors added to widgets of this page 
+    protected $errors;      // all validation errors for the current page; errors are managed in real-time. Any errors added to widgets of this page
                             // are automatically added to our page errors list.
     protected $delegate;    // an object implementing some of WFPageDelegate. OPTIONAL.
     protected $ignoreErrors;// whether or not the page should ignore errors that were generated during the page life cycle
@@ -206,6 +206,11 @@ class WFPage extends WFObject
         $this->delegate = NULL;
         $this->ignoreErrors = false;
         WFLog::log("instantiating a page", WFLog::TRACE_LOG, PEAR_LOG_DEBUG);
+    }
+
+    public function destroy($vars = array())
+    {
+        parent::destroy(array('module', 'template', 'delegate', 'instances'));
     }
 
     public function setIgnoreErrors($bIgnoreErrors)
@@ -290,7 +295,7 @@ class WFPage extends WFObject
      * Determine the name of the submitted form, if there is a submitted form for the current module.
      *
      * This function takes into account the module invocation's respondsToForms setting...
-     * 
+     *
      * @todo Should this be in WFRequestController?
      * @return string The name of the submitted form, if one was submitted. NULL if no form was submitted.
      */
@@ -324,10 +329,10 @@ class WFPage extends WFObject
     }
 
     /**
-     *  Tell the page to use an alternate .tpl file (besides the default, '<pagename>.tpl') for 
+     *  Tell the page to use an alternate .tpl file (besides the default, '<pagename>.tpl') for
      *  rendering the page.
      *
-     *  When responding to a request, you will form a response to send back to the client. Depending on the 
+     *  When responding to a request, you will form a response to send back to the client. Depending on the
      *  nature of the response, there are two options in PHOCOA for building the response page.
      *
      *  In many cases, your application will need to present the same data in different ways. Once example
@@ -336,7 +341,7 @@ class WFPage extends WFObject
      *
      *  The alternative is to use $module->setupResponsePage() to have PHOCOA respond to the request with
      *  a completely different page. However, this is most useful only if you are going to be displaying
-     *  different data from the request. For instance, the "continue shopping" button of a shopping cart may 
+     *  different data from the request. For instance, the "continue shopping" button of a shopping cart may
      *  go back to a product list page.
      *
      *  @param string The template file name to use.
@@ -430,7 +435,7 @@ class WFPage extends WFObject
     }
 
     /**
-     * Get a reference to an instance of the page. 
+     * Get a reference to an instance of the page.
      *
      * Using $page->outlet($id) is equivalent to accessing an object through a Cocoa outlet.
      *
@@ -505,7 +510,7 @@ class WFPage extends WFObject
 
     /**
      * Handle the instantiation of the passed object from the instances file.
-     * 
+     *
      * The .instances mechanism simply looks for a file named <pageName>.instances and a <pageName>.config file in your module's templates directory.
      * The .instances contains a list of all WFView instances for the page, and the hierarchy information.
      * <code>
@@ -564,7 +569,7 @@ class WFPage extends WFObject
 
     /**
      * Handle the instantiation of the passed object from the .yaml file.
-     * 
+     *
      * The .yaml mechanism simply looks for a file named <pageName>.yaml in your module's templates directory.
      * The .your contains a list of all WFView instances for the page, in a hierarchical tree, and the configuration / binding information for each instance.
      *
@@ -732,7 +737,7 @@ class WFPage extends WFObject
      *
      * The .config file is an OPTIONAL component. If your page has no instances, or the instances don't need configuration, you don't need a .config file.
      * The .config file is used to set up 'properties' of the WFView instances AND to configure the 'bindings'.
-     * 
+     *
      * Only primitive value types may be used. String, boolean, integer, double, NULL. NO arrays or objects allowed.
      *
      * <code>
@@ -904,7 +909,7 @@ class WFPage extends WFObject
         }
         return $url;
     }
-    
+
     /**
      * For each widget in the current form, give the widget a chance to PULL the values from the bound objects onto the bound properties.
      * Only meaningful when called on the responsePage of the module.
@@ -930,7 +935,7 @@ class WFPage extends WFObject
             }
         }
     }
-    
+
     /**
      * For each widget in the current form, give the widget a chance to PUSH the values from the form onto the bound objects.
      * Only meaningful when called on the requestPage of the module.
@@ -985,7 +990,7 @@ class WFPage extends WFObject
         $this->assertPageInited();
 
         if (!$this->hasSubmittedForm()) return; // no state to restore if no form was submitted!
-        
+
         WFLog::log("restoreState()", WFLog::TRACE_LOG);
 
         // Restore state of all widgets in the form!
@@ -1010,7 +1015,7 @@ class WFPage extends WFObject
             } catch (WFRequestController_HTTPException $e) {
                 throw $e;
             } catch (Exception $e) {
-                WFLog::log("Error restoring state for widget '$widgetID'.", WFLog::TRACE_LOG);
+                WFLog::log("Error restoring state for widget '$widgetID': {$e->getMessage()}", WFLog::TRACE_LOG);
             }
         }
     }
@@ -1147,7 +1152,7 @@ class WFPage extends WFObject
         WFLog::log("Initing page $pageName", WFLog::TRACE_LOG);
         if (!empty($this->pageName)) throw( new Exception("Page already inited with: {$this->pageName}. Cannot initPage twice.") );
         $this->pageName = $pageName;
-        
+
         // look for page delegate
         $pageDelegateClassName = $this->module->moduleName() . '_' . $this->pageName;
         if (class_exists($pageDelegateClassName, false))
@@ -1335,7 +1340,7 @@ class WFPage extends WFObject
                     // look up the instance ID for the specified action... look for "action|<actionOutletID>" in $_REQUEST...
                     // but need to skip the _x and _y fields submitted with image submit buttons
                     $actionOutletID = NULL;
-                    foreach ($_REQUEST as $name => $value) 
+                    foreach ($_REQUEST as $name => $value)
                     {
                         if (strncmp("action|", $name, 7) == 0 and !in_array(substr($name, -2, 2), array('_x', '_y')))
                         {
@@ -1370,7 +1375,7 @@ class WFPage extends WFObject
             else
             {
                 // look for action in Params
-                // new-school WFAction stuff; 
+                // new-school WFAction stuff;
                 $rpc = WFRPC::rpcFromRequest($this->module()->invocation()->invocationPath());
             }
 
@@ -1406,6 +1411,9 @@ class WFPage extends WFObject
                     try {
                         $rpc->execute($this);
                     } catch (WFErrorCollection $e) {
+                        // add all remaining errors to the general error display
+                        // note that propagateErrorsForKey* functions may prune errors
+                        // from the original WFErrorCollection before we get here.
                         $this->addErrors($e->allErrors());
                     }
                     if ($rpc->isAjax() and count($this->errors()))  // errors can also occur in the action method
@@ -1501,7 +1509,7 @@ class WFPage extends WFObject
     {
         if (!$this->isLoaded()) throw( new Exception("Attempted to access an uninitialized page.") );
     }
-    
+
     /**
      * Assign a value to the underlying template engine.
      * @param string Name of the value in the template engine.
@@ -1530,7 +1538,7 @@ class WFPage extends WFObject
     function render()
     {
         if (!$this->isResponsePage()) throw( new Exception("Render called on a page that is not the responsePage.") );
-        
+
         // there isn't always a skin; only on the ROOT invocation.
         $skin = $this->module->invocation()->skin();
 
@@ -1583,7 +1591,7 @@ class WFPage extends WFObject
             $this->delegate->pageInstancesDidLoad($this);
         }
     }
-    
+
     function parameterList()
     {
         $parameters = array();
@@ -1719,7 +1727,7 @@ class WFPage extends WFObject
 
     /**
      *  Debug function for dumping the instance tree for the page.
-     *  
+     *
      *  Recursive. Call dumpTree() to use.
      */
     function dumpTree($obj = NULL)

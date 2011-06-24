@@ -3,7 +3,7 @@
 /*
  * @package test
  */
- 
+
 
 error_reporting(E_ALL);
 require_once getenv("PHOCOA_PROJECT_CONF");
@@ -12,6 +12,9 @@ require_once getenv("PHOCOA_PROJECT_CONF");
 // smarty does bad things if there is NO session info... fake it out.
 $_SESSION = array();
 
+/**
+ * @group requiresPhocoaTestModules
+ */
 class InvocationTest extends PHPUnit_Framework_TestCase
 {
     // normal, allPages OFF
@@ -73,7 +76,7 @@ class InvocationTest extends PHPUnit_Framework_TestCase
     {
         $this->executeAndAssert('test/invocation/moduleInModule2', 'Module in module');
     }
-    
+
     // normal, allPages ON
     function testInvocationAllPagesModuleNameOnly()
     {

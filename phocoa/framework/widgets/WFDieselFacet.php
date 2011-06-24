@@ -5,18 +5,18 @@
  * @subpackage Widgets
  * @copyright Copyright (c) 2005 Alan Pinstein. All Rights Reserved.
  * @version $Id: kvcoding.php,v 1.3 2004/12/12 02:44:09 alanpinstein Exp $
- * @author Alan Pinstein <apinstein@mac.com>                        
+ * @author Alan Pinstein <apinstein@mac.com>
  */
 
 /**
  * A Dieselpoint Facet widget for our framework.
- * 
+ *
  * <b>PHOCOA Builder Setup:</b>
  *
  * <b>Required:</b><br>
  * - {@link WFDieselFacet::$attributeID attributeID}
  * - {@link WFDieselFacet::$dieselSearchHelper dieselSearchHelper}
- * 
+ *
  * <b>Optional:</b><br>
  * - {@link WFWidget::$formatter formatter} Any formatter assigned to the WFDieselFacet will be used to format the facet data and current selection data.
  * - {@link WFDieselFacet::$facetStyle facetStyle}
@@ -46,7 +46,7 @@ class WFDieselFacet extends WFWidget implements WFDieselSearchHelperStateTrackin
 
     protected $isPopup;
     protected $popupSelections;
-    
+
     /**
      * @var string The facet style. One of the WFDieselFacet::STYLE* constants.
      */
@@ -69,7 +69,7 @@ class WFDieselFacet extends WFWidget implements WFDieselSearchHelperStateTrackin
      */
     protected $rangeCount;
     /**
-     * @var boolean True to implement fake open-ended ranges corrections. With DP < 4.0, there is no range supprort, so we fake it with multi-value attr categories. IE Bedrooms 1+, 2+, 3+. 
+     * @var boolean True to implement fake open-ended ranges corrections. With DP < 4.0, there is no range supprort, so we fake it with multi-value attr categories. IE Bedrooms 1+, 2+, 3+.
      *              The downside of this is that the facets don't adjust as choices are selected (b/c 3+ includes 1+ and 2+).
      *              The fakeOpenEndedRange support will correct the facet display by eliminating choices less than the current value.
      */
@@ -373,7 +373,7 @@ class WFDieselFacet extends WFWidget implements WFDieselSearchHelperStateTrackin
                 if (gettype($facets) == 'array')
                 {
                     if ($this->facetStyle == WFDieselFacet::STYLE_TREE and $this->treeDataPath)
-                    {   
+                    {
                         // no items, but means specifically "no kids" thus need to deal with this for the Tree callback
                         // ajax callback -- send data
                         WFYAHOO_widget_TreeView::sendTree(array());
@@ -396,7 +396,7 @@ class WFDieselFacet extends WFWidget implements WFDieselSearchHelperStateTrackin
                 $height = ($this->isPopup ? '300px' : ($this->height ? $this->height : $this->parent()->facetNavHeight()));
                 // NOTE: Safari seems to have a bug where even tho the content fits within the width, it still puts a scroll bar. Works in FF, not sure about IE yet.
                 $html .= '<div style="max-height: ' . $height . '; overflow: auto; padding-right: 4px;' . $width . '">' . "\n";
-                    
+
                 // actual facets
                 switch ($this->facetStyle) {
                     case WFDieselFacet::STYLE_MENU:
@@ -507,7 +507,7 @@ class WFDieselFacet extends WFWidget implements WFDieselSearchHelperStateTrackin
         }
         return $html;
     }
-    
+
     function removeFacetLink($linkText = "Remove")
     {
         return "<a onClick=\"facetHandleClick(this.href); return false\" href=\"" . $this->parent()->baseURL() . '/' . urlencode($this->dieselSearchHelper->getQueryState($this->attributeID())) . "\">{$linkText}</a>";
@@ -521,7 +521,7 @@ class WFDieselFacet extends WFWidget implements WFDieselSearchHelperStateTrackin
         }
         // _nogo is to prevent browser from "scrolling" to this link; _nogo isn't a valid id.
         // return false on the onClick to prevent the js action from adding to the browser history
-        return "<a href=\"#{$this->id}_nogo\" {$class} onClick=\"doPopup('" . $this->id() . "', '" . urlencode($this->dieselSearchHelper->getQueryState($this->attributeID())) . "', '" . addslashes($this->dieselSearchHelper->getAttributeSelection($this->attributeID())) . "'); return false;\">{$linkText}</a>";
+        return "<a href=\"#{$this->id}_nogo\" {$class} onClick=\"doPopup('" . $this->id() . "', '" . urlencode($this->dieselSearchHelper->getQueryState($this->attributeID())) . "', '" . addslashes($this->dieselSearchHelper->getAttributeSelection($this->attributeID())) . "', this); return false;\">{$linkText}</a>";
     }
 
     private function facetMenuHTML($facets)

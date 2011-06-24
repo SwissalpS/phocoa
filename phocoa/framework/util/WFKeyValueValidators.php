@@ -4,10 +4,10 @@
  * @package KeyValueCoding
  * @copyright Copyright (c) 2005 Alan Pinstein. All Rights Reserved.
  * @version $Id: kvcoding.php,v 1.3 2004/12/12 02:44:09 alanpinstein Exp $
- * @author Alan Pinstein <apinstein@mac.com>                        
+ * @author Alan Pinstein <apinstein@mac.com>
  */
 
-/** 
+/**
  * Built-in Key-Value Validators.
  *
  * The WFKeyValueValidators class provides a bunch of commonly used validators.
@@ -60,7 +60,7 @@ class WFKeyValueValidators extends WFObject
             }
         }
 
-        if (function_exists('filter_var'))
+        if (function_exists('filter_var') && $options['requireRealDomains'])
         {
             $okFilter = filter_var($value, FILTER_VALIDATE_EMAIL);
         }
@@ -68,9 +68,16 @@ class WFKeyValueValidators extends WFObject
         {
             $okFilter = preg_match('/^[_A-Za-z0-9-\+]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*$/', $value);
         }
-        if ($okFilter and $options['requireRealDomains'])
+        if ($okFilter)
         {
-            $okFilter = preg_match('/@[A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)+$/', $value);
+            if ($options['requireRealDomains'])
+            {
+                $okFilter = preg_match('/@[A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)+$/', $value);
+            }
+            else
+            {
+                $okFilter = preg_match('/@[A-Za-z0-9-\.]{2,}$/', $value);
+            }
         }
         if (!$okFilter)
         {
@@ -103,7 +110,7 @@ class WFKeyValueValidators extends WFObject
                                     'requiredErrorCode' => NULL,
                                     'invalidErrorCode'  => NULL
                                     ), $options);
-        
+
         // normalize
         if (function_exists('filter_var'))
         {
@@ -178,7 +185,7 @@ class WFKeyValueValidators extends WFObject
                                     'key' => 'Phone #',
                                     'country' => 'US',
                                     ), $options);
-        
+
 
         //  normalize
         $value = trim($value);
@@ -241,7 +248,7 @@ class WFKeyValueValidators extends WFObject
                                     'country' => 'US',
                                     'unknownCountryIsAlwaysValid' => true
                                     ), $options);
-        
+
 
         // normalize
         $value = str_replace(' ', '', $value);
