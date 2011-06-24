@@ -9,7 +9,9 @@ Legend:
                   DEVELOPERS: Be sure to fire deprecation notices like so:
                               WF_LOG_DEPRECATED && WFLog::deprecated("MyObj::foo() is deprecated. Use MyObj::bar().");
 
-Version 0.4.0 - ??
+Version 0.4.1 - ??
+
+Version 0.4.0 - 4/26/2011
 - [improved] Refactored WFErrorArray and WFErrorsException to implement a new interface WFErrorCollection.
 - [new] Phocoa now includes a PropelException subclass WFPropelException to allow you to play nice with propel nested transactions while still supporting phocoa model error reporting.
 - [new] Add WFDecorator support to KVC. You can now use the [WFDecorator] syntax inside of KVC keyPaths to auto-wrap objects in decorators. Works on arrays as well.
@@ -37,6 +39,14 @@ Version 0.4.0 - ??
 - [new] Add WFDictionary object, a KVC-compliant hash object -- great for using widgets with transient data structures.
 - [improved] WFViewHiddenHelper and WFShowErrors have been updated to automagically work for WFDynamic's with oneShotMode enabled.
 - [bugfix] Fix nullPlaceholders in WFTextField and WFTextArea. They weren't italicizing on initial load or if the value was the same as the nullPlaceholder.
+- [improved] Make WFCheckbox.label support multi-value pattern bindings.
+- [improved] YAHOO_widget_AutoComplete now supports passing back additional arguments into the callback via a PHOCOA.widgets.<acId>.yuiDelegate.dynamicDataLoaderCollectArguments function.
+- [new] YAHOO_widget_TabView is now augmented with a goToTab(id) function that allows you to activate a tab by its phocoa ID.
+- [improved] PHOCOA now catches all PHP fatal errors (in addition to the previously caught uncaught exceptions) and routes them through the default WFRequestController::handleException()
+             which of course includes WFWebApplicationDelegate::handleUncaughtException().
+             These improvements allow truly unified error/exception handling and have even been structured so that you can report on parse errors and OOMs through your normal channels.
+             PHOCOA also allocates 25MB more memory so that even in OOM situations you have enough memory to fire off an email, do logging, and display a pretty error message.
+             This is a huge benefit for handling errors in production.
 
 Version 0.3.9 - 10/21/2010
 - [new] Add WFRequestController->isMobileBrowser()
@@ -50,6 +60,8 @@ Version 0.3.9 - 10/21/2010
 - [bugfix] WFPageDelegate.willPushBindings() is no longer called if pushBindings() doesn't run. Previously the willPushBindings() delegate method would run even on an initial page load.
 - [bugfix] Fix for WFBinding::OPTION_DO_NOT_PUSH_VALUE_SEMAPHORE which was accidentally causing a logic error even on widgets that did not use the feature. This caused bindings not to be pushed if the value was NULL. This broke many radio buttons, checkboxes, and dropdowns.
 - [new] Add optional error code injection into WFKeyValueValidators::validateUrl()
+- [new] Add WFObject::destroy() function to provide a canonical pathway for breaking circular references for pre-5.3 memory management.
+- [new] Add WFBlueimp_JqueryFileUpload widget for HTML5 drag-n-drop upload.
 
 Version 0.3.8 - 9/15/2010
 - [new] add WFWebApplicationDelegate::rerouteInvocationPath() function to allow routing customizations.
@@ -118,8 +130,8 @@ Version 0.3.5 - 1/28/2010
 - [BC-break] WFSelect will now "pushBindings" even if it is disabled. This shouldn't cause any problem since the data is immutable on the form, but is being listed as a BC here out of an abundance of caution.
 - [bugfix] WFYAHOO_widget_ColorPicker now works properly when used as a prototype for WFDynamic.
 - [new] WFYAHOO_widget_ColorPicker will bootstrap its own text field if none supplied.
-- [new] WFYAHOO_widget_ColorPicker.value is now bindable.
-- [new] Added WFArray.valuesForKeyPaths
+- [bugfix, BC-break] WFYAHOO_widget_Module, when set to build "programmatically", now defaults to being added to document.body rather than "inline" in the DOM where it is rendered. Previously it was always rendered inline, which made it very fragile to layout clipping and accidental creation of nested forms. YUI recommends the new behavior. I *thought* that I had already made this fix, but there was a bug. The BC-break is for existing uses of YUI containers that accidentally relied on the inline DOM positioning of the Container and didn't already have code (like setRenderTo()) to force inline rendering.
+- [bugfix] WFRPC.execute now works properly for raw URL redirects.
 
 Version 0.3.4 - 1/8/2010
 - [new] Now PEAR-installable! pear channel-discover apinstein.pearfarm.org; pear install apinstein/phocoa
@@ -130,6 +142,11 @@ Version 0.3.4 - 1/8/2010
 - [bugfix] Make WFDieselFacet compatible with YUI 2.7.0. It was eating clicks and getting stuck on "loading".
 - [bugfix] Fix bug in menu facets where onChange handler no longer worked due to newer version of prototype scoping code from evalScripts.
 - [improved] The phocoa shell is now even better, with full support for require'd files, tolerance of "fatal" errors, and more.
+- [BC-deprecated] The nomenclature for skins has been cleaned up to be more consistent and understandable, resulting in the following rename/deprecation:
+                  - {$skinDir} / $skin->getSkinDir() BECOMES {$skinThemeAssetsDir} / $skin->getSkinThemeAssetsDir()
+                  - {$skinDirShared} / $skin->getSkinDirShared() BECOMES {$skinSharedAssetsDir} / $skin->getSkinSharedAssetsDir()
+- [new] There is now a new "skin" assets section, for assets shared across all skin implementations for a given skin type.
+        This directory is at skins/<skinTypeName>/www/ and is accessible via {$skinTypeAssetsDir} / $skin->getSkinTypeAssetsDir()
 
 Version 0.3.3 - 11/2/2009
 - [BC-break] [new] WFRPC.execute() now automatically array-ifies arguments that are arrays of scalars. IE array(1,2,3) ==> arg_0[]=1&arg_0[]=2&arg_0[]=3.
