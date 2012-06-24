@@ -5,12 +5,12 @@
  * @subpackage Widgets
  * @copyright Copyright (c) 2005 Alan Pinstein. All Rights Reserved.
  * @version $Id: kvcoding.php,v 1.3 2004/12/12 02:44:09 alanpinstein Exp $
- * @author Alan Pinstein <apinstein@mac.com>
+ * @author Alan Pinstein <apinstein@mac.com>                        
  */
 
 /**
  * A YAHOO AutoComplete widget for our framework. This widget acts like a ComboBox: it is a text field with a pick-list and OPTIONAL custom entry.
- *
+ * 
  * Must call either {@link WFYAHOO_widget_AutoComplete::setDatasourceJSArray() setDatasourceJSArray} (for static lists) or {@link WFYAHOO_widget_AutoComplete::setDynamicDataLoader() setDynamicDataLoader} (for dynamic lookup of autocomplete options) to complete configuration.
  *
  * If you are using dynamic lookups, you will need to implement a page delegate function with the name passed to setDynamicDataLoader.
@@ -20,12 +20,12 @@
  * By default the prototype for the callback function is myDataLoader($page, $params, $query) where $query is the partially-entered data.
  * If you need additional arguments for the callback, define a PHOCOA.widgets.<acId>.yuiDelegate.dynamicDataLoaderCollectArguments function that returns an array of additional arguments
  * which will be passed in like so: myDataLoader($page, $params, $query, $additionalArg1, $additionalArg2, ...)
- *
+ * 
  * <b>PHOCOA Builder Setup:</b>
  *
  * <b>Required:</b><br>
  * none
- *
+ * 
  * <b>Optional:</b><br>
  *
  */
@@ -37,7 +37,7 @@ class WFYAHOO_widget_AutoComplete extends WFYAHOO
 
     const INPUT_TYPE_TEXTFIELD      = 'input';
     const INPUT_TYPE_TEXTAREA       = 'textarea';
-
+ 
     /**
      * @var string The type of input to use. One of {@link WFYAHOO_widget_AutoComplete::INPUT_TYPE_TEXTAREA INPUT_TYPE_TEXTAREA} or {@link WFYAHOO_widget_AutoComplete::INPUT_TYPE_TEXTFIELD INPUT_TYPE_TEXTFIELD}. Default is INPUT_TYPE_TEXTFIELD.
      */
@@ -366,8 +366,8 @@ class WFYAHOO_widget_AutoComplete extends WFYAHOO
 .yui-ac .yui-button {vertical-align:middle; }
 .yui-ac .yui-button button {
     background: url({$this->getWidgetWWWDir()}/ac-arrow-rt.png) center center no-repeat;
-}
-.yui-ac .open .yui-button button {background: url({$this->getWidgetWWWDir()}/ac-arrow-dn.png) center center no-repeat}
+} 
+.yui-ac .open .yui-button button {background: url({$this->getWidgetWWWDir()}/ac-arrow-dn.png) center center no-repeat} 
 </style>
             ";
             $html .= "
@@ -432,7 +432,7 @@ class WFYAHOO_widget_AutoComplete extends WFYAHOO
                 };
                 // perform initial check on search field value
                 PHOCOA.widgets.' . $this->id . '.handlePlaceholder();'
-                . $this->getListenerJS() .
+                . $this->getListenerJS() . 
                 '</script>';
             }
             return $html;
@@ -450,7 +450,7 @@ class WFYAHOO_widget_AutoComplete extends WFYAHOO
             case WFYAHOO_widget_AutoComplete::DATASOURCE_JS_ARRAY:
                 $html .= "var jsDSArray = [";
                 $first = true;
-                // we allow
+                // we allow 
                 $multiColumnData = false;
                 foreach ($this->datasourceJSArray as $item) {
                     if ($first)
@@ -509,6 +509,7 @@ class WFYAHOO_widget_AutoComplete extends WFYAHOO
         {
             $html .= "\n
 var urlGenerator = function(query) {
+    query = decodeURIComponent(query);  // YUI has already encoded this, but we will encode it too via PHOCOA, so we need to undo theirs to avoid encoding issues
     var phocoaArgs = [query];
     if (PHOCOA.widgets['{$this->id()}'] && PHOCOA.widgets['{$this->id()}'].yuiDelegate && PHOCOA.widgets['{$this->id()}'].yuiDelegate.dynamicDataLoaderCollectArguments)
     {

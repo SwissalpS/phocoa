@@ -4,13 +4,11 @@ require_once(getenv('PHOCOA_PROJECT_CONF'));
 
 if ($argc < 2) die("Usage: scaffold.php 'entity1 entity2 ...'\n");
 $adapter = 'Propel';
-$builder = 'WFModelCodeGen' . $adapter;
-if (defined(ORM_MODEL_ADAPTER)) {
-
+if (defined('ORM_MODEL_ADAPTER'))
+{
     $adapter = ORM_MODEL_ADAPTER;
-    $builder = 'WFModelCodeGenPropel';
-
 }
+$builder = 'WFModelCodeGenPropel';
 $configFile = APP_ROOT . '/propel-build/phocoa-generator-config.yaml';
 if (!file_exists($configFile))
 {
@@ -22,9 +20,9 @@ $aArgs = $argv;
 array_shift($aArgs); // drop invocation
 
 foreach ($aArgs as $sArgs) {
-	$delim = ' ';
+$delim = ' ';
 	if (false != strchr($sArgs, ',')) {
-		$delim = ',';
+    $delim = ',';
 	} // if got comma in arg
 
 	$aEntities = array_merge($aEntities,

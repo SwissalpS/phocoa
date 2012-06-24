@@ -137,5 +137,3 @@ class WFJumpSelect extends WFSelect
         return $output;
     }
 }
-
-?>

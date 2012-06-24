@@ -238,6 +238,11 @@ class WFSkin extends WFObject
      */
     protected $namedContent;
 
+    /**
+     * @var string The character set used for encoding strings.
+     */
+    protected $charset;
+
     function __construct()
     {
         // determine which skin to use
@@ -255,6 +260,7 @@ class WFSkin extends WFObject
         $this->metaDescription = NULL;
         $this->headStrings = array();
         $this->headTemplate = WFWebApplication::appDirPath(WFWebApplication::DIR_SMARTY) . '/head.tpl';
+        $this->charset = "ISO-8859-1";
     }
 
     /**
@@ -444,7 +450,7 @@ class WFSkin extends WFObject
      */
     function setTitle($title)
     {
-        $this->title = htmlentities($title);
+        $this->title = htmlentities($title, ENT_COMPAT, $this->charset);
     }
 
     /**
@@ -522,6 +528,35 @@ class WFSkin extends WFObject
     }
 
     /**
+     * @return string filesystem-accessible path to the skin directory. This is useful as a base dir for factoring out tpl code that's shared among different templateTypes.
+     */
+    function getSkinTemplatesDir()
+    {
+        return "{$this->getSkinTypeDir()}/{$this->skinName}";
+    }
+
+    /**
+     * @return string filesystem-accessible path to the skin type directory. This is useful for shared components *across* skins.
+     */
+    function getSkinTypeDir()
+    {
+        return WFWebApplication::appDirPath(WFWebApplication::DIR_SKINS) . '/' . $this->delegateName;
+    }
+
+    /**
+     * Set the charset string;
+     *
+     *
+     * @param charaset The character set string.
+     * @return object WFSkin (fluent interface).
+     */
+    function setCharset($charset)
+    {
+        $this->charset = $charset;
+        return $this;
+    }
+
+    /**
      * Render the skin.
      * @param boolean TRUE to display the results to the output buffer, FALSE to return them in a variable. DEFAULT: TRUE.
      * @return string The rendered view. NULL if displaying.
@@ -531,7 +566,7 @@ class WFSkin extends WFObject
     {
         $this->loadSkin();
 
-        $skinTemplateDir = WFWebApplication::appDirPath(WFWebApplication::DIR_SKINS) . '/' . $this->delegateName . '/' . $this->skinName;
+        $skinTemplatesDir = $this->getSkinTemplatesDir();
 
         $smarty = new WFSmarty();
         $smarty->assign('skin', $this);
@@ -542,6 +577,7 @@ class WFSkin extends WFObject
         $smarty->assign('skinTitle', $this->title);
         $smarty->assign('skinMetaKeywords', join(',', $this->metaKeywords));
         $smarty->assign('skinMetaDescription', $this->metaDescription);
+        $smarty->assign('skinCharset', $this->charset);
         $smarty->assign('skinBody', $this->body);
         $smarty->assign('skinHeadStrings', join("\n", array_values($this->headStrings)));
         $smarty->assign('phocoaDebug', WFWebApplication::sharedWebApplication()->debug());
@@ -554,6 +590,9 @@ class WFSkin extends WFObject
         $smarty->assign('skinTypeAssetsDir', $this->getSkinTypeAssetsDir() );
         $smarty->assign('skinSharedAssetsDir', $this->getSkinSharedAssetsDir() );
         $smarty->assign('skinThemeAssetsDir', $this->getSkinThemeAssetsDir() );
+        // FS paths of things
+        $smarty->assign('skinTemplatesDir', $skinTemplatesDir);
+        $smarty->assign('skinTypeDir', $this->getSkinTypeDir());
 
         // build the <head> section
         $smarty->assign('skinPhocoaHeadTpl', WFWebApplication::appDirPath(WFWebApplication::DIR_SMARTY) . '/head.tpl');
@@ -566,7 +605,7 @@ class WFSkin extends WFObject
         }
         else
         {
-            $smarty->setTemplate($skinTemplateDir . '/template_' . $this->templateType . '.tpl');
+            $smarty->setTemplate($skinTemplatesDir . '/template_' . $this->templateType . '.tpl');
         }
 
         // pre-render callback

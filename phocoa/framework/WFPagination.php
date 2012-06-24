@@ -586,6 +586,7 @@ class WFPaginator extends WFObject
      */
     function setPageSize($sz)
     {
+        if ($sz != WFPaginator::PAGINATOR_PAGESIZE_ALL and $sz < 1) throw new WFException("Paginator page size must be a positive integer, or -1 (WFPaginator::PAGINATOR_PAGESIZE_ALL).");
         $this->pageSize = $sz;
     }
 
@@ -602,7 +603,7 @@ class WFPaginator extends WFObject
         // cache
         if ($this->itemCount === NULL)
         {
-            $this->itemCount = $this->dataDelegate()->itemCount();
+            $this->itemCount = (int) $this->dataDelegate()->itemCount();
         }
         return $this->itemCount;
     }
@@ -1164,17 +1165,28 @@ class WFPagedPDOQuery implements WFPagedData
         $matches = array();
         if (stripos($this->baseSQL, 'order by'))
         {
-            $matchCount = preg_match('/^.*(\bfrom\b.*)(\border by\b.*)$/si', $this->baseSQL, $matches);
+            $matchCount = preg_match('/^.*?(\bfrom\b.*)(\border by\b.*)$/si', $this->baseSQL, $matches);
         }
         else
         {
-            $matchCount = preg_match('/^.*(\bfrom\b.*)$/si', $this->baseSQL, $matches);
+            $matchCount = preg_match('/^.*?(\bfrom\b.*)$/si', $this->baseSQL, $matches);
         }
         if ($matchCount != 1) throw(new Exception("Could not parse sql statement."));
 
         if ($this->options[self::OPT_COUNT_QUERY_ROWS_MODE] === true)
         {
-            $countSQL = "select count(*) from (select count(*) " . $matches[1] . ") as queryRows";
+            // To be backwards-compatible we'll check how many times the word "from" is used. If it's
+            // exactly one, we'll use the performance trick we were using before. Otherwise we'll wrap
+            // the whole query (select, order by, and all) in the select count(*) block. It's less
+            // performant but allows us to use subselects both before AND after the start of the FROM
+            // block.
+            $numberOfFroms = preg_match('/^\bfrom\b$/', $this->baseSQL);
+            if ($numberOfFroms == 1)
+            {
+                $countSQL = "select count(*) from (select count(*) " . $matches[1] . ") as queryRows";
+            } else {
+                $countSQL = "select count(*) from ({$this->baseSQL}) as queryRows";
+            }
         }
         else
         {

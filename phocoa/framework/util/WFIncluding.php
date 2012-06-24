@@ -4,7 +4,7 @@
  * @package framework-base
  * @copyright Copyright (c) 2005 Alan Pinstein. All Rights Reserved.
  * @version $Id: kvcoding.php,v 1.3 2004/12/12 02:44:09 alanpinstein Exp $
- * @author Alan Pinstein <apinstein@mac.com>
+ * @author Alan Pinstein <apinstein@mac.com>                        
  */
 
 /**
@@ -25,7 +25,7 @@ class WFIncluding
     static public function autoload($className)
     {
         // I am guessing that using a hashmap will be faster than a big switch statement... no tests yet, but... in any case I'll do it this way first.
-        // other option is to add a bunch of paths to include_path, but that seems like a bad idea... YES that's a VERY BAD IDEA. Searching paths is much more expensive
+        // other option is to add a bunch of paths to include_path, but that seems like a bad idea... YES that's a VERY BAD IDEA. Searching paths is much more expensive 
         // than including files directly because it hits the filesystem a lot to find the files.
         static $autoloadClassmapCache = NULL;
         if ($autoloadClassmapCache == NULL)
@@ -130,7 +130,10 @@ class WFIncluding
                 'WFCheckboxGroup' => 'framework/widgets/WFCheckboxGroup.php',
                 'WFRadio' => 'framework/widgets/WFRadio.php',
                 'WFRadioGroup' => 'framework/widgets/WFRadioGroup.php',
-                'WFUploadedFile' => 'framework/widgets/WFUpload.php',
+                 'WFUploadError'                                 => 'framework/widgets/WFUploading.php',
+                 'WFUploaderUtils'                               => 'framework/widgets/WFUploading.php',
+                 'WFUploadedFile'                                => 'framework/widgets/WFUploading.php',
+                 'WFUploadedFile_Basic'                          => 'framework/widgets/WFUploading.php',
                 'WFUpload' => 'framework/widgets/WFUpload.php',
                 'WFPostletUpload' => 'framework/widgets/WFPostletUpload.php',
                 'WFHTML5_Uploader' => 'framework/widgets/WFHTML5_Uploader.php',

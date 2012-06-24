@@ -5,7 +5,7 @@
  * @subpackage Widgets
  * @copyright Copyright (c) 2005 Alan Pinstein. All Rights Reserved.
  * @version $Id: kvcoding.php,v 1.3 2004/12/12 02:44:09 alanpinstein Exp $
- * @author Alan Pinstein <apinstein@mac.com>
+ * @author Alan Pinstein <apinstein@mac.com>                        
  */
 
 /**
@@ -25,7 +25,7 @@
  *
  * <b>Required:</b><br>
  * - (none)
- *
+ * 
  * <b>Optional:</b><br>
  * - {@link WFWidget::$value value}
  * - {@link WFCheckbox::$checked checked}
@@ -234,8 +234,9 @@ class WFCheckbox extends WFWidget
         {
             $labelRight = NULL;
         }
-        return $labelLeft . '<input type="checkbox" ' .
-                    'name="' . $this->name() . ($this->groupMode() ? '[]' : '') . '" ' .
+        $inputName = $this->name() . ($this->groupMode() ? '[]' : '');
+        $html = $labelLeft . '<input type="checkbox" ' .
+                    'name="' . $inputName . '" ' .
                     ($this->class ? ' class="' . $this->class . '" ' : '') .
                     'id="' . $this->id() . '" ' .
                     'value="' . $this->checkedValue() . '" ' .
@@ -243,10 +244,14 @@ class WFCheckbox extends WFWidget
                     ($this->enabled() ? '' : ' disabled readonly ') .
                     ($this->tabIndex ? ' tabIndex="' . $this->tabIndex . '" ' : NULL) .
                     ($this->title ? ' title="' . $this->title . '" ' : NULL) .
-                    ' />' .
+                    ' />' . 
                     $labelRight .
                     $this->getListenerJSInScriptTag();
-
+        if (!$this->enabled() && $this->checked())
+        {
+            $html .= "<input type=\"hidden\" name=\"{$inputName}\" value=\"{$this->checkedValue()}\" />";
+        }
+        return $html;
     }
 
     function canPushValueBinding() { return true; }

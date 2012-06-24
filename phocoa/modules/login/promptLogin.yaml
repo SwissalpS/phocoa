@@ -10,11 +10,13 @@ loginForm:
       class: 'WFCheckbox'
     continueURL: 
       class: 'WFHidden'
+    signUp:
+      class: 'WFLink'
     login: 
       class: 'WFSubmit'
       properties: 
         action: 'doLogin'
-        label: 'Login'
+        label: 'Log In'
 forgottenPasswordLink: 
   class: 'WFLink'
   properties: 
