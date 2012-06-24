@@ -260,7 +260,7 @@ class WFSkin extends WFObject
         $this->metaDescription = NULL;
         $this->headStrings = array();
         $this->headTemplate = WFWebApplication::appDirPath(WFWebApplication::DIR_SMARTY) . '/head.tpl';
-        $this->charset = "ISO-8859-1";
+        $this->charset = 'UTF-8';
     }
 
     /**
