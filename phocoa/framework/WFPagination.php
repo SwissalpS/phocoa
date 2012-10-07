@@ -1255,3 +1255,5 @@ class WFPaginatorException extends WFException
     const INVALID_PAGE = 1;
     const INVALID_PAGE_SIZE = 1;
 }
+
+?>
