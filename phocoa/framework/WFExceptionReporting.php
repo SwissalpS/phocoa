@@ -5,7 +5,7 @@
  * @subpackage Error
  * @copyright Copyright (c) 2005 Alan Pinstein. All Rights Reserved.
  * @version $Id: kvcoding.php,v 1.3 2004/12/12 02:44:09 alanpinstein Exp $
- * @author Alan Pinstein <apinstein@mac.com>                        
+ * @author Alan Pinstein <apinstein@mac.com>
  */
 
 /**
@@ -16,14 +16,14 @@ class WFExceptionReporting extends WFObject
     /**
       * Log the passed exception to the framework's log folder.
       */
-    function log(Exception $e)
+    satic function log(Exception $e)
     {
         $logfile = WFWebApplication::appDirPath(WFWebApplication::DIR_LOG) . '/framework_exceptions.log';
         $smarty = new WFSmarty();
         $smarty->assign('exception', $e);
         $smarty->setTemplate(WFWebApplication::appDirPath(WFWebApplication::DIR_SMARTY) . '/app_error_log.tpl');
         $errText = $smarty->render(false);
-        
+
         // append info to log
         $fs = fopen($logfile, 'a');
         fputs($fs, $errText);
