@@ -298,7 +298,7 @@ class WFRequestController extends WFObject
      *
      *  @return boolean
      */
-    function isAjax()
+    static function isAjax()
     {
         if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) and strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') return true;
         if (isset($_REQUEST['HTTP_X_REQUESTED_WITH']) and strtolower($_REQUEST['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') return true;  // for debugging

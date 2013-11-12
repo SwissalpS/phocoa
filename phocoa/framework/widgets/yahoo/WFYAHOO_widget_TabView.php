@@ -235,7 +235,7 @@ class WFYAHOO_widget_TabView extends WFYAHOO
         $this->selectedTabId = $tabId;
     }
 
-    function addChild($newChild)
+    function addChild(WFView $newChild)
     {
         parent::addChild($newChild);
         // make sure one tab is always selected
