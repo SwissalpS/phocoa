@@ -25,7 +25,7 @@ class Person extends WFObject
         return "{$this->name} ({$this->id}) is from: " . $this->valueForKeyPath('city.name');
     }
 
-    function personByID($id)
+    static function personByID($id)
     {
         foreach (Person::allPeople() as $person) {
             if ($person->id == $id) return $person;
@@ -49,7 +49,7 @@ class Person extends WFObject
         $this->city = City::cityByID($id);
     }
 
-    function allPeople()
+    static function allPeople()
     {
         static $people = NULL;
         if (!$people)
@@ -73,12 +73,12 @@ class Person extends WFObject
         return $people;
     }
 
-    function genderValues()
+    static function genderValues()
     {
         return array('male', 'female');
     }
 
-    function colorValues()
+    static function colorValues()
     {
         return array('blue', 'brown', 'green', 'red', 'yellow', 'orange');
     }
@@ -119,7 +119,7 @@ class City extends WFObject
         $this->name = $name;
     }
 
-    function cityByID($id)
+    static function cityByID($id)
     {
         foreach (City::allCities() as $city) {
             if ($city->id == $id) return $city;
@@ -127,7 +127,7 @@ class City extends WFObject
         return NULL;
     }
 
-    function allCities()
+    static function allCities()
     {
         static $cities = NULL;
         if (!$cities)
@@ -140,4 +140,3 @@ class City extends WFObject
         return $cities;
     }
 }}
-
