@@ -34,13 +34,12 @@ class WFHTML5_Uploader extends WFForm
      * Note that the handleUploadedFile() callback is not called if there is an error in the uploaded file.
      */
     protected $hasUploadCallback;
-
     /**
      * @var string The base URL for the web site. Defaults to HTTP_HOST
      */
     protected $baseurl;
     /**
-     * @var int The maximimum number of concurrent uploads. Defaults to 1. 
+     * @var int The maximimum number of concurrent uploads. Defaults to 1.
      *          NOTE: the underlying control presently supports only *all concurrent* or *all sequential*.
      */
     protected $maxConcurrentUploads;
@@ -49,7 +48,7 @@ class WFHTML5_Uploader extends WFForm
      */
     private $hasMultipleSimultaneousUploads;
     /**
-     * @var int The maximum file size in bytes to allow. A warning will be displayed for any file over that size and no upload will be attempted on that file. NULL = no limit; defaults to ini's upload_max_filesize setting. 
+     * @var int The maximum file size in bytes to allow. A warning will be displayed for any file over that size and no upload will be attempted on that file. NULL = no limit; defaults to ini's upload_max_filesize setting.
      */
     protected $maxUploadBytes;
     /**
@@ -90,7 +89,7 @@ class WFHTML5_Uploader extends WFForm
 
     /**
      * Set the callback function to be used to process the uploaded file.
-     * 
+     *
      * @param mixed String: the method of the current page delegate to call. Array: a php callback.
      * @throws object Exception
      */
@@ -116,7 +115,6 @@ class WFHTML5_Uploader extends WFForm
     {
         return "{$this->id}_file";
     }
-
     function restoreState()
     {
         //  must call super
@@ -236,7 +234,7 @@ class WFHTML5_Uploader extends WFForm
             $result = $this->_handleUploadedFile($f);
             if (!$result['uploadOK'])
             {
-                $allOk = false;       
+                $allOk = false;
             }
         }
         if ($allOk)
@@ -407,9 +405,9 @@ function() {
                 return jQuery('<tr>' +
                     '<td width="175">' + file.name + '<\/td>' +
                     '<td width="' + (thumbHTML ? 100 : 1) + '">' + thumbHTML + '<\/td>' +
-                    '<td width="250">' + file.description + '<\/td>' + 
-                    '<td width="16"><span class="ui-icon ' + (file.uploadOK ? 'ui-icon-check' : 'ui-icon-alert') + '"><\/span><\/td>' + 
-                    '<td><\/td>' + 
+                    '<td width="250">' + file.description + '<\/td>' +
+                    '<td width="16"><span class="ui-icon ' + (file.uploadOK ? 'ui-icon-check' : 'ui-icon-alert') + '"><\/span><\/td>' +
+                    '<td><\/td>' +
                     '<\/tr>');
             }
         });
@@ -419,12 +417,14 @@ END;
 
         $bootstrapJS = $loader->jsLoaderCode($withJqueryJS);
         $html .= <<<END
-<script> 
+<script>
 {$bootstrapJS}
-</script> 
+</script>
 END;
         return $html;
     }
 
     function canPushValueBinding() { return false; }
 }
+
+?>

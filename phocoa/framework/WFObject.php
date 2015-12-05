@@ -185,6 +185,14 @@ class WFObject implements WFKeyValueCoding
         return $this;
     }
 
+    function setValuesForKeyPaths($valuesForKeyPaths)
+    {
+        foreach ($valuesForKeyPaths as $k => $v) {
+            $this->setValueForKeyPath($v, $k);
+        }
+        return $this;
+    }
+
     function valuesForKeyPaths($keysAndKeyPaths)
     {
         $hash = array();
@@ -340,6 +348,10 @@ class WFObject implements WFKeyValueCoding
             else
             {
                 if (!is_object($target)) throw( new WFUndefinedKeyException('Value at keyPath: "' . join('.', array_slice($keys, 0, $keyI)) . "\" is not an object when trying to get next key \"{$key}\".") );
+                if (!($target instanceof WFObject) and !method_exists($target, 'valueForKey'))
+                {
+                    throw( new WFException("Target not an object at keypath: " . $keyPath . " for object " . get_class($rootObject)) );
+                }
                 $result = $target->valueForKey($key);
             }
 
@@ -353,6 +365,7 @@ class WFObject implements WFKeyValueCoding
 
                 if ($decoratorClass)
                 {
+                    if (!class_exists($decoratorClass)) throw new WFException("Decorator {$decoratorClass} does not exist.");
                     $result = new $decoratorClass($result);
                 }
             }
@@ -385,6 +398,7 @@ class WFObject implements WFKeyValueCoding
                         if (!method_exists($object, 'valueForKey')) throw( new Exception("target is not Key-Value Coding compliant for valueForKey.") );
                         if ($decoratorClass)
                         {
+                            if (!class_exists($decoratorClass)) throw new WFException("Decorator {$decoratorClass} does not exist.");
                             $object = new $decoratorClass($object);
                         }
                         $magicArray[] = $object->valueForKeyPath($rightKeyPath);
@@ -531,6 +545,8 @@ class WFObject implements WFKeyValueCoding
         {
             throw( new WFUndefinedKeyException("Unknown key '$key' (" . gettype($key) . ") requested for object '" . get_class($this) . "'.") );
         }
+
+        return $this;
     }
 
     /**
@@ -573,7 +589,7 @@ class WFObject implements WFKeyValueCoding
     {
         list($target, $targetKey) = $this->keyPathToTargetAndKey($keyPath);
         if (!is_object($target)) throw( new WFUndefinedKeyException("setValueForKey: target for keypath \"{$keyPath}\" is not an object.") );
-        $target->setValueForKey($value, $targetKey);
+        return $target->setValueForKey($value, $targetKey);
     }
 
     /**

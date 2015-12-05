@@ -6,7 +6,7 @@
  *
  * @copyright Copyright (c) 2002 Alan Pinstein. All Rights Reserved.
  * @version $Id: smarty_showcase.php,v 1.3 2005/02/01 01:24:37 alanpinstein Exp $
- * @author Alan Pinstein <apinstein@mac.com>                        
+ * @author Alan Pinstein <apinstein@mac.com>
  * @package UI
  * @subpackage Search
  **/
@@ -15,7 +15,7 @@
  * This class provides a PHP-front end to the basic Dieselpoint search capabilities.
  *
  * The unit of work of WFDieselSearch is a single search. Once a search has been performed, the search cannot be re-used.
- * 
+ *
  * Submit a query in DQL and get back paginated, sorted results. Also can generate "FacetGenerator" objects for the current search.
  *
  * DP Questions:
@@ -32,7 +32,7 @@
  * 1. In your webapp.conf, you should configure DIESELPOINT_JAR_FILES to include paths to all of the DP jars that you need, typically diesel-3.5.1.jar and javax.servlet.jar and mfg.jar (a special FacetGenerator that can generate child counts for children so we know if it's a leaf node or not).
  * 2. Instantiate a WFDieselSearch object in your module. The only required properties are {@link setIndex() index} and {@link resultObjectLoaderCallback()}.
  *
- * WFDieselSearch provides a WFPagedData interface as well, for pagination. WFDieselSearch is meant to be used only as the ID lookup for objects; the loading of the 
+ * WFDieselSearch provides a WFPagedData interface as well, for pagination. WFDieselSearch is meant to be used only as the ID lookup for objects; the loading of the
  * actualy objects is done via a callback function:
  *
  * array loadObjectsCallback($objectIDArray)
@@ -206,7 +206,7 @@ class WFDieselSearch extends WFObject implements WFPagedData
             $this->resultObjectLoaderCallbackPropelMode = false;
             return;
         }
-        
+
         // turn on propel mode
         $this->resultObjectLoaderCallback = NULL;
         $this->resultObjectLoaderCallbackPropelMode = true;
@@ -236,7 +236,7 @@ class WFDieselSearch extends WFObject implements WFPagedData
      *  Get the primary key column name suitable for criteria for the given peer.
      *
      *  NOTE: only works for tables with a SINGLE primary key.
-     * 
+     *
      *  @param string The peer name.
      *  @return string The Criteria-compatible PK specifier.
      *  @throws object Exception On error.
@@ -249,13 +249,13 @@ class WFDieselSearch extends WFObject implements WFPagedData
         if ($dbMap === null) {
             throw new PropelException("\$dbMap is null");
         }
-        
+
         if ($dbMap->getTable($tableName) === null) {
             throw new PropelException("\$dbMap->getTable() is null");
         }
-        
+
         $columns = $dbMap->getTable($tableName)->getColumns();
-        foreach(array_keys($columns) as $key) { 
+        foreach(array_keys($columns) as $key) {
             if ($columns[$key]->isPrimaryKey()) {
                 $pkCol = $columns[$key];
                 break;
@@ -389,7 +389,7 @@ class WFDieselSearch extends WFObject implements WFPagedData
             $trace = new java("java.io.ByteArrayOutputStream");
             $e->printStackTrace(new java("java.io.PrintStream", $trace));
             if (preg_match('/com.dieselpoint.query.(ParseException|SyntaxException)/', $trace))
-            {   
+            {
                 throw( new WFDieselSearch_ParseException("Dieselpoint could not parse the query: " . $this->getQueryString() ."\n\nDieselpoint said: " . $trace) );
             }
             else
@@ -593,7 +593,7 @@ class WFDieselSearch extends WFObject implements WFPagedData
             if ($numItems == WFPaginator::PAGINATOR_PAGESIZE_ALL) throw( new Exception("Paginator page size is set to PAGINATOR_PAGESIZE_ALL when using Dieselpoint. Are you crazy?") );
             $this->searcher->setNumberOfItemsOnAPage($numItems);
             $this->searcher->setPageNumber($pageNum - 1);
-            
+
             // sorting
             // remove the SORT_BY_RELEVANCE sortKey -- relevance sorting is triggered by the ABSENCE of a "setSort" call
             $sortKeysToUse = array();
@@ -641,7 +641,7 @@ class WFDieselSearch extends WFObject implements WFPagedData
             if ($this->resultObjectLoaderCallbackPropelMode)
             {
                 // For propel-backed object loading, we need to use a peer method that supports Criteria so we can preserve sorting.
-                
+
                 // check that the callback exists -- with PHOCOA's autoload, we need to check the class explicitly - I think this bug was fixed in php 5.x.x something
                 // this little block may be deprecated; i think it's just to get around a goofy PHP bug
                 if (!class_exists($this->resultObjectLoaderCallbackPropelPeerName))
@@ -651,7 +651,7 @@ class WFDieselSearch extends WFObject implements WFPagedData
                 }
                 $propelCallback = array($this->resultObjectLoaderCallbackPropelPeerName, $this->resultObjectLoaderCallbackPropelPeerMethod);
                 if (!is_callable($propelCallback)) throw( new Exception("Propel Callback function is not valid: {$this->resultObjectLoaderCallbackPropelPeerName}::{$this->resultObjectLoaderCallbackPropelPeerMethod}") );
-                
+
                 // determine primary key
                 $c = new Criteria;
                 $c->add($this->getPrimaryKeyColumnFromPropelPeer($this->resultObjectLoaderCallbackPropelPeerName), $allIDs, Criteria::IN);
@@ -697,7 +697,7 @@ class WFDieselSearch extends WFObject implements WFPagedData
 
 /**
  *  The WFDieselHit object represents a result row from a WFDieselSearch.
- * 
+ *
  *  The itemsAtIndex() call will return an array of WFDieselHit objects.
  *
  *  The WFDieselHit object encapsulates the relavance score, custom loaded callback objects, and data loaded from the index columns directly.
@@ -751,7 +751,7 @@ class WFDieselHit extends WFObject
     {
         return $this->data;
     }
-    
+
     /**
      *  Get the value for a particular column.
      *
@@ -764,7 +764,7 @@ class WFDieselHit extends WFObject
     }
 
     /**
-     *  Set the custom object for this hit. 
+     *  Set the custom object for this hit.
      *
      *  This will be set by the Propel dataloader or the custom dataloader.
      *
@@ -836,7 +836,7 @@ class WFDieselHitDataObject extends WFObject
     {
         return $this->data;
     }
-    
+
     function getDataForCol($col)
     {
         if (!isset($this->data[$col])) throw( new Exception("Col: '$col' doesn't exist.") );
@@ -935,7 +935,7 @@ class WFDieselSearchHelper extends WFObject
      * @var string If {@link WFDieselSearchHelper::$showAllOnBlankQuery showAllOnBlankQuery} is true, this is the DQL that will be used to "find all items".
      */
     protected $showAllDPQL;
-    
+
 
     /**
      * @var string The effective DQL query string after consolidating the complex search.
@@ -945,7 +945,7 @@ class WFDieselSearchHelper extends WFObject
      * @var array An assoc-arary of legal "attribute query" comparators and their logical operators.
      */
     private $legalComparatorList = array(
-                                            'EQ' => '=', 
+                                            'EQ' => '=',
                                             'NE' => '<>',
                                             'GT' => '>',
                                             'GE' => '>=',
@@ -1007,6 +1007,11 @@ class WFDieselSearchHelper extends WFObject
     function hasAttributeQueries()
     {
         return count($this->attributeQueries) > 0;
+    }
+
+    function getAttributeQueries()
+    {
+        return $this->attributeQueries;
     }
 
     /**
@@ -1158,7 +1163,7 @@ class WFDieselSearchHelper extends WFObject
                 $this->effectiveDQL = NULL;
             }
         }
-        
+
         // Set up search on dieselSearch object
         //print "<br>About to query using: '{$this->effectiveDQL}'";
         $this->dieselSearch->setQueryString($this->effectiveDQL);
@@ -1436,7 +1441,7 @@ class WFDieselSearchHelper extends WFObject
         }
         return NULL;
     }
-    
+
     /**
      *  Get the queryState for the current instance.
      *
@@ -1505,7 +1510,7 @@ class WFDieselSearchHelper extends WFObject
     }
 
     /**
-     *  Reset the query state to "empty". 
+     *  Reset the query state to "empty".
      *
      *  Note that this does not clear the restrictDQL.
      */
@@ -1648,7 +1653,7 @@ class WFDieselSearch_FacetedAttribute extends WFObject
     protected $options = array();
 
     /**
-     * @const boolean True to implement fake open-ended ranges corrections. With DP < 4.0, there is no range supprort, so we fake it with multi-value attr categories. IE Bedrooms 1+, 2+, 3+. 
+     * @const boolean True to implement fake open-ended ranges corrections. With DP < 4.0, there is no range supprort, so we fake it with multi-value attr categories. IE Bedrooms 1+, 2+, 3+.
      *                The downside of this is that the facets don't adjust as choices are selected (b/c 3+ includes 1+ and 2+).
      *                The fakeOpenEndedRange support will correct the facet display by eliminating choices less than the current value.
      */

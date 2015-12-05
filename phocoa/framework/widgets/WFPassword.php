@@ -5,7 +5,7 @@
  * @subpackage Widgets
  * @copyright Copyright (c) 2005 Alan Pinstein. All Rights Reserved.
  * @version $Id: kvcoding.php,v 1.3 2004/12/12 02:44:09 alanpinstein Exp $
- * @author Alan Pinstein <apinstein@mac.com>                        
+ * @author Alan Pinstein <apinstein@mac.com>
  */
 
 /**
@@ -102,7 +102,17 @@ class WFPassword extends WFWidget
     {
         if ($this->hidden) return NULL;
 
-        return '<input type="password" name="' . $this->valueForKey('name') . '" value="' . ($this->preserveInput ? $this->value : NULL) . '"' .
+        // defeating browser auto-fill so that it doesn't stuff user/pass into inappropriate places
+        // if we are doing "confirm password" then clearly we don't want to
+        // 1. Safari seems to be smart enough to not autofill user/pass if there are 2 password fields. Nothing needed.
+        // 2. Chrome 34, not so much. A honeypot approach (hidden fields) somehow thwarts it.
+        $browserAutofillKillers = NULL;
+        if ($this->valueForKey('autocomplete') === false && $this->confirmPasswordId)
+        {
+            // Chrome 34 killer
+            $browserAutofillKillers .= '<input type="text" style="display:none" /><input type="password" style="display:none"/>';
+        }
+        return $browserAutofillKillers . '<input type="password" name="' . $this->valueForKey('name') . '" value="' . ($this->preserveInput ? $this->value : NULL) . '"' .
             ($this->valueForKey('size') ? ' size="' . $this->valueForKey('size') . '" ' : '') .
             ($this->valueForKey('maxLength') ? ' maxLength="' . $this->valueForKey('maxLength') . '" ' : '') .
             ($this->valueForKey('enabled') ? '' : ' disabled readonly ') .

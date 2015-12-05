@@ -126,11 +126,11 @@ class module_' . $modName . '_' . $pageName . ' {
 
 function createPage($pageName) {
 
-		$configFile = "
+	$configFile = "
 result:
   class: SssSMessageBox";
 
-		$templateFile = "{* vim: set expandtab tabstop=4 shiftwidth=4 syntax=smarty: *}
+	$templateFile = "{* vim: set expandtab tabstop=4 shiftwidth=4 syntax=smarty: *}
 {assign var='oAuthInfo' value=\$__module->valueForKeyPath('oAuthInfo')}
 {assign var='bLoggedIn' value=\$oAuthInfo->isLoggedIn()}
 {assign var='bSuperUser' value=\$oAuthInfo->isSuperUser()}
@@ -153,5 +153,7 @@ Smarty HTML Goes Here.
 	}
 
 	print "Done!\n";
-}
+
+} // createPage
+
 ?>

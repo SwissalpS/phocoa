@@ -394,7 +394,7 @@ class WFPaginator extends WFObject
      */
     function addSortKey($key)
     {
-        if (!isset($this->sortOptions[$key])) throw( new WFException("Sort key '$key' not available in sortOptions.") );
+        if (!isset($this->sortOptions[$key])) throw( new WFException("Sort key '$key' not available in sortOptions." . print_r($this->sortOptions, true)) );
         $this->sortKeys[] = $key;
     }
 
@@ -976,14 +976,9 @@ class WFPagedPropelModelCriteria implements WFPagedData
             $criteria->setLimit($numItems);
         }
         foreach ($sortKeys as $sortKey) {
-            if (substr($sortKey, 0, 1) == '-')
-            {
-                $criteria->addDescendingOrderByColumn(substr($sortKey, 1));
-            }
-            else
-            {
-                $criteria->addAscendingOrderByColumn(substr($sortKey, 1));
-            }
+            $dir = substr($sortKey, 0, 1) == '-' ? Criteria::DESC : Criteria::ASC;
+            $col = substr($sortKey, 1);
+            $criteria->orderBy($col, $dir);
         }
         return $criteria->find($this->con);
     }
