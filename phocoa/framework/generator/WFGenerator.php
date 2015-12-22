@@ -14,7 +14,7 @@ class WFModel extends WFObject
     protected $entities = array();
     static private $_instance = NULL;
 
-    function sharedModel()
+    static function sharedModel()
     {
         if (!self::$_instance)
         {
