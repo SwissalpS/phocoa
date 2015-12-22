@@ -21,7 +21,7 @@ array_shift($aArgs); // drop invocation
 
 foreach ($aArgs as $sArgs) {
 $delim = ' ';
-	if (false != strchr($sArgs, ',')) {
+	if (false !== strchr($sArgs, ',')) {
     $delim = ',';
 	} // if got comma in arg
 
@@ -29,7 +29,6 @@ $delim = ' ';
 			array_map('trim', explode($delim, $sArgs)));
 
 } // loop all args and collect into array
-
 $model = WFModel::sharedModel();
 $model->buildModel($adapter, $configFile, $aEntities);
 print $model->__toString();
