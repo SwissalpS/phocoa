@@ -335,7 +335,7 @@ class WFModelCodeGenPropel extends WFObject
         $this->smarty->assign('descriptiveColumnName', $entity->valueForKey('descriptiveColumnName'));
 
         // look up Peer column constant name from the PHP name; call ObjPeer::translateFieldName($name, $fromType, $toType)
-        $translateF = array($entity->valueForKey('name') . 'Peer', 'translateFieldName');
+        $translateF = array($entity->valueForKey('name') . 'Query', 'translateFieldName');
         $peerColName = call_user_func($translateF, ucfirst($entity->valueForKey('descriptiveColumnName')), BasePeer::TYPE_PHPNAME, BasePeer::TYPE_FIELDNAME);
         $this->smarty->assign('descriptiveColumnConstantName', strtoupper($peerColName));
 
