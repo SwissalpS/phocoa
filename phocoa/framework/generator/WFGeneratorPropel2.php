@@ -4,8 +4,7 @@ class WFModelBuilderPropel2 extends WFObject implements WFModelBuilder
 {
     protected $builtEntities = array(); // prevent infinite loops!
 
-    function setup()
-    {
+    function setup() {
         if (is_readable(PROPEL2_RUNTIME_CONFIG)) {
             require_once(PROPEL2_RUNTIME_CONFIG);
         } else {
@@ -19,8 +18,7 @@ class WFModelBuilderPropel2 extends WFObject implements WFModelBuilder
      * @param string The name of the entity, as it's PHP class name.
      * @return object TableMap The Propel TableMap for this entity.
      */
-    function getEntityMetadata($name)
-    {
+    function getEntityMetadata($sClassName) {
         // in Propel, the MapBuilder class is only set up for an entity when the Peer file is loaded...
         //$s = $name::TABLE_MAP;
 var_dump($name);
@@ -35,7 +33,8 @@ exit();
         $tableMapTableName = eval("return {$peerClassName}::TABLE_NAME;");
         $tableMap = $dbMap->getTable($tableMapTableName);
         return $tableMap;
-    }
+
+    } // getEntityMetadata
 
     /**
      * Pass in a WFModelEntity object with a name filled out.
@@ -43,15 +42,14 @@ exit();
      * @param object WFModelEntity An WFModelEntity with a name.
      * @throws object WFModelEntity
      */
-    function buildEntityModel($entity)
-    {
-        if (!($entity instanceof WFModelEntity)) throw( new WFException("WFModelEntity required.") );
-        $name = $entity->valueForKey('name');
+    function buildEntityModel($oEntity) {
+        if (!($oEntity instanceof WFModelEntity)) throw( new WFException("WFModelEntity required.") );
+        $sName = $oEntity->valueForKey('name');
 
-        if (isset($this->builtEntities[$name])) return $this->builtEntities[$name];
+        if (isset($this->builtEntities[$sName])) return $this->builtEntities[$sName];
 
         // build a WFModelEntity structure from the Propel metadata....
-        $tableMap = $this->getEntityMetadata($name);
+        $oTableMap = $this->getEntityMetadata($sName);
 
         // set up properties
         foreach ($tableMap->getColumns() as $column) {
@@ -61,7 +59,7 @@ exit();
             $property->setValueForKey($propertyName, 'name');
             $property->setValueForKey($column->getDefaultValue(), 'defaultValue');
             // BOOLEAN|TINYINT|SMALLINT|INTEGER|BIGINT|DOUBLE|FLOAT|REAL|DECIMAL|CHAR|{VARCHAR}|LONGVARCHAR|DATE|TIME|TIMESTAMP|BLOB|CLOB
-            switch (strtoupper($column->getType())) {
+            switch (strtoupper($oColumn->getType())) {
                 case 'TINYINT':
                 case 'SMALLINT':
                 case 'INTEGER':
@@ -71,45 +69,46 @@ exit();
                 case 'FLOAT':
                 case 'REAL':
                 case 'DECIMAL':
-                    $type = WFModelEntityProperty::TYPE_NUMBER;
+                    $sType = WFModelEntityProperty::TYPE_NUMBER;
                     break;
                 case 'TIMESTAMP':
                 case 'DATETIME':
                 case 'DATE':
-                    $type = WFModelEntityProperty::TYPE_DATETIME;
+                    $sType = WFModelEntityProperty::TYPE_DATETIME;
                     break;
                 case 'TEXT':
                 case 'LONGVARCHAR':
-                    $type = WFModelEntityProperty::TYPE_TEXT;
+                    $sType = WFModelEntityProperty::TYPE_TEXT;
                     break;
                 case 'BOOLEAN':
-                    $type = WFModelEntityProperty::TYPE_BOOLEAN;
+                    $sType = WFModelEntityProperty::TYPE_BOOLEAN;
                     break;
                 case 'CHAR':
                 case 'VARCHAR':
                 case 'STRING':
-                    $type = WFModelEntityProperty::TYPE_STRING;
+                    $sType = WFModelEntityProperty::TYPE_STRING;
                     break;
                 default:
-                    print "WARNING: Unknown property type for column " . $property->valueForKey('name') . ": " . $column->getType() . "\n";
-                    $type = WFModelEntityProperty::TYPE_STRING;
+                    print "WARNING: Unknown property type for column "
+                        . $oProperty->valueForKey('name')
+                        . ": " . $oColumn->getType() . "\n";
+                    $sType = WFModelEntityProperty::TYPE_STRING;
                     break;
+            } // switch type
+            if (!$oEntity->valueForKey('descriptiveColumnName')
+                    && $sType === WFModelEntityProperty::TYPE_STRING) {
+                $oEntity->setValueForKey(
+                        $oProperty->valueForKey('name'),
+                        'descriptiveColumnName');
             }
-            if (!$entity->valueForKey('descriptiveColumnName') && $type === WFModelEntityProperty::TYPE_STRING)
-            {
-                $entity->setValueForKey($property->valueForKey('name'), 'descriptiveColumnName');
+            if (!$oEntity->valueForKey('primaryKeyProperty')
+                    && $oColumn->isPrimaryKey()) {
+                $oEntity->setValueForKey(
+                        $oProperty->valueForKey('name'),
+                        'primaryKeyProperty');
             }
-            if (!$entity->valueForKey('primaryKeyProperty') && $column->isPrimaryKey())
-            {
-                $entity->setValueForKey($property->valueForKey('name'), 'primaryKeyProperty');
-            }
-            $property->setValueForKey($type, 'type');
-            $entity->addProperty($property);
-        }
-        if (!$entity->valueForKey('descriptiveColumnName'))
-        {
-            $entity->setValueForKey($entity->valueForKey('primaryKeyProperty'), 'descriptiveColumnName');
-        }
+            $oProperty->setValueForKey($sType, 'type');
+            $oEntity->addProperty($oProperty);
 
         // set up relationships
         $tableMap->getRelations();  // populate databaseMap with related columns
@@ -157,8 +156,7 @@ exit();
                 $invRel->setValueForKey($invRelName, 'name');
                 $relatedEntity->addRelationship($invRel);
             }
-        }
-
-        $this->builtEntities[$entity->valueForKey('name')] = $entity;
-    }
-}
+        } // loop all columns extracting relationships
+        $this->builtEntities[$oEntity->valueForKey('name')] = $oEntity;
+    } // buildEntityModel
+} // WFModelBuilderPropel2
