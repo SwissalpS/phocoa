@@ -290,6 +290,8 @@ class WFModelCodeGenPropel extends WFObject
         print "Generating module for entity '" . $entity->valueForKey('name') . "'\n";
         $cwd = getcwd();
         $moduleName = strtolower( $entity->valueForKey('name') );
+        $aNamespaceParts = explode('\\', trim($moduleName, '\\'));
+        $moduleName = $aNamespaceParts[count($aNamespaceParts) -1];
         $moduleDir = $cwd . '/' . $moduleName;
         if (file_exists($moduleDir))
         {
