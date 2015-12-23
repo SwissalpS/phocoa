@@ -20,19 +20,11 @@ class WFModelBuilderPropel2 extends WFObject implements WFModelBuilder
      */
     function getEntityMetadata($sClassName) {
         // in Propel, the MapBuilder class is only set up for an entity when the Peer file is loaded...
-        //$s = $name::TABLE_MAP;
-var_dump($name);
-        $peerClassName = $name . 'Query';
-        if (!class_exists($peerClassName))
-        {
-            throw( new WFException("Entity {$name} is not a Propel object.") );
-        }
-exit();
-        $databaseName = eval("return {$peerClassName}::DATABASE_NAME;");        // autolaod will load the Peer file...
-        $dbMap = Propel::getDatabaseMap($databaseName);
-        $tableMapTableName = eval("return {$peerClassName}::TABLE_NAME;");
-        $tableMap = $dbMap->getTable($tableMapTableName);
-        return $tableMap;
+        $sTableMapClassName = $sClassName::TABLE_MAP;
+
+        $oTableMap = $sTableMapClassName::getTableMap();
+
+        return $oTableMap;
 
     } // getEntityMetadata
 
@@ -50,14 +42,15 @@ exit();
 
         // build a WFModelEntity structure from the Propel metadata....
         $oTableMap = $this->getEntityMetadata($sName);
+        $aColumns = $oTableMap->getColumns();
 
         // set up properties
-        foreach ($tableMap->getColumns() as $column) {
-            $property = new WFModelEntityProperty;
-            $propertyName = $column->getPhpName();
-            $propertyName[0] = strtolower($propertyName[0]);
-            $property->setValueForKey($propertyName, 'name');
-            $property->setValueForKey($column->getDefaultValue(), 'defaultValue');
+        foreach ($aColumns as $oColumn) {
+            $oProperty = new WFModelEntityProperty;
+            $sPropertyName = $oColumn->getPhpName();
+            $sPropertyName[0] = strtolower($sPropertyName[0]);
+            $oProperty->setValueForKey($sPropertyName, 'name');
+            $oProperty->setValueForKey($oColumn->getDefaultValue(), 'defaultValue');
             // BOOLEAN|TINYINT|SMALLINT|INTEGER|BIGINT|DOUBLE|FLOAT|REAL|DECIMAL|CHAR|{VARCHAR}|LONGVARCHAR|DATE|TIME|TIMESTAMP|BLOB|CLOB
             switch (strtoupper($oColumn->getType())) {
                 case 'TINYINT':
@@ -109,17 +102,28 @@ exit();
             }
             $oProperty->setValueForKey($sType, 'type');
             $oEntity->addProperty($oProperty);
+        } // loop all colums
+        if (!$oEntity->valueForKey('descriptiveColumnName')) {
+            $oEntity->setValueForKey(
+                    $oEntity->valueForKey('primaryKeyProperty'),
+                    'descriptiveColumnName');
+        } // if no descriptive column name
 
         // set up relationships
-        $tableMap->getRelations();  // populate databaseMap with related columns
-        foreach ($tableMap->getColumns() as $column) {
-            if (!$column->isForeignKey()) continue;
+        $oTableMap->getRelations();  // populate databaseMap with related columns
+if ($aColumns != $oTableMap->getColumns()) {
+var_dump('got more columns than before');
+}
+        foreach ($aColumns as $oColumn) {
+            if (!$oColumn->isForeignKey()) continue;
 
             //print "Processing {$tableMap->getPhpName()}.{$column->getPhpName()}\n";
 
             // get related entity
-            $relatedEntityName = $column->getRelatedTable()->getPhpName();
-            $relatedEntityTableMap = $this->getEntityMetadata($relatedEntityName);
+            $sRelatedEntityName = $oColumn->getRelatedTable()->getPhpName();
+            $relatedEntityTableMap = $this->getEntityMetadata($sRelatedEntityName);
+var_dump(get_class($relatedEntityTableMap), 'not yet coded relationship columns!!! edit ' . __FILE__ . '(' . __LINE__ . ')');
+exit();
             $relatedEntity = WFModel::sharedModel()->getEntity($relatedEntityTableMap->getPhpName());
             if (!$relatedEntity)
             {
