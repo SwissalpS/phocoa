@@ -934,6 +934,8 @@ class WFPagedPropelQuery implements WFPagedData
                 $criteria->addAscendingOrderByColumn(substr($sortKey, 1));
             }
         }
+		$oPeer = new $this->peerName();
+		return call_user_func(array($oPeer, $this->peerSelectMethod), $criteria);
         return call_user_func(array($this->peerName, $this->peerSelectMethod), $criteria);
     }
 }
