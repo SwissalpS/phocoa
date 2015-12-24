@@ -1,5 +1,7 @@
 <?php
 
+use Propel\Runtime\ActiveQuery\Criteria;
+
 // Created by PHOCOA WFModelCodeGen on {{php}}echo date('r');{{/php}}
 
 class module_{{$moduleName}} extends WFModule {
@@ -54,11 +56,11 @@ class module_{{$moduleName}}_list {
 
 			$sQuerySubStr = '%' . str_replace(' ', '%', trim($sQuery)) . '%';
 
-			$oC->add({{$entityName}}Peer::{{$descriptiveColumnConstantName}}, $sQuerySubStr, Criteria::LIKE); // for pgsql ILIKE
+			$oC->add({{$entityName}}Query::{{$descriptiveColumnConstantName}}, $sQuerySubStr, Criteria::LIKE); // for pgsql ILIKE
 
 		} // if got query string
 
-		$oPage->sharedOutlet('paginator')->setDataDelegate(new WFPagedPropelQuery($oC, '{{$entityName}}Peer'));
+		$oPage->sharedOutlet('paginator')->setDataDelegate(new WFPagedPropelQuery($oC, '{{$entityName}}Query'));
 		$oPage->sharedOutlet('{{$sharedEntityId}}')->setContent($oPage->sharedOutlet('paginator')->currentItems());
 
 	} // search
@@ -101,7 +103,7 @@ class module_{{$moduleName}}_edit {
 		if ($oPage->sharedOutlet('{{$sharedEntityId}}')->selection() === NULL) {
 
 			if ($aParams['{{$sharedEntityPrimaryKeyProperty}}']) {
-				$oPage->sharedOutlet('{{$sharedEntityId}}')->setContent(array({{$entityName}}Peer::retrieveByPK($aParams['{{$sharedEntityPrimaryKeyProperty}}'])));
+				$oPage->sharedOutlet('{{$sharedEntityId}}')->setContent(array({{$entityName}}Query::retrieveByPK($aParams['{{$sharedEntityPrimaryKeyProperty}}'])));
 
 				$oPage->module()->verifyEditingPermission($oPage);
 
@@ -179,7 +181,7 @@ class module_{{$moduleName}}_confirmDelete {
 		// if we're a redirected action, then the {{$entityName}} object is already loaded. If there is no object loaded, try to load it from the object ID passed in the params.
 		if ($oPage->sharedOutlet('{{$sharedEntityId}}')->selection() === NULL) {
 
-			$objectToDelete = {{$entityName}}Peer::retrieveByPK($aParams['{{$sharedEntityPrimaryKeyProperty}}']);
+			$objectToDelete = {{$entityName}}Query::retrieveByPK($aParams['{{$sharedEntityPrimaryKeyProperty}}']);
 
 			if (!$objectToDelete)
 				throw(new Exception("Could not load {{$entityName}} object to delete."));
@@ -230,7 +232,7 @@ class module_{{$moduleName}}_detail {
 
 	function parametersDidLoad($oPage, $aParams) {
 
-		$oEntity = {{$entityName}}Peer::retrieveByPK($aParams['{{$sharedEntityPrimaryKeyProperty}}']);
+		$oEntity = {{$entityName}}Query::retrieveByPK($aParams['{{$sharedEntityPrimaryKeyProperty}}']);
 
 		$oPage->sharedOutlet('{{$sharedEntityId}}')->setContent(array($oEntity));
 
