@@ -4,9 +4,9 @@ require_once($sPathPhocoaConfig);
 
 if ($argc != 2) die("You must enter the name of the class to test as an argument.\n\nphp createTestStub.php ClassUnderTest\n");
 $className = $argv[1];
-$classNameLower = strtolower($className[0]) . substr($className, 1);
+$classNameLower = str_replace(array('\\', '/',), '_', strtolower($className[0]) . substr($className, 1));
 
-$testFile = "./{$className}Test.php";
+$testFile = "./{$classNameLower}Test.php";
 if (file_exists($testFile)) throw new WFException("Test file {$testFile} already exists.");
 
 $testTemplate = <<<TPLEND
@@ -15,7 +15,7 @@ $testTemplate = <<<TPLEND
 require_once({$sPathPhocoaConfig});
 
 // http://www.phpunit.de/pocket_guide/3.0/en/writing-tests-for-phpunit.html
-class {$className}Test extends PHPUnit_Framework_TestCase
+class {$classNameLower}Test extends PHPUnit_Framework_TestCase
 {
     protected \${$classNameLower};
 
@@ -39,4 +39,4 @@ END;
 }
 TPLEND;
 
-file_put_contents($testFile, $testTemplate);
+$mRes = file_put_contents($testFile, $testTemplate);
