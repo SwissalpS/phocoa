@@ -335,12 +335,25 @@ class WFModelCodeGenPropel extends WFObject
         $this->smarty->assign('sharedEntityPrimaryKeyProperty', $entity->valueForKey('primaryKeyProperty'));
         $this->smarty->assign('descriptiveColumnName', $entity->valueForKey('descriptiveColumnName'));
 
-        // look up Peer column constant name from the PHP name; call ObjPeer::translateFieldName($name, $fromType, $toType)
         $sClassName = $entity->valueForKey('name');
         $sTableMap = $sClassName::TABLE_MAP;
+
+        // look up Peer column constant name from the PHP name; call ObjPeer::translateFieldName($name, $fromType, $toType)
         $translateF = array($sTableMap, 'translateFieldName');
         $peerColName = call_user_func($translateF, ucfirst($entity->valueForKey('descriptiveColumnName')), TableMap::TYPE_PHPNAME, TableMap::TYPE_FIELDNAME);
         $this->smarty->assign('descriptiveColumnConstantName', strtoupper($peerColName));
+
+        $aColumnsPhp = call_user_func(array($sTableMap, 'getFieldNames'), TableMap::TYPE_PHPNAME);
+        $sColumnNameSearch = $aColumnsPhp[0];
+        if (in_array('Name', $aColumnsPhp)) {
+            $sColumnNameSearch = 'Name';
+        } elseif (in_array('Title', $aColumnsPhp)) {
+            $sColumnNameSearch = 'Title';
+        } elseif (in_array('Uid', $aColumnsPhp)) {
+            $sColumnNameSearch = 'Uid';
+        } // if standard main search field found
+        $this->smarty->assign('columnNameSearch', $sColumnNameSearch);
+
         $moduleCode = $this->smarty->fetch(FRAMEWORK_DIR . '/framework/generator/module.tpl');
         file_put_contents($moduleDir . '/' . $moduleName . '.php', $moduleCode);
 
