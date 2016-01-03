@@ -112,7 +112,7 @@ class WFModelBuilderPropel2 extends WFObject implements WFModelBuilder
         // set up relationships
         $oTableMap->getRelations();  // populate databaseMap with related columns
 if ($aColumns != $oTableMap->getColumns()) {
-var_dump('got more columns than before');
+var_dump(__METHOD__, 'got more columns than before');
 }
         foreach ($aColumns as $oColumn) {
             if (!$oColumn->isForeignKey()) continue;

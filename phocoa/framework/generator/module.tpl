@@ -1,6 +1,7 @@
 <?php
 
 use Propel\Runtime\ActiveQuery\Criteria;
+use SwissalpS\PHOCOA\Pagination\WFPagedPropelQuery;
 
 // Created by PHOCOA WFModelCodeGen on {{php}}echo date('r');{{/php}}
 
@@ -48,20 +49,26 @@ class module_{{$moduleName}}_list {
 
 	function search($oPage, $aParams) {
 
-		$oC = new Criteria();
+		$sQuery = trim($oPage->outlet('query')->value());
 
-		$sQuery = $oPage->outlet('query')->value();
+		$oC = {{$entityName}}Query::create();
 
-		if (!empty($sQuery)) {
+		if (strlen($sQuery)) {
 
-			$sQuerySubStr = '%' . str_replace(' ', '%', trim($sQuery)) . '%';
+			$sQuerySubStr = '%' . str_replace(' ', '%', $sQuery) . '%';
 
-			$oC->add({{$entityName}}Query::{{$descriptiveColumnConstantName}}, $sQuerySubStr, Criteria::LIKE); // for pgsql ILIKE
+			$oC->filterBy{{$columnNameSearch}}($sQuerySubStr);
+
+			//$oC->add({{$entityName}}Query::{{$descriptiveColumnConstantName}}, $sQuerySubStr, Criteria::LIKE); // for pgsql ILIKE
 
 		} // if got query string
 
-		$oPage->sharedOutlet('paginator')->setDataDelegate(new WFPagedPropelQuery($oC, '{{$entityName}}Query'));
-		$oPage->sharedOutlet('{{$sharedEntityId}}')->setContent($oPage->sharedOutlet('paginator')->currentItems());
+		$oPaginator = $oPage->sharedOutlet('paginator');
+		$oSharedEntity = $oPage->sharedOutlet('{{$sharedEntityId}}');
+		$oPagedQuery = new WFPagedPropelQuery($oC); //, '{{$entityName}}Query'));
+
+		$oPaginator->setDataDelegate($oPagedQuery);
+		$oSharedEntity->setContent($oPaginator->currentItems());
 
 	} // search
 
