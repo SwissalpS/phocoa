@@ -2,7 +2,7 @@
 <h2>{SssSBla value="{{$entityName}}Sing"}</h2>
 <div class="form-container">
 {WFView id="statusMessage"}
-{WFShowErrors id={{$editFormId}}}
+{WFShowErrors id="{{$editFormId}}"}
 
 {WFViewBlock id="{{$editFormId}}"}
 	<fieldset>

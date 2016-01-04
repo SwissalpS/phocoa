@@ -289,25 +289,46 @@ class WFModelCodeGenPropel extends WFObject
 
     function generateModuleForEntity($entity)
     {
-        print "Generating module for entity '" . $entity->valueForKey('name') . "'\n";
-        $cwd = getcwd();
-        $moduleName = strtolower( $entity->valueForKey('name') );
-        $aNamespaceParts = explode('\\', trim($moduleName, '\\'));
+        $sEntityNameFull = $entity->valueForKey('name');
+
+        print "Generating module for entity '" . $sEntityNameFull . "'\n";
+
+        // JavaScript does not allow backslashes in names
+        $sModuleNameJSsafe = str_replace('\\', '_', $sEntityNameFull);
+
+        // for path we use lower case version of class/entity name
+        $moduleNameFullLower = strtolower($sEntityNameFull);
+
+        // figure out if this is namespaced class (which it is as of Propel2)
+        // split into parts
+        $aNamespaceParts = explode('\\', trim($moduleNameFullLower, '\\'));
+
+        // use last item in namespace as module name
         $moduleName = $aNamespaceParts[count($aNamespaceParts) -1];
-        $moduleDir = $cwd . '/' . $moduleName;
-        if (file_exists($moduleDir))
-        {
+
+        // concat to current module path for testing
+        $moduleDir = $this->modulePath . $moduleName;
+
+        if (file_exists($moduleDir)) {
+
             print "WARNING: Module $moduleName already exists. Skipping\n";
+
             return;
-        }
-        mkdir($moduleDir); // module dir
+
+        } // if dir already exists, skip
+
+        // add module dir to module path
         $this->modulePath .= $moduleName;
 
+        // prepare the path for module
+        mkdir($this->modulePath);
+
         // setup shared instances
-        $sharedYaml[$entity->valueForKey('name')] = array(
+        $sharedYaml = [];
+        $sharedYaml[$sModuleNameJSsafe] = array(
                 'class' => 'WFArrayController',
                 'properties' => array(
-                    'class' => $entity->valueForKey('name'),
+                    'class' => $sEntityNameFull,
                     'classIdentifiers' => $entity->valueForKey('primaryKeyProperty'),
                     'selectOnInsert' => true,
                     'automaticallyPreparesContent' => false
@@ -318,27 +339,26 @@ class WFModelCodeGenPropel extends WFObject
                 'properties' => array(
                     'modeForm' => 'search',
                     'pageSize' => 25,
-                    'itemPhraseSingular' => 'SssSBla' . $entity->valueForKey('name') . 'Sing',
-                    'itemPhrasePlural' => 'SssSBla' . $entity->valueForKey('name') . 'Plur'
+                    'itemPhraseSingular' => 'SssSBla' . $sModuleNameJSsafe . 'Sing',
+                    'itemPhrasePlural' => 'SssSBla' . $sModuleNameJSsafe . 'Plur'
                     )
                 );
         file_put_contents($moduleDir . '/shared.yaml', WFYaml::dump($sharedYaml));
 
-        $sharedEntityId = $entity->valueForKey('name');
+        $sharedEntityId = $sModuleNameJSsafe;
 
         // build module code
         $this->smarty->assign('modulePath', $this->modulePath);
         $this->smarty->assign('moduleName', $moduleName);
         $this->smarty->assign('entity', $entity);
-        $this->smarty->assign('entityName', $entity->valueForKey('name'));
+        $this->smarty->assign('entityName', $sModuleNameJSsafe);
         $this->smarty->assign('sharedEntityId', $sharedEntityId);
         $this->smarty->assign('sharedEntityPrimaryKeyProperty', $entity->valueForKey('primaryKeyProperty'));
         $this->smarty->assign('descriptiveColumnName', $entity->valueForKey('descriptiveColumnName'));
 
-        $sClassName = $entity->valueForKey('name');
-        $sTableMap = $sClassName::TABLE_MAP;
+        $sTableMap = $sEntityNameFull::TABLE_MAP;
 
-        // look up Peer column constant name from the PHP name; call ObjPeer::translateFieldName($name, $fromType, $toType)
+        // look up Peer column constant name from the PHP name; call ObjMap::translateFieldName($name, $fromType, $toType)
         $translateF = array($sTableMap, 'translateFieldName');
         $peerColName = call_user_func($translateF, ucfirst($entity->valueForKey('descriptiveColumnName')), TableMap::TYPE_PHPNAME, TableMap::TYPE_FIELDNAME);
         $this->smarty->assign('descriptiveColumnConstantName', strtoupper($peerColName));
@@ -360,7 +380,7 @@ class WFModelCodeGenPropel extends WFObject
         // build list page
         // list.yaml
         $listYaml = array();
-        $listFormId = 'search' . $entity->valueForKey('name') . 'Form';
+        $listFormId = 'search' . $sModuleNameJSsafe . 'Form';
         $listYaml[$listFormId] = array(
                 'class' => 'WFForm', 'children' => array(
                     'search' => array(
@@ -465,7 +485,7 @@ class WFModelCodeGenPropel extends WFObject
         // build edit page
         // build edit.yaml
         $editYaml = array();
-        $editFormId = 'edit' . $entity->valueForKey('name') . 'Form';
+        $editFormId = 'edit' . $sModuleNameJSsafe . 'Form';
         $editYaml[$editFormId] = array('class' => 'WFForm', 'children' => array());
 
         $widgets = array();
@@ -563,7 +583,7 @@ class WFModelCodeGenPropel extends WFObject
 
         // build confirmDelete page
         $confirmDeleteYaml = array();
-        $confirmDeleteFormId = 'confirmDelete' . $entity->valueForKey('name')  . 'Form';
+        $confirmDeleteFormId = 'confirmDelete' . $sModuleNameJSsafe  . 'Form';
         $pkId = $entity->valueForKey('primaryKeyProperty');
         $confirmDeleteYaml[$confirmDeleteFormId] = array(
                 'class' => 'WFForm',
@@ -601,7 +621,7 @@ class WFModelCodeGenPropel extends WFObject
                         'controllerKey' => 'selection',
                         'modelKeyPath' => $descriptiveColumnName,
                         'options' => array(
-                            'ValuePattern' => 'Are you sure you want to delete ' . $entity->valueForKey('name') . ' "%1%"?'
+                            'ValuePattern' => 'Are you sure you want to delete ' . $sEntityNameFull . ' "%1%"?'
                             )
                         )
                     )
@@ -617,7 +637,7 @@ class WFModelCodeGenPropel extends WFObject
         $deleteSuccessYaml['statusMessage'] = array(
                 'class' => 'SssSMessageBox',
                 'properties' => array(
-                    'value' => 'SssSBla' . $entity->valueForKey('name') . 'DeleteSuccess'
+                    'value' => 'SssSBla' . $sModuleNameJSsafe . 'DeleteSuccess'
                     )
                 );
         file_put_contents($moduleDir . '/deleteSuccess.yaml', WFYaml::dump($deleteSuccessYaml));
@@ -659,5 +679,6 @@ class WFModelCodeGenPropel extends WFObject
         // build detail.tpl
         $this->smarty->assign('widgets', $widgets);
         file_put_contents($moduleDir . '/detail.tpl', $this->smarty->fetch(FRAMEWORK_DIR . '/framework/generator/detail.tpl'));
-    }
-}
+    } // generateModuleForEntity
+    
+} // WFModelCodeGenPropel
