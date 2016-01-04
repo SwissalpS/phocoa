@@ -1,4 +1,4 @@
-<h2>{{SssSBla value="{{$entityName}}Sing"}}</h2>
+<h2>{SssSBla value="{{$entityName}}Sing"}</h2>
 
 <div class="form-container">
 {WFViewBlock id="{{$confirmDeleteFormId}}"}
