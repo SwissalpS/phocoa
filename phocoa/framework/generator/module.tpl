@@ -107,21 +107,28 @@ class module_{{$moduleName}}_edit {
 
 	function parametersDidLoad($oPage, $aParams) {
 
-		if ($oPage->sharedOutlet('{{$sharedEntityId}}')->selection() === NULL) {
+		$oSharedEntity = $oPage->sharedOutlet('{{$sharedEntityId}}');
 
-			if ($aParams['{{$sharedEntityPrimaryKeyProperty}}']) {
-				$oPage->sharedOutlet('{{$sharedEntityId}}')->setContent(array({{$entityName}}Query::retrieveByPK($aParams['{{$sharedEntityPrimaryKeyProperty}}'])));
+		if (null === $oSharedEntity->selection()) {
+
+			if (isset($aParams['{{$sharedEntityPrimaryKeyProperty}}'])) {
+
+				$oC = {{$entityName}}Query::create();
+
+				$oEntity = $oC->findPk($aParams['{{$sharedEntityPrimaryKeyProperty}}']);
+
+				$oSharedEntity->setContent(array($oEntity));
 
 				$oPage->module()->verifyEditingPermission($oPage);
 
 			} else {
 
 				// prepare content for new
-				$oPage->sharedOutlet('{{$sharedEntityId}}')->setContent(array(new {{$entityName}}()));
+				$oSharedEntity->setContent(array(new {{$entityName}}()));
 
-			} //
+			} // if edit or new
 
-		} //
+		} // if nothing selected
 
 	} // parametersDidLoad
 
@@ -156,17 +163,19 @@ class module_{{$moduleName}}_edit {
 
 		//$oSkin->addHeadString('<link rel="stylesheet" type="text/css" href="' . $oSkin->getSkinDirShared() . '/form.css" />');
 
-		if ($oPage->sharedOutlet('{{$sharedEntityId}}')->selection()->isNew()) {
+		$oSharedEntity = $oPage->sharedOutlet('{{$sharedEntityId}}');
+		if ($oSharedEntity->selection()->isNew()) {
 
-			$title = SssSBla::cleanForTitle(WFLocalizedString('{{$entityName}}New'));
-		}
-		else {
+			$sTitle = SssSBla::cleanForTitle(WFLocalizedString('{{$entityName}}New'));
 
-			$title = SssSBla::cleanForTitle(WFLocalizedString('{{$entityName}}Edit')) . ':' . $oPage->sharedOutlet('{{$sharedEntityId}}')->selection()->valueForKeyPath('{{$descriptiveColumnName}}');
+		} else {
 
-		}
+			$sTitle = SssSBla::cleanForTitle(WFLocalizedString('{{$entityName}}Edit'))
+					. ':' . $oSharedEntity->selection()->valueForKeyPath('{{$descriptiveColumnName}}');
 
-		$oSkin->setTitle($title);
+		} // if is new or edit
+
+		$oSkin->setTitle($sTitle);
 
 	} // setupSkin
 
@@ -185,20 +194,30 @@ class module_{{$moduleName}}_confirmDelete {
 
 	function parametersDidLoad($oPage, $aParams) {
 
+		$oSharedEntity = $oPage->sharedOutlet('{{$sharedEntityId}}');
+
 		// if we're a redirected action, then the {{$entityName}} object is already loaded. If there is no object loaded, try to load it from the object ID passed in the params.
-		if ($oPage->sharedOutlet('{{$sharedEntityId}}')->selection() === NULL) {
+		if (null === $oSharedEntity->selection()) {
 
-			$objectToDelete = {{$entityName}}Query::retrieveByPK($aParams['{{$sharedEntityPrimaryKeyProperty}}']);
+			$oC = {{$entityName}}Query::create();
 
-			if (!$objectToDelete)
+			$objectToDelete = $oC->findPk($aParams['{{$sharedEntityPrimaryKeyProperty}}']);
+
+			if (!$objectToDelete) {
+
 				throw(new Exception("Could not load {{$entityName}} object to delete."));
 
-			$oPage->sharedOutlet('{{$sharedEntityId}}')->setContent(array($objectToDelete));
+			} // if nothing found
+
+			$oSharedEntity->setContent(array($objectToDelete));
 
 		} // if not yet loaded
 
-		if ($oPage->sharedOutlet('{{$sharedEntityId}}')->selection() === NULL)
+		if (null === $oSharedEntity->selection()) {
+
 			throw(new Exception("Could not load {{$entityName}} object to delete."));
+
+		} // if still none loaded
 
 	} // parametersDidLoad
 
@@ -212,13 +231,15 @@ class module_{{$moduleName}}_confirmDelete {
 
 	function deleteObj($oPage) {
 
+		$oSharedEntity = $oPage->sharedOutlet('{{$sharedEntityId}}');
+
 		$oPage->module()->verifyEditingPermission($oPage);
 
-		$myObj = $oPage->sharedOutlet('{{$sharedEntityId}}')->selection();
+		$myObj = $oSharedEntity->selection();
 
 		$myObj->delete();
 
-		$oPage->sharedOutlet('{{$sharedEntityId}}')->removeObject($myObj);
+		$oSharedEntity->removeObject($myObj);
 
 		$oPage->module()->setupResponsePage('deleteSuccess');
 
@@ -239,7 +260,9 @@ class module_{{$moduleName}}_detail {
 
 	function parametersDidLoad($oPage, $aParams) {
 
-		$oEntity = {{$entityName}}Query::retrieveByPK($aParams['{{$sharedEntityPrimaryKeyProperty}}']);
+		$oC = {{$entityName}}Query::create();
+
+		$oEntity = $oC->findPk($aParams['{{$sharedEntityPrimaryKeyProperty}}']);
 
 		$oPage->sharedOutlet('{{$sharedEntityId}}')->setContent(array($oEntity));
 
