@@ -99,6 +99,9 @@ abstract class WFView extends WFObject
                 break;
         }
 
+        // namespaced class-names are not js friendly
+        $id = str_replace('\\', '_', $id);
+
         $this->id = $id;
         $this->enabled = true;
         $this->children = array();
