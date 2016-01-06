@@ -307,7 +307,7 @@ class WFModelCodeGenPropel extends WFObject
         $moduleName = $aNamespaceParts[count($aNamespaceParts) -1];
 
         // concat to current module path for testing
-        $moduleDir = $this->modulePath . $moduleName;
+        $moduleDir = getcwd() . DIRECTORY_SEPARATOR . $moduleName;
 
         if (file_exists($moduleDir)) {
 
@@ -321,7 +321,7 @@ class WFModelCodeGenPropel extends WFObject
         $this->modulePath .= $moduleName;
 
         // prepare the path for module
-        mkdir($this->modulePath);
+        mkdir($moduleDir);
 
         // setup shared instances
         $sharedYaml = [];
@@ -352,6 +352,7 @@ class WFModelCodeGenPropel extends WFObject
         $this->smarty->assign('moduleName', $moduleName);
         $this->smarty->assign('entity', $entity);
         $this->smarty->assign('entityName', $sModuleNameJSsafe);
+        $this->smarty->assign('entityNameFull', $sEntityNameFull);
         $this->smarty->assign('sharedEntityId', $sharedEntityId);
         $this->smarty->assign('sharedEntityPrimaryKeyProperty', $entity->valueForKey('primaryKeyProperty'));
         $this->smarty->assign('descriptiveColumnName', $entity->valueForKey('descriptiveColumnName'));
@@ -490,35 +491,61 @@ class WFModelCodeGenPropel extends WFObject
 
         $widgets = array();
         foreach ($entity->getProperties() as $property) {
+
             $widgetID = $property->valueForKey('name');
             $widgets[$widgetID] = $property;
 
-            if ($property->valueForKey('name') === $entity->valueForKey('primaryKeyProperty'))
-            {
-                $class = 'WFHidden';
-            }
-            else
-            {
-                switch ($property->valueForKey('type')) {
-                    case WFModelEntityProperty::TYPE_TEXT;
-                        $class = 'WFTextArea';
-                        break;
-                    case WFModelEntityProperty::TYPE_NUMBER;
-                    case WFModelEntityProperty::TYPE_STRING;
-                    case WFModelEntityProperty::TYPE_DATETIME;
-                    case WFModelEntityProperty::TYPE_TIME;
-                    case WFModelEntityProperty::TYPE_DATE;
-                        $class = 'WFTextField';
-                        break;
-                    case WFModelEntityProperty::TYPE_BOOLEAN;
-                        $class = 'WFCheckbox';
-                        break;
-                    default:
-                        $class = 'WFTextField';
-                }
-            }
+            if ($widgetID === $entity->valueForKey('primaryKeyProperty')) {
+
+                $sClass = $this->widgetClassForType($property->valueForKey('type'));
+                $widgets[$widgetID . 'New'] = $property;
+                $this->smarty->assign('entityNewWidgetID', $widgetID . 'New');
+                $editYaml[$editFormId]['children'][$widgetID . 'New'] = array(
+                    'class' => $sClass,
+                    'bindings' => array(
+                        'value' => array(
+                            'instanceID' => $sharedEntityId,
+                            'controllerKey' => 'selection',
+                            'modelKeyPath' => $widgetID,
+                        ),
+                        'hidden' => array(
+                            'instanceID' => $sharedEntityId,
+                            'controllerKey' => 'selection',
+                            'modelKeyPath' => 'isNew',
+                            'options' => array(
+                                'valueTransformer' => 'WFNegateBoolean',
+                            )
+                        )
+                    )
+                );
+
+                $sClass = 'WFHidden';
+                $editYaml[$editFormId]['children'][$widgetID] = array(
+                    'class' => $sClass,
+                    'bindings' => array(
+                        'value' => array(
+                            'instanceID' => $sharedEntityId,
+                            'controllerKey' => 'selection',
+                            'modelKeyPath' => $widgetID
+                        ),
+                        'hidden' => array(
+                            'instanceID' => $sharedEntityId,
+                            'controllerKey' => 'selection',
+                            'modelKeyPath' => 'isNew',
+                        )
+                    )
+                );
+
+                continue;
+
+            } else {
+
+                $sClass = $this->widgetClassForType($property->valueForKey('type'));
+
+            } // if is primary key
+
             $editYaml[$editFormId]['children'][$widgetID] = array(
-                    'class' => $class,
+                    'class' => $sClass,
                     'bindings' => array(
                         'value' => array(
                             'instanceID' => $sharedEntityId,
@@ -528,7 +555,8 @@ class WFModelCodeGenPropel extends WFObject
                         )
                     );
 
-        }
+        } // loop properties
+
         // status message
         $editYaml['statusMessage'] = array('class' => 'SssSMessageBox');
         $editYaml[$editFormId]['children']['saveNew'] = array(
@@ -680,5 +708,33 @@ class WFModelCodeGenPropel extends WFObject
         $this->smarty->assign('widgets', $widgets);
         file_put_contents($moduleDir . '/detail.tpl', $this->smarty->fetch(FRAMEWORK_DIR . '/framework/generator/detail.tpl'));
     } // generateModuleForEntity
-    
+
+
+    public function widgetClassForType($cType = null)
+    {
+
+        switch ($cType) {
+
+            case WFModelEntityProperty::TYPE_TEXT:
+                $sClass = 'WFTextArea';
+                break;
+
+            case WFModelEntityProperty::TYPE_BOOLEAN:
+                $class = 'WFCheckbox';
+                break;
+
+            case WFModelEntityProperty::TYPE_NUMBER:
+            case WFModelEntityProperty::TYPE_STRING:
+            case WFModelEntityProperty::TYPE_DATETIME:
+            case WFModelEntityProperty::TYPE_TIME:
+            case WFModelEntityProperty::TYPE_DATE:
+            default:
+                $sClass = 'WFTextField';
+
+        } // switch type
+
+        return $sClass;
+
+    } // widgetClassForType
+
 } // WFModelCodeGenPropel

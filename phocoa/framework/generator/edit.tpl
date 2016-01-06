@@ -7,12 +7,18 @@
 {WFViewBlock id="{{$editFormId}}"}
 	<fieldset>
 		<legend>{SssSBla value="{{$entityName}}Detail"}</legend>
-
     {{foreach name=widgets from=$widgets key="widgetId" item="property"}}
-        {{if $property->valueForKey('name') == $entity->valueForKey('primaryKeyProperty')}}
-            {WFView id="{{$widgetId}}"}
-        {{else}}
+        {{if $widgetId == $entity->valueForKey('primaryKeyProperty')}}
+{WFViewHiddenHelper id="{{$widgetId}}"}{WFView id="{{$widgetId}}"}{/WFViewHiddenHelper}
+		{{elseif $widgetId == $entityNewWidgetID}}
+{WFViewHiddenHelper id="{{$widgetId}}"}
 		<div>
+			<label for="{{$widgetId}}">{SssSBla value="{{$entityName}}{{$property->valueForKey('name')}}"}:</label>
+			{WFView id="{{$widgetId}}"}{WFShowErrors id="{{$widgetId}}"}
+		</div>
+			{/WFViewHiddenHelper}
+		{{else}}
+<div>
 			<label for="{{$widgetId}}">{SssSBla value="{{$entityName}}{{$property->valueForKey('name')}}"}:</label>
 			{WFView id="{{$widgetId}}"}{WFShowErrors id="{{$widgetId}}"}
 		</div>

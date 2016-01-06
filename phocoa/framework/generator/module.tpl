@@ -51,7 +51,7 @@ class module_{{$moduleName}}_list {
 
 		$sQuery = trim($oPage->outlet('query')->value());
 
-		$oC = {{$entityName}}Query::create();
+		$oC = {{$entityNameFull}}Query::create();
 
 		if (strlen($sQuery)) {
 
@@ -59,13 +59,11 @@ class module_{{$moduleName}}_list {
 
 			$oC->filterBy{{$columnNameSearch}}($sQuerySubStr);
 
-			//$oC->add({{$entityName}}Query::{{$descriptiveColumnConstantName}}, $sQuerySubStr, Criteria::LIKE); // for pgsql ILIKE
-
 		} // if got query string
 
 		$oPaginator = $oPage->sharedOutlet('paginator');
 		$oSharedEntity = $oPage->sharedOutlet('{{$sharedEntityId}}');
-		$oPagedQuery = new WFPagedPropelQuery($oC); //, '{{$entityName}}Query'));
+		$oPagedQuery = new WFPagedPropelQuery($oC);
 
 		$oPaginator->setDataDelegate($oPagedQuery);
 		$oSharedEntity->setContent($oPaginator->currentItems());
@@ -113,7 +111,7 @@ class module_{{$moduleName}}_edit {
 
 			if (isset($aParams['{{$sharedEntityPrimaryKeyProperty}}'])) {
 
-				$oC = {{$entityName}}Query::create();
+				$oC = {{$entityNameFull}}Query::create();
 
 				$oEntity = $oC->findPk($aParams['{{$sharedEntityPrimaryKeyProperty}}']);
 
@@ -124,7 +122,7 @@ class module_{{$moduleName}}_edit {
 			} else {
 
 				// prepare content for new
-				$oSharedEntity->setContent(array(new {{$entityName}}()));
+				$oSharedEntity->setContent(array(new {{$entityNameFull}}()));
 
 			} // if edit or new
 
@@ -199,7 +197,7 @@ class module_{{$moduleName}}_confirmDelete {
 		// if we're a redirected action, then the {{$entityName}} object is already loaded. If there is no object loaded, try to load it from the object ID passed in the params.
 		if (null === $oSharedEntity->selection()) {
 
-			$oC = {{$entityName}}Query::create();
+			$oC = {{$entityNameFull}}Query::create();
 
 			$objectToDelete = $oC->findPk($aParams['{{$sharedEntityPrimaryKeyProperty}}']);
 
@@ -260,7 +258,7 @@ class module_{{$moduleName}}_detail {
 
 	function parametersDidLoad($oPage, $aParams) {
 
-		$oC = {{$entityName}}Query::create();
+		$oC = {{$entityNameFull}}Query::create();
 
 		$oEntity = $oC->findPk($aParams['{{$sharedEntityPrimaryKeyProperty}}']);
 
