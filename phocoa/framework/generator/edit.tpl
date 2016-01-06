@@ -10,16 +10,9 @@
     {{foreach name=widgets from=$widgets key="widgetId" item="property"}}
         {{if $widgetId == $entity->valueForKey('primaryKeyProperty')}}
 {WFViewHiddenHelper id="{{$widgetId}}"}{WFView id="{{$widgetId}}"}{/WFViewHiddenHelper}
-		{{elseif $widgetId == $entityNewWidgetID}}
-{WFViewHiddenHelper id="{{$widgetId}}"}
-		<div>
-			<label for="{{$widgetId}}">{SssSBla value="{{$entityName}}{{$property->valueForKey('name')}}"}:</label>
-			{WFView id="{{$widgetId}}"}{WFShowErrors id="{{$widgetId}}"}
-		</div>
-			{/WFViewHiddenHelper}
 		{{else}}
 <div>
-			<label for="{{$widgetId}}">{SssSBla value="{{$entityName}}{{$property->valueForKey('name')}}"}:</label>
+			<label for="{{$widgetId}}">{SssSBla value="{{$entityName}}_{{$property->valueForKey('name')}}"}:</label>
 			{WFView id="{{$widgetId}}"}{WFShowErrors id="{{$widgetId}}"}
 		</div>
         {{/if}}

@@ -497,28 +497,6 @@ class WFModelCodeGenPropel extends WFObject
 
             if ($widgetID === $entity->valueForKey('primaryKeyProperty')) {
 
-                $sClass = $this->widgetClassForType($property->valueForKey('type'));
-                $widgets[$widgetID . 'New'] = $property;
-                $this->smarty->assign('entityNewWidgetID', $widgetID . 'New');
-                $editYaml[$editFormId]['children'][$widgetID . 'New'] = array(
-                    'class' => $sClass,
-                    'bindings' => array(
-                        'value' => array(
-                            'instanceID' => $sharedEntityId,
-                            'controllerKey' => 'selection',
-                            'modelKeyPath' => $widgetID,
-                        ),
-                        'hidden' => array(
-                            'instanceID' => $sharedEntityId,
-                            'controllerKey' => 'selection',
-                            'modelKeyPath' => 'isNew',
-                            'options' => array(
-                                'valueTransformer' => 'WFNegateBoolean',
-                            )
-                        )
-                    )
-                );
-
                 $sClass = 'WFHidden';
                 $editYaml[$editFormId]['children'][$widgetID] = array(
                     'class' => $sClass,
