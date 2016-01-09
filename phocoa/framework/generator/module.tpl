@@ -1,6 +1,7 @@
 <?php
 
 use Propel\Runtime\ActiveQuery\Criteria;
+use SwissalpS\PHOCOA\Localization\Bla as SssSBla;
 use SwissalpS\PHOCOA\Pagination\WFPagedPropelQuery;
 
 // Created by PHOCOA WFModelCodeGen on {{php}}echo date('r');{{/php}}

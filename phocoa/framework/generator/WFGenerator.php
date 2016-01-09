@@ -385,13 +385,13 @@ class WFModelCodeGenPropel extends WFObject
         $listYaml[$listFormId] = array(
                 'class' => 'WFForm', 'children' => array(
                     'search' => array(
-                        'class' => 'SssSSubmit',
+                        'class' => 'SwissalpS\PHOCOA\Widgets\WFSubmit',
                         'properties' => array(
                             'label' => 'SssSBlaSharedSearch'
                             ),
                         ),
                     'clear' => array(
-                        'class' => 'SssSSubmit',
+                        'class' => 'SwissalpS\PHOCOA\Widgets\WFSubmit',
                         'properties' => array(
                             'label' => 'SssSBlaSharedClear'
                             ),
@@ -404,11 +404,11 @@ class WFModelCodeGenPropel extends WFObject
                     )
                 );
         $listYaml['paginatorNavigation'] = array(
-                'class' => 'SssSPaginatorNavigation',
+                'class' => 'SwissalpS\PHOCOA\Widgets\WFPaginatorNavigation',
                 'properties' => array('paginator' => '#module#paginator'),
                 );
         $listYaml['paginatorPageInfo'] = array(
-                'class' => 'SssSPaginatorPageInfo',
+                'class' => 'SwissalpS\PHOCOA\Widgets\WFPaginatorPageInfo',
                 'properties' => array('paginator' => '#module#paginator'),
                 );
 
@@ -536,9 +536,9 @@ class WFModelCodeGenPropel extends WFObject
         } // loop properties
 
         // status message
-        $editYaml['statusMessage'] = array('class' => 'SssSMessageBox');
+        $editYaml['statusMessage'] = array('class' => 'SwissalpS\PHOCOA\Widgets\WFMessageBox');
         $editYaml[$editFormId]['children']['saveNew'] = array(
-                'class' => 'SssSSubmit',
+                'class' => 'SwissalpS\PHOCOA\Widgets\WFSubmit',
                 'properties' => array(
                     'label' => 'SssSBlaSharedCreate', // ' . $entity->valueForKey('name'),
                     'action' => 'save'
@@ -555,7 +555,7 @@ class WFModelCodeGenPropel extends WFObject
                     )
                 );
         $editYaml[$editFormId]['children']['save'] = array(
-                'class' => 'SssSSubmit',
+                'class' => 'SwissalpS\PHOCOA\Widgets\WFSubmit',
                 'properties' => array(
                     'label' => 'SssSBlaSharedSave'
                     ),
@@ -568,7 +568,7 @@ class WFModelCodeGenPropel extends WFObject
                     )
                 );
         $editYaml[$editFormId]['children']['deleteObj'] = array(
-                'class' => 'SssSSubmit',
+                'class' => 'SwissalpS\PHOCOA\Widgets\WFSubmit',
                 'properties' => array(
                     'label' => 'SssSBlaSharedDelete'
                     ),
@@ -605,13 +605,13 @@ class WFModelCodeGenPropel extends WFObject
                             )
                         ),
                     'cancel' => array(
-                        'class' => 'SssSSubmit',
+                        'class' => 'SwissalpS\PHOCOA\Widgets\WFSubmit',
                         'properties' => array(
                             'label' => 'SssSBlaSharedCancel'
                             )
                         ),
                     'deleteObj' => array(
-                        'class' => 'SssSSubmit',
+                        'class' => 'SwissalpS\PHOCOA\Widgets\WFSubmit',
                         'properties' => array(
                             'label' => 'SssSBlaSharedDelete'
                             )
@@ -620,7 +620,7 @@ class WFModelCodeGenPropel extends WFObject
                     );
         // TODO: SssSBlaHelper for formatted localization
         $confirmDeleteYaml['confirmMessage'] = array(
-                'class' => 'SssSMessageBox',
+                'class' => 'SwissalpS\PHOCOA\Widgets\WFMessageBox',
                 'bindings' => array(
                     'value' => array(
                         'instanceID' => $sharedEntityId,
@@ -641,7 +641,7 @@ class WFModelCodeGenPropel extends WFObject
         // delete success
         $deleteSuccessYaml = array();
         $deleteSuccessYaml['statusMessage'] = array(
-                'class' => 'SssSMessageBox',
+                'class' => 'SwissalpS\PHOCOA\Widgets\WFMessageBox',
                 'properties' => array(
                     'value' => 'SssSBla' . $sModuleNameJSsafe . 'DeleteSuccess'
                     )
@@ -667,7 +667,7 @@ class WFModelCodeGenPropel extends WFObject
                     );
         }
         $detailYaml['editMe'] = array(
-        	'class' => 'SssSLink',
+        	'class' => 'SwissalpS\PHOCOA\Widgets\WFLink',
         	'bindings' => array(
         		'value' => array(
         			'instanceID' => $sharedEntityId,
