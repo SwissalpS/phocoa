@@ -605,7 +605,7 @@ class WFPage extends WFObject
     protected function initInstanceYAML($id, $instanceManifest) {
         // determine the class
         if (!isset($instanceManifest['class'])) throw( new Exception("Instance ID '$id' declared without a class. FATAL!") );
-        $class = $instanceManifest['class'];
+        $class = trim($instanceManifest['class']);
 
         WFLog::log("Instantiating object id '$id'", WFLog::TRACE_LOG);
         // we want to see if the class is a WFView subclass before instantiating (so that we can be sure our 'new' call below calls an existing prototype).
@@ -629,6 +629,7 @@ class WFPage extends WFObject
 
             // atrributes
             foreach ($instanceManifest['properties'] as $keyPath => $value) {
+                
                 switch (gettype($value)) {
                     case "boolean":
                     case "integer":
@@ -1192,7 +1193,7 @@ class WFPage extends WFObject
         if (file_exists($yamlFile))
         {
             WFLog::log("Loading YAML config: {$pageName}.yaml", WFLog::TRACE_LOG);
-            $yamlConfig = WFYaml::load($yamlFile);
+            $yamlConfig = WFYaml::loadFile($yamlFile);
             //print_r($yamlConfig);
             foreach ($yamlConfig as $id => $instanceManifest) {
                 $this->initInstanceYAML($id, $instanceManifest);
