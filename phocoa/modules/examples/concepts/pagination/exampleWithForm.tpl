@@ -2,7 +2,7 @@
 
 {WFForm id="form"}
     {WFPaginatorState id="paginatorState"}
-    Select the number of people in the data set: {WFSelect id="numPeople"} {WFSubmit id="submit"}
+    Select the number of people in the data set: {WFSelect id="numPeople"} {WFSubmit id="submiter"}
 {/WFForm}
 
 <hr>
@@ -25,7 +25,7 @@ Sort: {WFView id="pageSort"}<br />
 {literal}
 {WFForm id="form"}
     {WFPaginatorState id="paginatorState"}
-    Select the number of people in the data set: {WFSelect id="numPeople"} {WFSubmit id="submit"}
+    Select the number of people in the data set: {WFSelect id="numPeople"} {WFSubmit id="submiter"}
 {/WFForm}
 
 <hr>
@@ -84,7 +84,7 @@ $__instances = array(
     'form' => array('class' => 'WFForm', 'children' => array(
         'paginatorState' => array('class' => 'WFPaginatorState', 'children' => array()),
         'numPeople' => array('class' => 'WFSelect', 'children' => array()),
-        'submit' => array('class' => 'WFSubmit', 'children' => array()),)
+        'submiter' => array('class' => 'WFSubmit', 'children' => array()),)
     ),
 );
 </pre>
@@ -148,7 +148,7 @@ $__config = array(
         $this->people->setContent($this->paginator->currentItems());
         $page->assign('people', $this->people->arrangedObjects());
     }
-    function exampleWithForm_submit_Action($page)
+    function exampleWithForm_submiter_Action($page)
     {
         // no-op
     }

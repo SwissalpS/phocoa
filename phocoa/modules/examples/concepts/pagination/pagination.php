@@ -64,7 +64,7 @@ class pagination extends WFModule
         $this->people->setContent($this->paginator->currentItems());
         $page->assign('people', $this->people->arrangedObjects());
     }
-    function exampleWithForm_submit_Action($page)
+    function exampleWithForm_submiter_Action($page)
     {
         // no-op
     }

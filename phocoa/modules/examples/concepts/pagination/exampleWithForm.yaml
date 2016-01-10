@@ -29,5 +29,5 @@ form:
       class: 'WFSelect'
       properties: 
         value: '100'
-    submit: 
+    submiter: 
       class: 'WFSubmit'
