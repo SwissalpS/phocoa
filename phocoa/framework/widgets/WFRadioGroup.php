@@ -5,13 +5,13 @@
  * @subpackage Widgets
  * @copyright Copyright (c) 2005 Alan Pinstein. All Rights Reserved.
  * @version $Id: kvcoding.php,v 1.3 2004/12/12 02:44:09 alanpinstein Exp $
- * @author Alan Pinstein <apinstein@mac.com>                        
+ * @author Alan Pinstein <apinstein@mac.com>
  */
 
 /**
  * The WFRadioGroup is the "interface" object used to interact with a set of WFRadio widgets.
- * 
- * The WFRadioGroup provides a single object that you can interface with to manage a set of Radio buttons. 
+ *
+ * The WFRadioGroup provides a single object that you can interface with to manage a set of Radio buttons.
  * To bind an object to a set of radio buttons, bind them to the WFRadioGroup's value, and then specify {@link WFRadio WFRadio's} as choices.
  * If you want to use WFDynamic to create the list of WFRadio choices, create a WFRadioGroup and a WFDynamic. Provide the ID of the WFRadioGroup as the parentFormID of the WFDynamic.
  *
@@ -127,7 +127,7 @@ class WFRadioGroup extends WFWidget
         return $this->selectedRadio;
     }
 
-    function addChild($newChild)
+    function addChild(WFView $newChild)
     {
         parent::addChild($newChild);
         // make sure one child is always selected
