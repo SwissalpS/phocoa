@@ -16,7 +16,7 @@ class module_tree_tree
     {
         new WFYAHOO_widget_Logger('logger',$page);
         // static
-        $treeItemsAll = array( 
+        $treeItemsAll = array(
                     'Portals' => new WFYAHOO_widget_TreeViewNode('Portals'),
                     'Search Engines' => new WFYAHOO_widget_TreeViewNode('Search Engines'),
                 );
@@ -37,7 +37,8 @@ class module_tree_tree
 
     function randomNodes($path = null)
     {
-        $path = array_pop(explode('|', $path));
+        $aPathParts = explode('|', $path);
+        $path = array_pop($aPathParts);
         $min = (empty($path) ? 5 : 1);
         $nkids = rand($min, 5);
         $nodes = array();
