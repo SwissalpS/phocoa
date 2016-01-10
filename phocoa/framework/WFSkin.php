@@ -65,7 +65,7 @@ abstract class WFSkinManifestDelegate extends WFObject
  * The main web application mechanism always uses the skin delegate provided by {@link WFApplicationDelegate}. However, an application may have multiple skin delegates
  * for multiple skinned usages. For instance, maybe you have a need to send skinned email, but the skins for email have a different setup than the normal web site.
  * In this case, you could create a skin object and provide a specialized skin delegate to handle the skinnable email function.
- * 
+ *
  * You may also find that you need more template types besides "normal" and "raw". WFSkinDelegate allows you to manifest additional templateTypes(). Each skin
  * you create for that WFSkinDelegate will of course need to implement all of the templateTypes() that the skinDelegate supports.
  */
@@ -138,12 +138,12 @@ class WFSkinDelegate
  *                 Most web sites have just one skin type, that handles the elements appropriate for the skins of that application.
  *                 However, sometimes there is a need for a single site to have multiple skins. For instance, the public site may have different
  *                 navigational needs than the back-end admin interface.
- *                 A {@link WFSkinDelegate} is implemented for each skin type an tells the system what data is available for the skin type. 
+ *                 A {@link WFSkinDelegate} is implemented for each skin type an tells the system what data is available for the skin type.
  *                 Skin Types, however, do NOT provide any layout or style.
  *                 By default, each Skin Type implements only the "normal" template type. Your Skin Type may need additional layouts. For instance, printer-friendly
  *                 or minimal layouts used for popups. Your skin can support additiona template types via {@link WFSkinDelegate::templateTypes() templateTypes()}.
  *                 Every Skin for a Skin Type must have a template file for all template types to ensure proper operation.
- * 2. Skin -- A skin provides basic layout for a given Skin Type. Skins are specific for Skin Types, since they necessarily know about the 
+ * 2. Skin -- A skin provides basic layout for a given Skin Type. Skins are specific for Skin Types, since they necessarily know about the
  *            data types offered by a particular skin type, via its Skin Delegate.
  *            Each Skin resides in its own directory inside the Skin Type directory that it belongs to.
  *            Each Skin thus provides a template file that implements a layout. Skins may also have multiple Skin Themes.
@@ -407,7 +407,7 @@ class WFSkin extends WFObject
         // load the current skin
         $skinsDir = WFWebApplication::appDirPath(WFWebApplication::DIR_SKINS);
         $skinManifestDelegateFileClassName = $this->skinName . '_SkinManifestDelegate';
-        
+
         // in lieu of require_once
         if (!class_exists($skinManifestDelegateFileClassName))
         {
@@ -624,7 +624,7 @@ class WFSkin extends WFObject
      * @static
      * @return array Skin Types are installed.
      */
-    function installedSkinTypes()
+    static function installedSkinTypes()
     {
         $skinTypes = array();
 
@@ -699,7 +699,7 @@ class WFSkin extends WFObject
     /**
      * Get the named content.
      *
-     * This will use the value from the delegate *first*, and if one is not found (ie NULL is returned) then it will also 
+     * This will use the value from the delegate *first*, and if one is not found (ie NULL is returned) then it will also
      * look for a value in the local namedContent list.
      *
      * @see WFSkinDelegate::namedContent
