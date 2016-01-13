@@ -649,7 +649,7 @@ class WFAuthorizationManager extends WFObject
      */
     function shouldEnableRememberMe()
     {
-        if (!$this->authorizationDelegate) throw( new Exception("WFAuthorizationDelegate required for shouldEnableRememberMe.") );
+        //if (!$this->authorizationDelegate) throw( new Exception("WFAuthorizationDelegate required for shouldEnableRememberMe.") );
 
         $shouldEnableRememberMe = false;
         if (method_exists($this->authorizationDelegate, 'shouldEnableRememberMe'))
@@ -671,7 +671,7 @@ class WFAuthorizationManager extends WFObject
      */
     function shouldRememberMeByDefault()
     {
-        if (!$this->authorizationDelegate) throw( new Exception("WFAuthorizationDelegate required for shouldRememberMeByDefault.") );
+        //if (!$this->authorizationDelegate) throw( new Exception("WFAuthorizationDelegate required for shouldRememberMeByDefault.") );
 
         $shouldRememberMeByDefault = false;
         if (method_exists($this->authorizationDelegate, 'shouldRememberMeByDefault'))
@@ -692,8 +692,13 @@ class WFAuthorizationManager extends WFObject
      */
     function loginMessage()
     {
-        if (!$this->authorizationDelegate) throw( new Exception("WFAuthorizationDelegate required for loginMessage.") );
+        /*
+        if (!$this->authorizationDelegate) {
 
+            throw new Exception("WFAuthorizationDelegate required for loginMessage.");
+
+        } //
+*/
         $loginMessage = 'You must log in to access the requested page.';
         if (method_exists($this->authorizationDelegate, 'loginMessage'))
         {
@@ -713,7 +718,7 @@ class WFAuthorizationManager extends WFObject
      */
     function usernameLabel()
     {
-        if (!$this->authorizationDelegate) throw( new Exception("WFAuthorizationDelegate required for usernameLabel.") );
+        //if (!$this->authorizationDelegate) throw( new Exception("WFAuthorizationDelegate required for usernameLabel.") );
 
         $usernameLabel = 'Username';
         if (method_exists($this->authorizationDelegate, 'usernameLabel'))
@@ -734,7 +739,7 @@ class WFAuthorizationManager extends WFObject
      */
     function signUpLabel()
     {
-        if (!$this->authorizationDelegate) throw( new Exception("WFAuthorizationDelegate required for signUpLabel.") );
+        //if (!$this->authorizationDelegate) throw( new Exception("WFAuthorizationDelegate required for signUpLabel.") );
 
         if (method_exists($this->authorizationDelegate, 'signUpLabel'))
         {
@@ -754,7 +759,7 @@ class WFAuthorizationManager extends WFObject
      */
     function signUpUrl()
     {
-        if (!$this->authorizationDelegate) throw( new Exception("WFAuthorizationDelegate required for signUpUrl.") );
+        //if (!$this->authorizationDelegate) throw( new Exception("WFAuthorizationDelegate required for signUpUrl.") );
 
         if (method_exists($this->authorizationDelegate, 'signUpUrl'))
         {
@@ -800,7 +805,7 @@ class WFAuthorizationManager extends WFObject
      */
     function shouldEnableForgottenPasswordReset()
     {
-        if (!$this->authorizationDelegate) throw( new Exception("WFAuthorizationDelegate required for shouldEnableForgottenPasswordReset.") );
+        //if (!$this->authorizationDelegate) throw( new Exception("WFAuthorizationDelegate required for shouldEnableForgottenPasswordReset.") );
 
         $shouldEnableForgottenPasswordReset = false;
         if (method_exists($this->authorizationDelegate, 'shouldEnableForgottenPasswordReset'))
