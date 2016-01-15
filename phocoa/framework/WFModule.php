@@ -567,7 +567,7 @@ class WFModuleInvocation extends WFObject
         {
             $this->pageName = $this->module->defaultPage();
         }
-        if (empty($this->pageName)) throw( new WFException("No page could be determined. Make sure you are supplying an page in the invocation path or have your module supply a defaultPage.") );
+        if (empty($this->pageName)) throw( new WFException("No page could be determined. Make sure you are supplying a page in the invocation path or have your module supply a defaultPage.") );
 
         // redirect as needed - this doesn't make sense inside of WFModuleInvocation...
         // of course cannot have invocationParameters from invocationPath unless module and pageName are specified
@@ -597,7 +597,7 @@ class WFModuleInvocation extends WFObject
      *  If you want to pass data to a WFModuleInvocation before executing, you'll need to instantiate WFModuleInvocation
      *  yourself and call execute() manually.
      *
-     *  @param string The {@lin invocationPathk WFModule::__construct()} for the module.
+     *  @param string The {@link invocationPath WFModule::__construct()} for the module.
      *  @param object WFModuleInvocation The parent WFModuleInvocation that is creating this invocation, or NULL if this is the root invocation. Default is NULL (no parent).
      *  @param string The name of the skin delegate to use. Default is NULL (no skin).
      *  @return string The resulting output of module execution.
