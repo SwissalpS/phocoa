@@ -717,6 +717,9 @@ abstract class WFModule extends WFObject
         // check security
         $this->runSecurityCheck();
 
+        // load localizations
+        $this->initLocalizations();
+
         // load shared instances
         $this->prepareSharedInstances();
 
@@ -724,6 +727,26 @@ abstract class WFModule extends WFObject
         $this->requestPage = new WFPage($this);
         $this->responsePage = NULL;
     }
+
+
+    // subclasses may want to override this behaviour
+    // the default is to look for localizableStrings.php in module dir.
+    // If it exists, include it.
+    public function initLocalizations() {
+
+        $sPathModuleLocalisation = $this->pathToModule() . DIRECTORY_SEPARATOR
+                                    . 'localizableStrings.php';
+
+        if (is_readable($sPathModuleLocalisation)) {
+
+            include($sPathModuleLocalisation);
+
+        } // if has module localisation file
+
+        return $this;
+
+    } // initLocalizations
+
 
     public function destroy($vars = array())
     {
