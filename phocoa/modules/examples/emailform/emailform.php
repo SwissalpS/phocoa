@@ -9,6 +9,7 @@ class ExampleEmail extends WFObject
 
     function send()
     {
+        $sent = false;
         //$sent = mail( $this->toEmail, $this->subject, $this->message );
         $this->sendTimestamp = time();
         return $sent;
@@ -29,7 +30,7 @@ class ExampleEmail extends WFObject
         $value = trim($value);
         $edited = true;
         if ($value != '') return true;
-        
+
         $errors[] = new WFError("The subject cannot be blank.");
         return false;
     }
