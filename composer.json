@@ -1,18 +1,24 @@
 {
-    "name": "apinstein/phocoa",
+    "name": "SwissaplS/phocoa",
     "type": "library",
     "description": "The phocoa MVC framework.",
     "keywords": ["framework"],
-    "homepage": "http://github.com/apinstein/phocoa",
+    "homepage": "http://github.com/SwissalpS/phocoa",
     "license": "MIT",
     "authors": [
         {
             "name": "Alan Pinstein",
             "email": "apinstein@mac.com",
             "role": "Developer"
+        },
+        {
+            "name": "Luke Zimmermann aka SwissalpS",
+            "email": "SwissalpS@LukeZimmermann.com",
+            "role": "Developer"
         }
     ],
     "require": {
-        "php": ">=5.2.0"
+        "php": ">=5.2.0",
+        "propel/propel": "~2.0@dev"
     }
 }
